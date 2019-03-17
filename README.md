@@ -125,7 +125,7 @@ Notes: Inline remarks are written in English as priority.<br/>
   National Cheng Kung University, 
   Tainan city 701,
   Taiwan 
-  計算機與網絡中和 / 資訊工程學系暨研究所
+  計算機與網絡中心 / 資訊工程學系暨研究所
   國立成功大學
   701 台南
   台灣
