@@ -1,0 +1,469 @@
+﻿obj,en-US,zh-TW
+title,Ladder,Ladder
+subtitle,A visualized studio for neural network editing,隨時隨地編輯類神經網絡的工作站
+setH,Language:,語言:
+create,Create,新增
+open,Open,開啟
+networkModel,a neural object model,類神經網絡模型
+resultsFolder,a results folder,結果資料夾
+firstTime,Haven't tried before?,您是首次使用嗎?
+firstTimeDes,Follow tutorials to start step-by-step.,參考導覽手把手建立模型吧！
+startNow,Start Now!,現在開始!
+OR,OR,或
+startTableSpec,1.  Data Specification,1. 資料規格
+startColInstruction,"If you don't submit a file or data here, fill in the info describing your dataset.",如果您不在這步選取資料，請填上有關資料集的描述。
+startTableLoc,2.  Fill in Data File Location,2. 資料檔案位址
+selFileOnDevice,Select from this device…,在本裝置選取…
+startTableSpecInfo,Fill in information,自行填寫資訊
+startTableSpecUpload,Select a file sample,選取檔案樣本
+startCSVInstruction,Select a CSV file of your dataset (including test data).,選取您的資料集 CSV 檔案 (包括測試資料)。
+startTableSpecPaste,Paste a sample,貼上樣本
+startPasteInstruction,Click cell A1 and press Ctrl+V to paste.,點選 A1 儲存格，按 Ctrl+V 貼上資料。
+includeHeader,Include Header,包括欄位名稱
+colCount,Column Count:,欄位數量:
+onlyCSVT,Incorrect File,檔案錯誤
+onlyCSVC,"Only "".csv"" files are supported","目前只支援 "".csv"" 檔案"
+readCSVProgress,Reading CSV File,正在閱讀 CSV 檔
+readCSVErrorT,File Reading Error,讀檔錯誤
+readCSVFinishT,File Reading Finished,讀檔完成
+readCSVErrorC,The data cannot be parsed as a table,相關資料未能看作成資料表格
+startLocWarn,"If not a full path is given, you'll need to save your program at where the above data file locates.",若不是填寫完整檔案位址，你將會跑的程式需要放在資料來源的相同資料來。
+checkFileStructure,"Please check if you have the files and folders ready in the following structure:","請檢查你的資料夾和檔案應按下列結構分佈："
+embedStartData,Embed data above,內嵌以上資料
+notaNumber,This is not a number,這不是數字
+numOutofRange,Number out of range,這個數字不在範圍內
+numLowerMin,Number lower than minimum value,這個數字比最小值還要小
+numLargerMax,Number larger than maximum value,這個數字比最大值還要大
+numOutofStep,Number is not with according precision,這個數值不符合差距
+incorrectStartT,Incorrect Info,不正確的資訊
+incorrectStartC,"You must fill in correct column number, and fill in correct file path or select to embed any data",你需要填寫正確的欄位數，並輸入資料來源位址或勾選內嵌資料
+invalidPath,This is not a file path,這不是檔案位址
+invalidFolderPath,This is not a folder path,這不是文件夾位址
+invalidFileType,This file type is not supported,這個檔案類別沒有支援
+needTick,Need to check here,需要勾選這個
+missingVal,Please fill in this value,請填寫這格
+saveProject,Save Project,儲存專案
+viewPythonCodes,View Python Codes,檢視 Python 程式碼
+attachOn,attach on...,連附在...
+connectTo,connect to...,連接至...
+startImageLoc,Fill in image folder location,填寫圖片資料夾的位址
+startImageData,Renowned Dataset:,著名圖片集:
+propFolderLoc,Folder Location:,資料夾位址:
+TableSource,Table Source,表格來源
+ImageSource,Image Source,圖片來源
+CSVSource,CSV Source,CSV 來源
+propShpae,Shape:,維度:
+propPred,Prediction on:,估值任務:
+graphActions,Actions:,動作:
+actionSelFeature,Select Features for Model Input...,選取模型輸入的資料特徵...
+actionSelTsmFeature,Select or Transform Features...,選取或轉換資料特徵...
+actionAppendLayer,Append Layer...,加入新一層...
+actionAttachLayer,Attach Layer...,放置新一層...
+actionSetTask,Set Training Task...,設定訓練項目...
+actionSaveProg,Save Training Program,儲存訓練程序碼
+actionSaveProj,Save Project,儲存專案
+appLayerT,Append Layer,加入新一層
+appLayerC,Properties of the new layer:,建立新模型層的屬性：
+insertLayerT,Insert Layer,插入模型層
+insertLayerB1T,Insert a layer before ,在 
+insertLayerA1T,Insert a layer after ,在 
+insertLayerC1T,Append a layer after ,在 
+insertLayerB2T,:, 之前插入新模型層：
+insertLayerA2T,:, 之後插入新模型層：
+insertLayerC2T,:, 之後加入新模型層：
+propLayerType,Layer Type:,隱藏層類別:
+propParamShare,Weights Sync.:,權重參數同步:
+propTransRefWeight,Transpose Ref. Weights:,同步權重置轉:
+propHiddenSize,Hidden Size:,神經元數量:
+learningParams,Learning Parameters,學習參數
+weightL,Weight:,權重:
+biasL,Bias:,偏差:
+propWeightLogging,Train Observing:,訓練監視:
+log,Log,記錄
+moreSettings,More Settings...,更多設定...
+varConfig,Variable Configurations,變數設定
+initializer,Initializers,起始函數
+viConstant,Constant,不變常數
+viZeros,Zeros,均零
+viOnes,Ones,均一
+viRandNorm,Random Normal,隨機高斯分佈
+viTrunNorm,Truncated Normal,截斷高斯分佈
+viRandUni,Random Uniform,隨機均勻分佈
+viOtgl,Orthogonal,正交矩陣
+viIdty,Identity,單位矩陣
+propFilterWidth,Filter Width:,濾鏡寬度:
+propStrideX,Stride-x,移位-x:
+propStrideY,Stride-y,移位-y:
+propDilation,Dilation:,擴張寬度:
+dilationDeviceErr,"Some convolutional dilations are non-zero, which is not supported by CPU processing.","有部分 Conv. 卷積層擴展寬度不是 0 ，而 CPU 處理是不能支援 Conv. 卷積擴展的。"
+propPadding,Keep Dimension:,維持形狀大小:
+propPaddingMethod,Padding / Resize:,填補 / 調整大小:
+propCNNPadding,Padding Method:,填補方法:
+zeroPadding,Zero Padding,以 0 填補
+rsBicubic,Resize (Bicubic),調整大小 (雙三次插值)
+rsBilinear,Resize (Bi-linear),調整大小 (雙線性插值)
+rsNN,Resize (Nearest Neighbor),調整大小 (最近鄰插值)
+propBatchNorm,Batch Normalization:,批標準化:
+propActv,Activation Function:,激活函數:
+layerProceedings,Layer Proceedings,隱藏層後續
+BasicLayer,Fully Connected Layer,全連結層
+layerInfo,Layer Operations,隱藏層運算
+CNNLayer,Convolutional Layer,Conv. 卷積層
+DCNNLayer,Deconvolutional Layer,Deconv. 反卷積層
+Collector,Collector,收集層
+incomingCollections,Incoming Collections,輸進收集
+method,Method:,方法:
+sources,Sources:,資料來源:
+layers,Layers:,模型層:
+ICConcat,Concatenate,串連 (Concatenate)
+ICSum,Sum,相加 (Sum)
+ICMultiply,Multiply,相乘 (Multiply)
+ICBlend,Blend,柔合 (Blend)
+propMerge,Merging:,合併:
+ICSubsample,Sub-sample,區間選取
+ICSptDpth,Space to Depth,空間維度轉移至深度
+ICMaxPool,Max Pool,區間內最大選取
+ICMeanPool,Mean Pool,區間平均選取
+outputManipulations,Output Manipulations,輸出調整
+OCDefault,No Changes,沒有調整
+OCFlatten,Flatten,矩陣展平
+OCReshape,Reshape,重整矩陣形狀
+propFlatten,On Axis:,展平軸:
+propReshape,New Shape:,新形狀:
+shapeNaNErr,Some of the dimensions are of shape not a number,矩陣中部分形狀不是數字
+shapeFlexError,Can't specify a shape with more than 1 auto dimension-shape (-1),不能使用多於一個自動矩陣軸形狀 (-1)
+shapeTooManyNoneError,The shape is having too many flexible dimensions None,過多彈性的軸 (None) 被指定
+shapeRestrictedError,The shape is not started with: ,形狀沒有以這樣的開頭: 
+shapeFormatErr,The shape is not well formatted; it should be comma-separated numbers or None within a pair of [],形狀沒有按格式填寫; 應該在 [] 內填寫以逗號分隔的數字或 None
+shapeIntError,The shape numbers should be -1 or positive integers,形狀數字應為 -1 或正整數
+shapeTotalDimError,The total dimension does not match correctly,矩陣的維度總數不正確
+classifierShapeErr,Ladder Classifier can only predict on one target column (Shape: [None, 1]) with categorical values filled,Ladder 分類只可以用作針對單一欄位 (形狀: [None, 1]) 估算，目標欄位應填上分類類別值
+classifierDTypeErr,"Classifier can only predict on target items with integer values, since classification can't predict on continuous values.",分類只可針對整數資料作為估算，不能估算連續性質資料
+regressorDTypeErr,"Regressor cannot predict on items using discrete integral values, since regression can only predict continuous values.",迴歸不能針對離散整數作為估算，只能估算連續性質資料
+regressorOneHotErr,"Regressor cannot predict on items using one hot encoding, since regression can only predict continuous values.",迴歸不能針對有使用 one-hot 的欄位作為估算，只能估算連續性質資料
+properties,Properties,屬性
+Train,Train,模型訓練
+Source,Data Source,資料來源
+TrainSource,Data Source,資料來源
+Layer,Layer,模型層
+Task,Task,任務
+cmInsBef,Insert Before,在前插入
+cmInsAft,Insert After,在後插入
+cmAttLay,Attach on Layer,放置在神經層
+cmCntLay,Connect to Layer,連接至神經層
+cmCrtLay,Create a Layer,建立神經層
+cmDel,Delete,刪除
+cmDelLayer,Delete Layer,刪除模型層
+cmDelAll,Del This & All after This,刪除這個及所有後續層
+cmBGSaveImg,Save as Picture,儲存成圖片
+cmViewImg,View Image,檢視圖片
+cmGraphOpt,Dashboard Options,圖表選項
+cfDelLayer,Are you sure to delete this layer (,你確定要刪除這模型層 (
+cfDelLayer2,)?,) 嗎?
+cfDelLayer3,) and all proceeding layers?,) 及其後續層嗎?
+ColConfig,Data Preprocessing,資料前處理
+training,Model Training,模型訓練
+trainingProfile,Training Profile,訓練調校
+propLearningRate,Learning Rate:,學習速度:
+propAdvOpt,Advanced Options...,進階選項...
+lrDecay,Learning Rate Decay,學習速度遞減
+propLRDecay,Decay Rate:,遞減率:
+propEpochPerLR,No. of Epoch per Decay:,遞減周期:
+propEpochPerLRNo,No decay,不會遞減
+propEpochPerLRMore,Decay for every...,設定遞減周期...
+expMvAvg,Exponential Moving Averages,指數移動平均
+propExpAvgLoss,Loss Value:,損失值:
+propExpAvgVar,Training Variables:,訓練變數:
+repeatedRuns,Repeated Runs,訓練次數
+count,Count:,數量:
+configs,Configurations,設置
+propLogFolder,Log Folder:,記錄資料夾:
+propRestorePath,Restore Path:,恢復資料夾:
+propDevice,Device:,運算硬體:
+cpu,CPU,處理器
+gpu,GPU,顯示卡
+propOptimizer,Optimizer:,優化函數:
+propLogFreq,Log Freq:,步驟紀錄頻率:
+propSaveFreq,Save Freq:,儲存頻率:
+propTestFreq,Test Freq:,測試頻率:
+propWeightFreq,Weight Freq:,權重紀錄頻率:
+propFilterFreq,Filter Freq:,濾鏡紀錄頻率:
+configTrace,Item Tracing,項目追蹤
+propTraceCount,Trace Count:,追蹤項數:
+propTraceFreq,Trace Freq:,追蹤頻率:
+propFileLoc,File Location:,檔案位址:
+propImport,Import:,匯入:
+propEncoding,Encoding:,編碼:
+encoding,Encoding,編碼
+ecdChi,Legacy Multi-Byte Chinese Encodings,舊有多元中文編碼
+ecdBig5HK,Big 5 (HKSAR),Big 5 (香港特別行政區)
+ecdJp,Legacy Multi-Byte Japanese Encodings,舊有多元日文編碼
+ecdKn,Legacy Multi-Byte Korean Encodings,舊有多元韓文編碼
+ecdCn,Legacy Multi-Byte Simplified Chinese Encodings,舊有多元簡體中文編碼
+ecdSingle,Legacy Single-Byte Encodings,舊有單元編碼
+ecdMisc,Legacy Miscellaneous Encodings,其他舊有編碼
+propBatchSize,Batch Size:,分批大小:
+crossVal,Cross Validation,交叉驗證
+dataPart,Data Partitioning,資料分割
+propStatus,Status:,狀態:
+propAllow,Allowed,允許
+propDisable,Disabled,停用
+propTestRatio,Test Ratio:,測試比例:
+propImgSource,Image Type:,圖片類別:
+propShuffle,Shuffle:,隨機排序:
+propDropKeep,Dropout Keep:,神經元保留比例:
+yes,Yes,需要
+no,No,不要
+finished,Finished,完成
+cancel,Cancel,取消
+confirm,Confirm,確定
+inputDppKey,Input,輸進特徵
+targetDppKey,Target,目標項目
+selFeatures,Select Input and Target Features,選取輸進/目標欄位
+selFeaturesInfo,Choose which table columns are used as input features or target results:,選擇對應輸進特徵及目標結果的欄位：
+selColumns,Select Columns,選取欄位
+propInputCols,Feature Columns:,輸進特徵欄位:
+propTargetCols,Target Columns:,目標結果欄位:
+propColumns,Columns:,欄位:
+selIdx,Indexing:,選取欄數:
+select,Select...,選取...
+toTickCol,Select the columns below as ,選取下列欄位作為
+columnSelection,Column Selection,欄位選取
+recordGeneration,Record Generation,項目導出
+colNumNone,Only Numbers or None is allowed for a column selection,只可以填寫數字或 None
+colOutofRange,Column selection out of range,選取的欄位不正確
+colIncNone,None only available only for a range,只有使用範圍選取時才可使用 None
+idxRangeError,Selected range is invalid,選取的範圍不正確
+dppKeyTranx,Transformations,資料轉換
+dppKeyCir,Circular Data,循環數據
+dataType,Data Type,資料型態:
+dTypeAuto,Auto (Float),自動 (浮動值)
+dTypeFloat,Float,浮動值
+dTypeInt,Integer,整數
+dppKeyDataPrev,Data Preview,數據預覽
+addTxm,Add a Transformation...,新增轉換...
+addTxmT,Add Transformation,新增轉換
+defCir,Define Circular Data...,定義循環數據...
+defCirData,Define Circular Data,定義循環數據
+prevCirError,There has been circular definition on some of the requested columns.,部分要求套用定義的欄位已被定義作循環數據。
+noAppendT,Layer Not Added,新一層未能加進
+noAppendC,"Please check with the layer shapes, and see if they're matched.","請檢查神經元層的形狀是否配對好。"
+noDelT,Layer not Deleted,模型層未能刪除
+noDelC,"Please check with the layer shapes if they have conflicts.<br>You may choose removing other layers first.","請檢查神經元層的形狀是否配對好，或許你可以選擇刪除其他模型層。"
+noDelCRef,"Some layers are referencing this layer.<br>Please clear the reference before removing it.","有其他神經元層正與這一層進行權重同步，請在移除這層前移除參數同步。"
+noInsT,Layer not Inserted,模型層未能插入
+delT,Layer Deleted,模型層已刪除
+propCirCol,Circular Columns:,循環數據欄位:
+propTxmCol,Transformed Columns:,轉換數據欄位:
+propMaxVal,Max Value:,最大值:
+propMinVal,Min Value:,最小值:
+propGain,Gain,
+propTransSel,Transformation:,轉換類別:
+txNormMinMax,Normalization (using data range),正規化 (使用資料值範圍)
+txNormMax,Normalization (relative to 0),正規化 (相對於 0)
+txLog,Log,對數
+txExp,Exponential,指數
+txClassify,Class IDs,分類編號
+colSelection,Column Selection,欄位選取
+onehot,One-Hot Encoding,One-Hot 獨立分類欄位
+propEpochCount,No. of Epoch:,資料訓練圈數:
+weightInit,Weights / Biases Initializations,權重/偏差起始值
+propMean,Mean:,平均值:
+propStdDev,Standard Deviation:,標準偏差:
+propInitialValue,Initial Value:,起始值:
+weightReg,Weights Regularizations,權重正規化
+propL1,L1 Loss:,L1 正規化:
+propL2,L2 Loss:,L2 正規化:
+propL1Rate,L1 Loss Rate:,L1 正規化權重:
+propL2Rate,L2 Loss Rate:,L2 正規化權重:
+propWL2Rate,L2 Loss Rate:,L2 正規化權重:
+finLayerT,Add a Task,加入訓練項目
+propTaskType,Task Type:,訓練項目:
+Classifier,Classifier,分類
+Regressor,Regressor,迴歸估值
+propClassCount,No. of Classes:,類別數量:
+asgTargetTask,Assign the Task to Compare with Data Source:,指定資料來源的欄位用作訓練結果:
+incorrectProjT,Incorrect Project,專案錯誤
+incorrectProjC,The project file should be in .json format,專案的檔案應是 .json 格式的
+taskDetails,Task Details,訓練項目明細
+propMes,Measurement:,評估方法:
+MSE,MSE,均方誤差(MSE)
+SMAPE,SMAPE,對稱平均絕對百分比誤差(SMAPE)
+PSNR,PSNR,峰值信噪比(PSNE)
+accuracy,Accuracy,準確度
+propType,Type:,種類:
+None,None,沒有
+crossValKFold,K-Fold,K 次交叉驗證
+crossValRand,Repeated Random,重覆隨機交叉驗證
+propValProp,Validation Proportion:,驗證佔比:
+propValRound,Validation Rounds:,驗證圏數:
+logFolderInfo,"Log Folder is where the training and testing results are saved. You can open the <strong>outputLogs</strong> folder generated in the start screen of Ladder to visualize the results.","記錄資料夾是用來存放訓練記錄和測試結果的。您可以把裡面生成的 <strong>outputLogs</strong> 資料夾開啟至 Ladder 的開始畫面，以圖表方式顯示結果。"
+valRoundInfo,"If you're using K-Fold validation, 1 round will be repeated for K epoches of data training. However, if you're using Repeated Random validation, 1 round will only go through 1 epoch of data training.","若是你選了 K 次交叉驗證，1 圈驗證會進行 K 個完整資料集的訓練。但是當你選用重覆隨機驗證，1 圏驗證只會進行 1 次完整資料訓練。"
+traceRecInfo,"Sample N items to trace and compare the predicted results during model training, where N≤30 is suggested.","抽樣選取 N 個項目去瞭解跟比較在訓練過程的預測結果，建議 N≤30 。"
+dataPartInfo,"Data sources available for data partitioning would be able to split standalone test or validation datasets. If not, cross validation would not be available, and the test set may be specified according to the data source type.","可以分割的資料能讓你獨自建立測試/驗證資料集。否則，交叉驗證將不能使用，而測試資料集要視乎資料來源的定義。"
+colConfigDataTypeInfo,"Data type preprocessing allows enforcing a data type for its output. By default, it will be a float data (allowing decimal places). For classification tasks, you may need to use integers based on the discrete data characteristics.","資料前處理可以強制模型導進資料的型態。在預設之下，資料會轉化成浮動值 (允許小數)。而分類項目，你需要轉換成整數，明確指示分類的離散性質。"
+taskInfoRegressor,"A Regressor provides training on continuous target variables. The previous shape should be the same as the target variables. If not, a fully connected layer will be automatically added inside Ladder to transform the shape.","迴歸可以提供針對連續性變數的訓練。如果前一層的形狀不等同目標項目的形狀，Ladder 會自動在裡面加入一個全連接層轉換形狀。"
+taskInfoClassifier,"A Classifier provides training on categorical data. The target data supported by Ladder Classifier is one column of categorical values. If the last dimension of previous layer does not match the number of class, Ladder will automatically add a fully connected layer inside so as to compute the logit for each class. The prediction output will be a column of categorical data based on the argument-max of the logits.","分類可以提供針對類別性變數的訓練。Ladder 分類任務需要一個欄位的類別資訊，該欄位中填寫不同類別的值。而如果前一層最後的維度不等同分類數量，Ladder 會在裡面自動加入一個全連結層，運算各類別的 logit 值，使得整個模型的預測資料輸出的一個欄位的分類值是基於各類別的 logit 值 argmax 而取得。"
+propImgOutW,Crop As Width:,裁剪闊度:
+propImgOutH,Crop As Height:,裁剪高度:
+shapeAffected,Changes would affect the model structure,這個改變會顯響網絡架構
+dtypeAffected,Changes would affect the model structure,這個改變會顯響網絡架構
+preproDelWithLayer,This preprocessing node can't be removed because there are layers using this feature,本資料不能被移除，因為有模型層正在使用
+colSelectionError,There are some conflicts on the new column selection changes,新改動的欄位會導致衝突錯誤
+colSelectionMust,There must be some columns selected,必須選取一些欄位
+colAddError,Error raised when adding the new data preproccessing information,在建立新資料匯出前處理時出現錯誤
+onehotError,Using one-hot on newly requested column(s) will incur errors,使用所要求的欄位進行 One-Hot 出現錯誤
+onehotTooMuch,The requested column(s) will incur too many categories. Please double-check if you have select the right columns with categorical values.,你所選取的欄位會導致很多類別欄位的產生。請確保選取一些確實是類別性質的資料欄。
+notreferenceable,Not a referenceable layer,這模型層無法被參照
+notCompWithPrev,Not compatible with previous layer(s),無法與上層相容
+notCompWithNext,Not compatible with previous layer(s),無法與後層相容
+shapeAffectLay,The change is disallowed because of incompatibility with shapes of previous layer(s),這個改變會導致不能與輸入節點形狀的相容
+changeAffectLay,Not buildable with changes in this layer.,更新後無法建立這模型層
+propTaskTo,Compare To:,比較項目:
+back,Back,返回
+save,Save,儲存
+cancel,Cancel,取消
+ok,OK,確定
+pyProgT,Python Program,Python 程式碼
+pyProgInstruction,Save the code below and execute in Python to train and test the dataset.,儲存以下的程式碼，並以 Python 執行，訓練和測試資料夾。
+pyProgReadMore1,Read more on ,閱讀
+pyProgReadMore2,Requirements & Setup,使用需求及設置
+pyProgReadMore3, to understand how to install and use Python and related libraries.,去瞭解更多關於下載和使用 Python 及相關程式庫。
+graphImg,Graph Image,圖表圖片
+finalEmbedNeuralSimplycode,Embed Neural Simplycode,內嵌 Neural Simplycode
+errorT,Error,錯誤
+errorPythonC,Sorry that there was issues in generating the Python code,很抱歉在編寫 Python 程式碼時出現錯誤
+projectReadingT,Reading Project,在理解這專案
+projectSuccess,Project Resumed,專案已重啟
+projectFailed,Project Error,專案錯誤
+readLabel,Finished: ,已完成: 
+curResultHeadPre,Results on,在
+curResultHeadPos,:,的結果:
+trainingTimes,trainings,次訓練
+frIncorrectT,Incorrect Folder,錯誤資料夾
+frIncorrectC,The results folder is not Neural Simplycode-structured,開啟的資料夾並不是 Neural Simplycode 架構匯出的
+frAnalysisT,Data Analysing…,資料分析中…
+frNofilesT,No Files,沒有檔案
+frNofilesC,The folder contains no files for analysis,這個資料夾沒有可以分析的檔案喔
+tooManyFoldersT,Too Many Folders,太多資料夾
+tooManyFoldersC,You can only drag one folder to open,您只可以拖放一個資料夾的喔
+missingFileT,Missing Files,遺漏檔案
+missingFileC,Sorry that some files have error in reading the folder. You may re-open the folder again.,很抱歉在資料夾中有些檔案讀進錯誤，您可以稍後重新再拖放資料夾
+frReadingErrorT,Reading Error,檔案錯誤
+frReadingErrorC,There are fatal errors in reading the files.,在讀取檔案時出現嚴重錯誤
+frReadingCSVErrorC,There are fatal errors in extracting the file information.,在分析檔案的資料時出現嚴重錯誤
+frEncodingError,The file is read in a wrong encoding.,檔案的讀進編碼錯誤。
+folderReadingT,Reading Folder…,正讀取資料夾…
+frFinishT,Files Processed,檔案已成功讀取
+creatingGraphT,Creating Graph…,繪圖中…
+createdGraphT,Graph Created,已完成繪圖
+tooMuchDataT,Too Many Data,資料線過多
+noDataRecordsT,No Records,沒有記錄
+noDataRecordsC,There is no records on the requested graph,所需要的展示沒有任何記錄
+tooMuchDataC,Only at most 32 data-lines can be plotted in one graph,只支援最多32條資料線在同一圖表中
+Global Step,Global Step,整體訓練步次
+Local Step,Local Step,分段訓練步次
+Run,Run,嘗試
+Cross Validation Step,Cross Validation Step,交叉驗證步次
+Average Loss,Average Loss,平均 Loss 值
+Total Loss,Total Loss,總 Loss 值
+Learning Rate,Learning Rate,學習速度
+Test Measurements,Test Results,測試結果
+Examples per Second,Examples per Second,每秒處理項數
+Seconds per Step,Seconds per Step,每步訓練時間
+MSE,MSE,MSE
+accuracy,Accuracy,準確度
+dbTrials,Other Trials,其他訓練結果
+nmi,NMI,NMI
+fdSwitchTo,Switch To…,切換到…
+fdMulti,(Multi Select),(多選)
+dbTrainLog,Train Log,訓練記錄
+dbWeightGraph,Weight Graph,權重圖
+dbTraceLog,Trace Log,追蹤項目
+wgFromDim,Dimension From,維度由
+wgToDim,Dimension To,維度至
+weight,weight,權重
+bias,bias,偏差
+options,Options…,選項…
+optionsTitle,Options,選項
+graphOpt,Graph Options,繪圖選項
+optFontSize,Font Size:,字體大小:
+fsAuto,Auto,自動
+fsS,Small,小
+fsM,Medium,中
+fsL,Large,大
+fsX,Extra Large,極大
+optShowLegend,Show Legend:,顯示圖例:
+optColorScheme,Color Scheme:,色彩系列:
+weightColorHelp,Low-Zero-High Colors:,低-零-高 色譜:
+wcRG,Red-Grey-Green,紅-灰-綠
+wcGR,Green-Grey-Red,綠-灰-紅
+wcBW,Black-Grey-White,黑-灰-白
+wcBY,Blue-Grey-Yellow,藍-灰-黃
+wcWM,Wine-Grey-Mint,紅酒紫-灰-薄荷綠
+dataOpt,Data Options,資料選項
+optAutoAxis,Auto Axis:,自動軸標:
+optDataAxis,Data Axis:,資料軸標:
+optTraceTar,Target Display:,目標顯示方式:
+ttAuto,Auto,自動
+ttSide,Side by Side,並排
+ttHide,Hide,隱藏
+primAxis,Primary Axis,主軸
+otherDL,Other Datalines,其它資料線
+hiddenDL,Hidden Datalines,隱藏資料線
+graphRBCV,Multi-Run/Build/Validations,多跑多建多驗証
+optRunNo,Run No.:,訓練輪數:
+all,All,全部
+specific,Specific...,指定...
+optCVNo,Cross Validation Fold:,交叉驗證輪數:
+testRound,Test Round,測試全部
+specificFold,Specific Fold...,指定輪數:
+setA,About us,關於我們
+setT,Theme:,佈景主題:
+setS,Download Neural Simplycode,下載 Neural Simplycode
+themeLight,Light,炫白
+themeDark,Dark,酷黑
+themeTrueBlack,True Black,夜黑
+startEdit,Start with a data source:,利用一個資料來源開始建立模型:
+tableSource,Data Table,資料表格
+imgDatasets,Renowned Image Datasets,著名圖片檔案
+cifar10,CIFAR-10 Images,CIFAR-10 圖片
+mnist,MNIST Images, MIST 圖片
+rootFolder,(root),(根文件夾)
+diskFolder,Disk ,磁碟 
+pyCodeLoc,(Python Code Location),(Python 程式碼位置)
+tltInput,Input,輸入資料
+tltPred,Prediction,預測結果
+tltTruth,Truth,實際結果
+flSwitchTo,Model Tasks:,模型任務:
+txtCL,Class Label,分類標籤
+txtL,Label,標籤
+txtV,Value,數值
+txtT,Target,目標
+txtOI,Original Image,原圖
+txtRI,Reconstructed Image,重建圖
+txtR,Results,結果
+txtI,Image,圖片
+txtC,Class,分類
+conFailed,Updates failed,連接編輯失敗
+createConFailedTxt,"The layer connection is not completed, due to constraints of the layer shapes.",因為神經層間的限制無法完成新增的連接
+removeConFailedTxt,"The connection removal is not completed, due to constraints of the layer shapes.",因為神經層間的限制無法完成刪除連接
+appInfo,"<strong>Version:</strong> 1903.00, <strong>Updated:</strong> Mar-17,2019","<strong>版本:</strong> 1903.00, <strong>更新日期:</strong> 2019年03月17日"
+appDesc,"An open-source web app for editing <strong>basic neural network models</strong> and displaying the corresponding results, with the help of another open-source Python neural network training framework from our lab, <strong>Neural Simplycode</strong>.",這是一個協助編輯<strong>基本類神經網絡</strong>架構及視覺化相關結果的開源網頁應用程式，及透過另一個我們實驗室的開源 Python 套件 <strong>Neural Simplycode</strong> 作為訓練類神經網絡模型。
+appLead,"Asst Prof. Jui-Hung Chang","張端紘 副教授"
+appDev,"Dexter, Yin-Chung Leung","梁彥聰 (Dexter)"
+appTest,"Kai-hsiang Lin","林凱翔"
+setProjLead,Project Leader,項目領導
+setDevTeam,Developers,開發人員
+setTest,Acceptance Testers,驗收測試
+appLab,"Creative System and Software Application Laboratory, NCKU",國立成功大學 - 創新系統軟體應用實驗室
+appWeb,More Info:,更多資訊:
+appOffWeb,Ladder Official Homepage,Ladder 官方網站
+appWebHelp,Help:,幫助:
+appWebFAQ,FAQ,常見問題
+appCopyrightTitle,Copyright Notice,版權資訊
+appCopyrightNotice,Copyright © 2019 Creative System and Software Applications Laboratory,Copyright © 2019 創新系統軟體應用實驗室
+appCopyrightFormal,"This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.<br/>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.<br/>You should have received a copy of the GNU General Public License along with this program.  If not, see &lt;<a href='https://www.gnu.org/licenses/' target='_blank'>https://www.gnu.org/licenses/</a>&gt;.","本程式為自由軟體，在自由軟體聯盟發佈的GNU通用公共授權合約的約束下，你可以對其進行再發佈及修改。協議版本為第三版或（隨你）更新的版本。我們希望發佈的這款程式有用，但不保證，甚至不保證它有經濟價值和適合特定用途。詳情參見GNU通用公共授權合約。<br />你理當已收到一份GNU通用公共授權合約的副本，如果沒有，請查閱&lt;<a href='https://www.gnu.org/licenses/' target='_blank'>http://www.gnu.org/licenses/</a>&gt;同時提供你的電子郵寄地址或傳統的郵件聯繫方式。"
+appOrigin,Production in TAIWAN,台灣製作
+appPrivacy,Privacy Policy,隱私政策
+appCookies,Cookie Policy,Cookie 政策
