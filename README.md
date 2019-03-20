@@ -19,7 +19,7 @@ Notes: Inline remarks are written in English as priority.<br/>
 
   Version 版本:
 
-  1903.00
+  1903.01
 
   Website & Docs 網站及文件庫:
 
@@ -28,6 +28,17 @@ Notes: Inline remarks are written in English as priority.<br/>
 
   Production in TAIWAN | 台灣製作
         
+
+# Updates 更新 (English Only 只提供英文版)
+  
+  1903.01   Mar-20, 2019 (Dexter)
+  * Effective for NeuralSimplycode.py, script.js, lang.csv
+  - [UI] New Ladder UI control for preventing users using string
+    values as model inputs for numerical processing.
+  - [DataPreprocessing > Transformation] Updates on algorithm of 
+    Normalization (feature scaling) relative to zero, supporting 
+    negatively ranged data.
+
 
 # How to Contribute 如何貢獻
 
