@@ -1688,6 +1688,12 @@ class DataPreprocessingNode {
         /** @type {Element} - The HTML element as shown on the model graph. */
         this.ele = null;
     }
+
+    /**
+     * Abstract method for getting whether all data is number.   --- UPDATED (Dexter) 20190320
+     * @returns {Boolean} - Whether all data is number.
+     */
+    isNumber() { }
     
     /**
      * Export this @DataPreprocessing.Node object into a represtable object for project saving.   --- UPDATED (Dexter) 20190131
@@ -2032,6 +2038,16 @@ class ColConfig extends DataPreprocessing.Node {
     }
 
     /**
+     * Get whether all data is number.   --- UPDATED (Dexter) 20190320
+     * @param {Boolean} peek - Wether to determine using part of the data instead of the entire dataset.
+     * @returns {Boolean} - Whether all data is number.
+     */
+    isNumber(peek = false) {
+        var data = peek ? this.trainSource.getColData(this.key) : this.trainSource.getColData(this.key, undefined, 0, 30);
+        return !data.some(row=>row.some(val=>isNaN(Number(val))));
+    }
+
+    /**
      * Enumeration representing the step of data preprocessing within a @DataPreprocessing.ColumnsNode object.   --- UPDATED (Dexter) 20190129
      * @returns {Enum}
      */
@@ -2063,6 +2079,14 @@ class ImagePreprocessingNode extends DataPreprocessing.Node {
      */
     constructor(dtype=null, defaultHeader=null) {
         super(DataPreprocessing.InstanceClassEnum.ImageNode, null, dtype, defaultHeader);
+    }
+
+    /**
+     * Get whether all data is number.   --- UPDATED (Dexter) 20190320
+     * @returns {Boolean} - Whether all data is number.
+     */
+    isNumber() {
+        return true;
     }
 
     /**
@@ -2987,7 +3011,7 @@ class TableSource extends Source.Config {
     }
 
     /**
-     * Transform data in a particular column config.   --- UPDATED (Dexter) 20190130
+     * Transform data in a particular column config.   --- UPDATED (Dexter) 20190320
      * @param {String} sourceDppKey - The @DataPreprocessing.ColumnsNode key that is to be applied with.
      * @param {String} cols - Index range string for selecting the columns from this @DataPreprocessing.ColumnsNode object.
      * @param {String} scaleType - The transformation type.
@@ -3007,11 +3031,17 @@ class TableSource extends Source.Config {
             var dataCol = (needPreExtraction && this._fullyExtracted && this._oriData)? this.getColData(sourceDppKey, DataPreprocessing.ColumnsNode.StepEnum.Input) : [];
 
             // For each of the specified columns, append the transformation actions:
-            if (["normMinMax", "normMax"].includes(scaleType)) {
+            if (scaleType == "normMinMax") {
                 var values = dataCol.map(row=>row[idx]);
-                var minV = (scaleType == "normMinMax") ? Math.min(...values) : 0;
+                var minV = Math.min(...values);
                 var maxV = Math.max(...values);
                 tranxToAry.push(col=>col.map(v=>(v-minV)/(maxV-minV)));
+            } else if (scaleType == "normMax") {
+                var values = dataCol.map(row=>row[idx]);
+                var minV = Math.min(...values);
+                var maxV = Math.max(...values);
+                var numRange = Math.max(0, maxV) - Math.min(0, minV);
+                tranxToAry.push(col=>col.map(v=>v/numRange));
             } else if (scaleType == "log") {
                 tranxToAry.push(col=>col.map(v=>Math.log(Math.min(v,0))));
             } else if (scaleType == "exp") {
@@ -6027,7 +6057,7 @@ class LayerProfile extends ModelNode.Config {
     }
 
     /**
-     * Try to get the shapes of the incoming layer nodes.   --- UPDATED (Dexter) 20181127
+     * Try to get the shapes of the incoming layer nodes.   --- UPDATED (Dexter) 20190320
      * @param {Object[]} fromShapeChanges - An array of shape information of the preceding layers.
      * @param {String} fromShapeChanges[].type - The type of the preceding layer, "source", "layer" or "dynamic".
      * @param {Number|String} fromShapeChanges[].id1 - The source ID if the preceding layer is a "source"; the layer name if it's a "layer".
@@ -6044,6 +6074,9 @@ class LayerProfile extends ModelNode.Config {
         // Get the model editing build no. if it has been pushed into a train.
         const buildNo = this.train ? this.train._editingBuild : undefined;
 
+        // Enusre the data sources are numbers.
+        if (this.fromSource[buildNo].length && this.fromSource[buildNo].some(s=>!this.train.getDataSource(...s).isNumber())) return null;
+
         var fromTensors;
         if (!fromShapeChanges) {
             // If no changes is given, return the list of shapes of preceding layers / sources.
@@ -6052,10 +6085,12 @@ class LayerProfile extends ModelNode.Config {
             // Depending on whether the change is made on "source" or "layer", get the list of non-affecting layers' shapes.
             if (fromShapeChanges.type != "dynamic") {
                 if (fromShapeChanges.type == "source") {
+                    // Enusre the data sources are numbers.
                     fromTensors = [...this.fromSource[buildNo].map(s=>{
-                        if (s[0] != fromShapeChanges.id1 && s[1] != fromShapeChanges.id2)
-                            return this.train.getDataSource(...s).getShape();
-                        else return null;
+                        if (s[0] != fromShapeChanges.id1 && s[1] != fromShapeChanges.id2) {
+                            let dppNode = this.train.getDataSource(...s);
+                            return dppNode.getShape() && dppNode.isNumber(true);
+                        } else return null;
                     }), ...this.fromNode[buildNo].map(lp=>lp._shape[buildNo])];
                 } else if (fromShapeChanges.type == "layer") {
                     fromTensors = [...this.fromSource[buildNo].map(s=>this.train.getDataSource(...s).getShape()), ...this.fromNode[buildNo].map(lp=>{
@@ -10771,7 +10806,7 @@ class Project {
     }
 
     /**
-     * Validate the insertion after some layers.   --- UPDATED (Dexter) 20181217
+     * Validate the insertion after some layers.   --- UPDATED (Dexter) 20190320
      * @param {Object} insertionInfo - The insertion data.
      * @param {ModelNode.Layer.Config[]} insertionInfo.prevLayers - Previous layers.
      * @param {DataPreprocessing.Node[]} insertionInfo.prevSources - Previous data sources.
@@ -10786,6 +10821,12 @@ class Project {
         // Validate for the layer count.
         var layerCountSucc = InputBox.validate($("appLayerCount"));
         if (!layerCountSucc) return false;
+        
+        // Ensure all sources are numbers. 
+        if (insertionInfo.prevSources.some(dppNode=>!dppNode.isNumber(true))) {
+            InputBox.showError($("appLayerCtxErr"), "strInputErr", "warning.svg");
+            return false;
+        }
 
         // Validate for layer-specific items.
         var hiddenSize = Number($("appLayerCount").value);

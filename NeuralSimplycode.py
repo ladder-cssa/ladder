@@ -2254,7 +2254,7 @@ class TableSource(TrainSource):
     
     def setTransform(self, newDppKey:str=None, sourceDppKey:str="target", cols:str="None:None", transformFunction: Callable = None, scaleType: str = "normMinMax"):
         '''
-			Set a transformation on specific columns on a column config of a source.   --- UDPATED (Dexter) 20190225
+			Set a transformation on specific columns on a column config of a source.   --- UDPATED (Dexter) 20190320
 
             Parameters
             ------------------------------
@@ -2319,11 +2319,17 @@ class TableSource(TrainSource):
                 nowColConfig.transformFrom[colIdx] = []
             
             # Append the transformation according to different scaleType, and update the dtype if needed.
-            if ((scaleType in ["normMinMax", "normMax"])):
-                minV = np.min(dataCol[:,[colIdx]]) if scaleType == "normMinMax" else 0
+            if (scaleType == "normMinMax"):
+                minV = np.min(dataCol[:,[colIdx]])
                 maxV = np.max(dataCol[:,[colIdx]])
                 nowColConfig.transformTo[colIdx].append(lambda col: (col-minV)/(maxV-minV))
                 nowColConfig.transformFrom[colIdx].append(lambda col: col*(maxV-minV) + minV)
+            elif (scaleType == "normMax"):
+                minV = np.min(dataCol[:,[colIdx]])
+                maxV = np.max(dataCol[:,[colIdx]])
+                numRange = max([0, maxV]) - min([0, minV])
+                nowColConfig.transformTo[colIdx].append(lambda col: col/numRange)
+                nowColConfig.transformFrom[colIdx].append(lambda col: col*numRange)
             elif (scaleType == "log"):
                 nowColConfig.transformTo[colIdx].append(lambda col: np.log(np.minimum(col,0)))
                 nowColConfig.transformFrom[colIdx].append(lambda col: np.exp(col))

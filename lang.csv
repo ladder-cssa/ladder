@@ -259,8 +259,8 @@ propMaxVal,Max Value:,最大值:
 propMinVal,Min Value:,最小值:
 propGain,Gain,
 propTransSel,Transformation:,轉換類別:
-txNormMinMax,Normalization (using data range),正規化 (使用資料值範圍)
-txNormMax,Normalization (relative to 0),正規化 (相對於 0)
+txNormMinMax,Normalization (scaling using min/max range),正規化 (使用資料值範圍)
+txNormMax,Normalization (scaling relative to 0),正規化 (相對於 0)
 txLog,Log,對數
 txExp,Exponential,指數
 txClassify,Class IDs,分類編號
@@ -315,6 +315,7 @@ colAddError,Error raised when adding the new data preproccessing information,在
 onehotError,Using one-hot on newly requested column(s) will incur errors,使用所要求的欄位進行 One-Hot 出現錯誤
 onehotTooMuch,The requested column(s) will incur too many categories. Please double-check if you have select the right columns with categorical values.,你所選取的欄位會導致很多類別欄位的產生。請確保選取一些確實是類別性質的資料欄。
 notreferenceable,Not a referenceable layer,這模型層無法被參照
+strInputErr,Model input sources must be converted to numbers before adding model layers. Try to use One-Hot Encoding.,模型的輸進資料需要轉換成數字。請嘗試使用 One-Hot 轉換。
 notCompWithPrev,Not compatible with previous layer(s),無法與上層相容
 notCompWithNext,Not compatible with previous layer(s),無法與後層相容
 shapeAffectLay,The change is disallowed because of incompatibility with shapes of previous layer(s),這個改變會導致不能與輸入節點形狀的相容
@@ -448,7 +449,7 @@ txtC,Class,分類
 conFailed,Updates failed,連接編輯失敗
 createConFailedTxt,"The layer connection is not completed, due to constraints of the layer shapes.",因為神經層間的限制無法完成新增的連接
 removeConFailedTxt,"The connection removal is not completed, due to constraints of the layer shapes.",因為神經層間的限制無法完成刪除連接
-appInfo,"<strong>Version:</strong> 1903.00, <strong>Updated:</strong> Mar-17,2019","<strong>版本:</strong> 1903.00, <strong>更新日期:</strong> 2019年03月17日"
+appInfo,"<strong>Version:</strong> 1903.01, <strong>Updated:</strong> Mar-20,2019","<strong>版本:</strong> 1903.01, <strong>更新日期:</strong> 2019年03月20日"
 appDesc,"An open-source web app for editing <strong>basic neural network models</strong> and displaying the corresponding results, with the help of another open-source Python neural network training framework from our lab, <strong>Neural Simplycode</strong>.",這是一個協助編輯<strong>基本類神經網絡</strong>架構及視覺化相關結果的開源網頁應用程式，及透過另一個我們實驗室的開源 Python 套件 <strong>Neural Simplycode</strong> 作為訓練類神經網絡模型。
 appLead,"Asst Prof. Jui-Hung Chang","張端紘 副教授"
 appDev,"Dexter, Yin-Chung Leung","梁彥聰 (Dexter)"
