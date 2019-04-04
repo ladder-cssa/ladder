@@ -19,7 +19,7 @@
 
         Version 版本:
 
-            1903.00
+            1903.02
 
         Website & Docs 網站及文件庫:
         
@@ -997,6 +997,16 @@ class App {
      */
     static getImageLocation() {
         return (document.URL.endsWith("zh/") || document.URL.endsWith("en/")) ? "../img/" : "img/";
+    }
+
+    /**
+     * For a template object that is to be duplicated, replace any image resources with a URL that can be used.   --- UPDATED (Dexter) 20190321
+     * @param {Element} - The template HTML element.
+     */
+    static getTemplateImages(tempObj) {
+        for (let img of tempObj.getElementsByClassName("tmpImg")) {
+            img.src = App.getImageLocation() + img.dataset.src;
+        }
     }
 
     /**
@@ -10535,7 +10545,7 @@ class Project {
     }
 
     /**
-     * Update the circular data definition list on the Properties Pane.   --- UPDATED (Dexter) 20190131
+     * Update the circular data definition list on the Properties Pane.   --- UPDATED (Dexter) 20190321
      * @param {Number} sourceIdx - The index of the TrainSource to request
      * @param {String} dppKey - The column key of the ColConfig in the TrainSource
      * @param {Boolean} updateImmediately - Update the list of data preview immediately.
@@ -10558,6 +10568,7 @@ class Project {
             var show = allCItems[idx+1];
             if (!show) {
                 show = $("colConfigCirTemp").cloneNode(true);
+                App.getTemplateImages(show);
                 show.removeAttribute("id");
                 show.getElementsByClassName("rmv")[0].addEventListener("click", Project.toRemoveCircularItem, false);
                 cList.insertBefore(show, cList.children[cList.children.length-1]);
@@ -10613,7 +10624,7 @@ class Project {
     }
 
     /**
-     * Update the transformation list on the Properties Pane.   --- UPDATED (Dexter) 20190131
+     * Update the transformation list on the Properties Pane.   --- UPDATED (Dexter) 20190321
      * @param {Number} sourceIdx - The index of the TrainSource to request
      * @param {String} dppKey - The column key of the ColConfig in the TrainSource
      * @param {Boolean} updateImmediately - Update the list of data preview immediately.
@@ -10636,6 +10647,7 @@ class Project {
             var show = allTItems[idx+1];
             if (!show) {
                 show = $("colConfigTxTemp").cloneNode(true);
+                App.getTemplateImages(show);
                 show.removeAttribute("id");
                 show.getElementsByClassName("rmv")[0].addEventListener("click", Project.toRemoveTransformItem, false);
                 tList.insertBefore(show, tList.children[tList.children.length-1]);
@@ -14207,7 +14219,7 @@ class InputBox {
     }
 }
 
-/** Class of static functions controlling in app notifications.  --- UPDATED (Dexter) 20180528 */
+/** Class of static functions controlling in app notifications.  --- UPDATED (Dexter) 20190321 */
 class AppNotification {
     /**
      * Show an in-app notification.  --- UPDATED (Dexter) 20190209
@@ -14220,6 +14232,7 @@ class AppNotification {
     static show(title, msg, icon, cancellable = true) {
         // Clone an in-app notification template, and fill in the content, then insert it them into the $("notification").
         var newNF = $("notificationTemplate").cloneNode(true);
+        App.getTemplateImages(newNF);
         newNF.id = "";
         newNF.getElementsByClassName("nfClose")[0].addEventListener("click", AppNotification.close, false);
         if (icon.endsWith(".svg")) {

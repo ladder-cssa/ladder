@@ -19,7 +19,7 @@
 
         Version 版本:
 
-            1903.00
+            1903.02
 
         Website & Docs 網站及文件庫:
         
@@ -2515,7 +2515,7 @@ class TableSource(TrainSource):
 
     def splitValidationDataset(self, validation: float = 0.1, shuffle: bool = False):
         '''
-			Split current data into training and validation datasets.   --- UPDATED (Dexter) 20181112
+			Split current data into training and validation datasets.   --- UPDATED (Dexter) 20190404
             
             Parameters
             ------------------------------
@@ -2540,7 +2540,7 @@ class TableSource(TrainSource):
             data = self.oriData.copy()[1:] if self.hasHeading else self.oriData.copy() 
 
             # 1B-2. If it's the first time to split and this dataset needs shuffling, shuffle the dataset.
-            if (self.shuffle): 
+            if (i == 0 and self.shuffle): 
                 np.random.shuffle(data)
 
             # 1B-3: Split the dataset by the index.

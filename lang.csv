@@ -449,7 +449,7 @@ txtC,Class,分類
 conFailed,Updates failed,連接編輯失敗
 createConFailedTxt,"The layer connection is not completed, due to constraints of the layer shapes.",因為神經層間的限制無法完成新增的連接
 removeConFailedTxt,"The connection removal is not completed, due to constraints of the layer shapes.",因為神經層間的限制無法完成刪除連接
-appInfo,"<strong>Version:</strong> 1903.01, <strong>Updated:</strong> Mar-20,2019","<strong>版本:</strong> 1903.01, <strong>更新日期:</strong> 2019年03月20日"
+appInfo,"<strong>Version:</strong> 1903.02, <strong>Updated:</strong> Apr-04,2019","<strong>版本:</strong> 1903.02, <strong>更新日期:</strong> 2019年04月04日"
 appDesc,"An open-source web app for editing <strong>basic neural network models</strong> and displaying the corresponding results, with the help of another open-source Python neural network training framework from our lab, <strong>Neural Simplycode</strong>.",這是一個協助編輯<strong>基本類神經網絡</strong>架構及視覺化相關結果的開源網頁應用程式，及透過另一個我們實驗室的開源 Python 套件 <strong>Neural Simplycode</strong> 作為訓練類神經網絡模型。
 appLead,"Asst Prof. Jui-Hung Chang","張端紘 副教授"
 appDev,"Dexter, Yin-Chung Leung","梁彥聰 (Dexter)"
