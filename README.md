@@ -19,7 +19,7 @@ Notes: Inline remarks are written in English as priority.<br/>
 
   Version 版本:
 
-  1903.01
+  1903.02
 
   Website & Docs 網站及文件庫:
 
@@ -30,6 +30,14 @@ Notes: Inline remarks are written in English as priority.<br/>
         
 
 # Updates 更新 (English Only 只提供英文版)
+  
+  1903.02   Apr-04, 2019 (Dexter)
+  * Effective for NeuralSimplycode.py, script.js, index.html, lang.csv
+  - [Bug Fixed - User Reports] [Cross Validation] Updates bugs 
+    on the scenario of K-fold cross validation with data shuffling. 
+    Thank you for reporting bugs!
+  - [Bug Fixed] [UI] Updates on some icons which may not be 
+    displayed correctly.
   
   1903.01   Mar-20, 2019 (Dexter)
   * Effective for NeuralSimplycode.py, script.js, lang.csv
