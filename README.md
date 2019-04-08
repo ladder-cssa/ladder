@@ -11,10 +11,10 @@ Notes: Inline remarks are written in English as priority.<br/>
 
   Creators 創作團隊: 
 
-  Yin-Chung Leung, Kai-Hsiang Lin, Jui-Hung Chang
+  Yin-Chung Leung, Kai-Hsiang Lin, Jui-Hung Chang <br>
   梁彥聰、林凱翔、張瑞紘
 
-  @ Creative System and Software Applications Laboratory, National Cheng Kung Univerisity, Taiwan
+  @ Creative System and Software Applications Laboratory, National Cheng Kung Univerisity, Taiwan <br>
   @ 創新系統軟體應用實驗室 —— 台灣 國立成功大學
 
   Version 版本:
@@ -23,7 +23,7 @@ Notes: Inline remarks are written in English as priority.<br/>
 
   Website & Docs 網站及文件庫:
 
-  English:    http://cssa.cc.ncku.edu.tw/ladder/
+  English:    http://cssa.cc.ncku.edu.tw/ladder/ <br>
   中文:       http://cssa.cc.ncku.edu.tw/ladder/?lang=zh_TW
 
   Production in TAIWAN | 台灣製作
@@ -31,6 +31,11 @@ Notes: Inline remarks are written in English as priority.<br/>
 
 # Updates 更新 (English Only 只提供英文版)
   
+  1903.03   Apr-08, 2019 (Dexter)
+  * Effective for script.js, style.css, lang.csv
+  - [Bug Fixed] [UI] Updates on some icons which may not be 
+    displayed correctly for error tooltips.
+
   1903.02   Apr-04, 2019 (Dexter)
   * Effective for NeuralSimplycode.py, script.js, index.html, lang.csv
   - [Bug Fixed - User Reports] [Cross Validation] Updates bugs 
