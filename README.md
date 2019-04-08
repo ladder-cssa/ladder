@@ -32,9 +32,12 @@ Notes: Inline remarks are written in English as priority.<br/>
 # Updates 更新 (English Only 只提供英文版)
   
   1903.03   Apr-08, 2019 (Dexter)
-  * Effective for script.js, style.css, lang.csv
+  * Effective for NeuralSimplycode.py, script.js, style.css, lang.csv
   - [Bug Fixed] [UI] Updates on some icons which may not be 
     displayed correctly for error tooltips.
+  - [Bug Fixed] [Data Preprocessing] Transformation and circular data
+    definition may have conflicts on one-hot encoding columns. The
+    issue affected both UI and Python training programme.
 
   1903.02   Apr-04, 2019 (Dexter)
   * Effective for NeuralSimplycode.py, script.js, index.html, lang.csv
