@@ -16,7 +16,7 @@
 
         Version 版本:
 
-            1903.00
+            1903.03
 
         Website & Docs 網站及文件庫:
         
@@ -1662,7 +1662,7 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 }
 /* #endregion --- Common Widgets --- Customized Context Menus and Flyouts */
 
-/* #region --- Common Widgets --- Input Validation */
+/* #region --- Common Widgets --- Input Validation --- UPDATED (Dexter) 20190408 */
 .inputError {width: 16rem; }
 .inputError>.ctxWrapper {
     border-color: red; border-width: 3px;
@@ -1672,6 +1672,9 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 }
 .inputValMsg .icon {
     margin: .5rem .5rem .5rem 1rem;  height: auto; font-size: 1.25rem;
+}
+.inputValMsg .icon>img {
+    width: 1.5rem; height: 1.5rem;
 }
 .inputValMsg .text {
     margin: .5rem 1rem .5rem 0; height: auto; text-align: center;

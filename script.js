@@ -19,7 +19,7 @@
 
         Version 版本:
 
-            1903.02
+            1903.03
 
         Website & Docs 網站及文件庫:
         
@@ -268,6 +268,19 @@ class Matrix {
      */
     static rowSlicing(ary, batchStart = "None", batchEnd = "None") {
         return ary.slice(batchStart == "None" ? 0 : batchStart, batchEnd == "None" ? ary.length : batchEnd)
+    }
+
+    /**
+     * Get the shape of an array.   --- UPDATED (Dexter) 20190322
+     * @param {Array} ary - Array of data.
+     * @returns {Array<Number>} - The shape of the array.
+     */
+    static getShape(ary) {
+        if (ary instanceof Array) {
+            return [ary.length, ...Matrix.getShape(ary[0])]
+        } else {
+            return [];
+        }
     }
 }
 
@@ -3021,7 +3034,7 @@ class TableSource extends Source.Config {
     }
 
     /**
-     * Transform data in a particular column config.   --- UPDATED (Dexter) 20190320
+     * Transform data in a particular column config.   --- UPDATED (Dexter) 20190408
      * @param {String} sourceDppKey - The @DataPreprocessing.ColumnsNode key that is to be applied with.
      * @param {String} cols - Index range string for selecting the columns from this @DataPreprocessing.ColumnsNode object.
      * @param {String} scaleType - The transformation type.
@@ -3030,16 +3043,21 @@ class TableSource extends Source.Config {
     setTransform(sourceDppKey="target", cols="None:None", scaleType="normMinMax", _pushSaves=true) {
         // Get the column config and find out the column indexes that are actually referring to.
         var colConfig = this.colConfigs.get(sourceDppKey);
-        var nowCols = TableSource.getColList(colConfig.getShape()[1], cols);
+
+        // Some types of transformation needs pre estimation of data.
+        const needPreExtraction = ["normMinMax", "normMax", "classify"].includes(scaleType);
+            
+        // Get the data column if allowed.
+        var dataCol = (needPreExtraction && this._fullyExtracted && this._oriData)? this.getColData(sourceDppKey, DataPreprocessing.ColumnsNode.StepEnum.Input) : [];
+
+        // Get the column list from the column selection on the requested column configs.
+        var nowCols = TableSource.getColList(Matrix.getShape(dataCol)[1], cols);
 
         nowCols.forEach(idx=>{
             // Get previously defined transformations within the transform Map objects.
             var tranxToAry = colConfig.transformTo.get(idx) || [];
             
-            // Some types of transformation needs pre estimation of data.
-            const needPreExtraction = ["normMinMax", "normMax", "classify"].includes(scaleType);
-            var dataCol = (needPreExtraction && this._fullyExtracted && this._oriData)? this.getColData(sourceDppKey, DataPreprocessing.ColumnsNode.StepEnum.Input) : [];
-
+            
             // For each of the specified columns, append the transformation actions:
             if (scaleType == "normMinMax") {
                 var values = dataCol.map(row=>row[idx]);
@@ -3089,7 +3107,7 @@ class TableSource extends Source.Config {
      }
 
     /**
-     * Define any circular data columns in a particular column config.   --- UPDATED (Dexter) 20190124
+     * Define any circular data columns in a particular column config.   --- UPDATED (Dexter) 20190408
      * @param {String} sourceDppKey - The @DataPreprocessing.ColumnsNode key that is to be applied with.
      * @param {colSel} cols - The array of columns for selecting the columns from this @DataPreprocessing.ColumnsNode
      * @param {Number} minV - Minimum value of the circular range (includes)
@@ -3100,7 +3118,8 @@ class TableSource extends Source.Config {
     setCircularOutput(sourceDppKey="target", cols="None:None", minV=0, maxV=360, _pushSaves=true) {
         // Get the column config and find out the column indexes that are actually referring to.
         var colConfig = this.colConfigs.get(sourceDppKey);
-        var nowCols = TableSource.getColList(colConfig.getShape()[1], cols);
+        var nowCols = TableSource.getColList(colConfig.getInputShape()[1], colConfig.sourceCol);
+        nowCols = TableSource.getColList(nowCols.length, cols);
 
         // Create a set to store previously defined column indexes.
         var allPrevIdx = new Set();
@@ -9888,7 +9907,7 @@ class Project {
     }
 
     /**
-     * Actions fired on chaning the file of a Table source.   --- UPDATED (Dexter) 20190225
+     * Actions fired on chaning the file of a Table source.   --- UPDATED (Dexter) 20190406
      * @param {Event} e - A change event for the input holder
      */
     static async readStartFile(e) {
@@ -9897,7 +9916,7 @@ class Project {
         
         // Ensure the file ends with CSV file, where it is the only supported file format currently.
         if (![".csv"].some(ext=>file.name.endsWith(ext))) {
-            InputBox.showError($("startSourceLocationBtn"), "onlyCSVC", "warning.svg");
+            InputBox.showError($("startSourceLocationBtn"), "onlyCSVC", false, "warning.svg");
             return;
         }
 
@@ -10818,7 +10837,7 @@ class Project {
     }
 
     /**
-     * Validate the insertion after some layers.   --- UPDATED (Dexter) 20190320
+     * Validate the insertion after some layers.   --- UPDATED (Dexter) 20190406
      * @param {Object} insertionInfo - The insertion data.
      * @param {ModelNode.Layer.Config[]} insertionInfo.prevLayers - Previous layers.
      * @param {DataPreprocessing.Node[]} insertionInfo.prevSources - Previous data sources.
@@ -10836,7 +10855,7 @@ class Project {
         
         // Ensure all sources are numbers. 
         if (insertionInfo.prevSources.some(dppNode=>!dppNode.isNumber(true))) {
-            InputBox.showError($("appLayerCtxErr"), "strInputErr", "warning.svg");
+            InputBox.showError($("appLayerCtxErr"), "strInputErr", false, "warning.svg");
             return false;
         }
 
@@ -10860,7 +10879,7 @@ class Project {
         var shapeSucc = newLayer.getOutputShape({type: "dynamic", info: insertionInfo.prevShapes.map(s=>{return {shape:s};})});
         if (!shapeSucc) {
             if (newLayerType == "CNNLayer" || newLayerType == "DCNNLayer") {
-                InputBox.showError($("appLayerCtxErr"), "notCompWithPrev", "warning.svg");
+                InputBox.showError($("appLayerCtxErr"), "notCompWithPrev", false, "warning.svg");
             }
             return false;
         } else {
@@ -10889,7 +10908,7 @@ class Project {
                 // Request next layer results and check if they're fine with the changes.
                 var nextLayerResults = [...insertionInfo.nextLayers.map(lp=>lp.applyShapeChanges(nextFromShapeChanges, undefined, centralizedMap, false))];
                 return Project.extractErrors(nextLayerResults, (e)=>{
-                    InputBox.showError($("appLayerCtxErr"), "notCompWithNext", "warning.svg");
+                    InputBox.showError($("appLayerCtxErr"), "notCompWithNext", false, "warning.svg");
                 })[0] == null;
             }
         }
@@ -13960,7 +13979,7 @@ class WarningMsg {
 /** Class static functions controlling an a user-input element.   --- UPDATED (Dexter) 20180528 */
 class InputBox {
     /**
-     * Show an error of a user-input element.   --- UPDATED (Dexter) 20180819
+     * Show an error of a user-input element.   --- UPDATED (Dexter) 20190408
      * @param {Element} obj - An HTML element regarding on a user-input, not neceessarily to be `<input>`, but may also `<select>` or `<div>` with class "checkbox"
      * @param {(String|Array<Object>)} msg - A translation key for the message to be displayed, or an object with translation key-value pairs.
      * @param {Boolean} removeOth - Whether to remove other context menus / flyouts
@@ -14002,7 +14021,16 @@ class InputBox {
                     txtEle.innerHTML = App.getTxtFromLang(msg);
                     txtEle.dataset.lt = msg;
                 }
-                txtEle.previousElementSibling.innerText = icon;
+                
+                // Show the icon if needed.
+                if (icon.endsWith(".svg")) {
+                    var iconSVG = new Image();
+                    iconSVG.src = App.getImageLocation() + icon;
+                    txtEle.previousElementSibling.innerHTML = "";
+                    txtEle.previousElementSibling.append(iconSVG);
+                } else {
+                    txtEle.previousElementSibling.innerHTML = icon || "";
+                }
 
                 // Get the position and show the input validation flyout.
                 const bbox = obj.getBoundingClientRect();

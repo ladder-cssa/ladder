@@ -19,7 +19,7 @@
 
         Version 版本:
 
-            1903.02
+            1903.03
 
         Website & Docs 網站及文件庫:
         
@@ -2254,7 +2254,7 @@ class TableSource(TrainSource):
     
     def setTransform(self, newDppKey:str=None, sourceDppKey:str="target", cols:str="None:None", transformFunction: Callable = None, scaleType: str = "normMinMax"):
         '''
-			Set a transformation on specific columns on a column config of a source.   --- UDPATED (Dexter) 20190320
+			Set a transformation on specific columns on a column config of a source.   --- UDPATED (Dexter) 20190408
 
             Parameters
             ------------------------------
@@ -2274,34 +2274,30 @@ class TableSource(TrainSource):
         if (sourceDppKey not in self.colConfigs) :
             raise ValueError("The column key cannot be found.")
         
-        # Get the column config of the requested key.
-        sourceColConfig = self[sourceDppKey]
-
-        # Get the column list from the column selection on the requested column configs.
-        toColList = TableSource.getColList(sourceColConfig.getShape()[1],cols)
-
         # Determine whether pre-extraction is needed for a certain type of transformation.
         needPreExtraction = (scaleType in ["normMinMax", "normMax", "classify"] or transformFunction is not None)
 
+        
+        if (needPreExtraction and not self.hasColData(sourceDppKey)):
+            raise ValueError("Data (" + sourceDppKey + ") is not set up.")
+                
+        # Create a new column config if requested. Otherwise, we just point the column config on the existing one.
+        if newDppKey is not None:
+            self[newDppKey] = DataPreprocessing.ColumnsNode(source=sourceDppKey, sourceCol = cols)
+            nowColConfig = self[newDppKey]
+            nowColConfig.refreshItemShape()
+        else:
+            nowColConfig = self[sourceDppKey]
+
+        # Get the data column if allowed.
+        dataCol = self.getColData(sourceDppKey if newDppKey is None else newDppKey, DataPreprocessing.ColumnsNode.StepEnum.Input) if needPreExtraction and self._fullyExtracted and (self.oriData is not None and len(self.oriData) > 0) else []
+        
+        # Get the column list from the column selection on the requested column configs.
+        toColList = TableSource.getColList(dataCol.shape[1], cols if newDppKey is None else "None:None")
+        
         # Raise error for several scenarios.
         if len(toColList) == 0:
             raise ValueError("No columns can be applied.")
-        elif (needPreExtraction and not self.hasColData(sourceDppKey)):
-            raise ValueError("Data (" + sourceDppKey + ") is not set up.")
-        
-        # Check the number of columns to be updated.
-        colCount = len(toColList)
-
-        # Create a new column config if requested. Otherwise, we just point the column config on the existing one.
-        if newDppKey is not None:
-            nowColConfig = self[newDppKey] = DataPreprocessing.ColumnsNode(source=sourceDppKey, sourceCol = cols)
-            nowColConfig.refreshItemShape()
-            toColList = [*range(0, colCount)]
-        else:
-            nowColConfig = sourceColConfig
-        
-        # Get the data column if needed.
-        dataCol = self.getColData(sourceDppKey, DataPreprocessing.ColumnsNode.StepEnum.Input) if needPreExtraction and self._fullyExtracted and (self.oriData is not None and len(self.oriData) > 0) else []
 
         # Prepares transformation for each of the requested columns.
         for colIdx in toColList:
@@ -2349,7 +2345,7 @@ class TableSource(TrainSource):
 
     def setCircularOutput(self, sourceDppKey: str = "target", cols: str ="None:None", minV: float = 0, maxV: float = 360):
         '''
-			Define circular data on specific columns on a column config of a source.   --- UDPATED (Dexter) 20190205
+			Define circular data on specific columns on a column config of a source.   --- UDPATED (Dexter) 20190408
 
             Parameters
             ------------------------------
@@ -2372,7 +2368,8 @@ class TableSource(TrainSource):
         prevColConfig = self[sourceDppKey]
 
         # Get the column list from the column selection on the requested column configs.
-        toColList = TableSource.getColList(prevColConfig.getShape()[1], cols)
+        toColList = TableSource.getColList(prevColConfig.getInputShape()[1], prevColConfig.sourceCol)
+        toColList = TableSource.getColList(len(toColList), cols)
 
         # If no column is actually selected, raise error.
         if len(toColList) == 0:
