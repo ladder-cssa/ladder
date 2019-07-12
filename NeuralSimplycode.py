@@ -19,7 +19,7 @@
 
         Version 版本:
 
-            1903.03
+            1903.04
 
         Website & Docs 網站及文件庫:
         
@@ -6537,7 +6537,7 @@ class LayerProfile():
     
     def __combineIncomingTensors__(self, buildNo: int = 0) -> 'tf.Tensor':
         '''
-			Get the feed-in tensors from the previous layer modules or sources.   --- UPDATED (Dexter) 20190210
+			Get the feed-in tensors from the previous layer modules or sources.   --- UPDATED (Dexter) 20190712
 
             Parameters
             ------------------------------
@@ -6602,10 +6602,15 @@ class LayerProfile():
 
             # 1-2-1)  Raise errors for illogical connections.
             if (axis >= len(coreShape)):
+                # 1-2-1-A) The merge axis should be within the dimension of core node.
                 raise ValueError("Axis is larger than or equal to the length of core node's shape.")
 
-            elif not all([(s[:axis] == coreShape[:axis] or all([(dim == coreShape[idx] or (dim == None and coreShape[idx] == None) or (dim % coreShape[idx] == 0)) for idx,dim in enumerate(s[:axis])])) for s in incomingShapes]):
-                # 1-2-1-B) Case: CoreNode: [None,4,4,6] IncomingNode: [None,5,5,7] => Error;   CoreNode: [None,4,4,6] IncomingNode: [None,8,8,8] => OK
+            elif any([(None in s[1:]) for s in incomingShapes]):
+                # 1-2-1-B) None of the incoming shape should have None shape after the fist dimension.
+                raise ValueError("There should be no varied dimensions on dimension 1 or above.")
+
+            elif not all([all([(dim == coreShape[idx+1] or dim % coreShape[idx+1] == 0) for idx,dim in enumerate(s[1:axis])]) for s in incomingShapes]):
+                # 1-2-1-C) Case: CoreNode: [None,4,4,6] IncomingNode: [None,5,5,7] => Error;   CoreNode: [None,4,4,6] IncomingNode: [None,8,8,8] => OK
                 raise ValueError("Some incoming layers are not having the same dimension or multiplicative dimension as the core node along the dimensions before the concatenation axis.")
             
             # 1-2-2)  Align the dimensions of all tensors through reshaping.
@@ -6635,8 +6640,7 @@ class LayerProfile():
                         else:
                             tempTensor = t
                             transposeIdx = []
-                            oriLastDimension = incomingShapes[idx][axis]
-                            newLastDimension = oriLastDimension
+                            newLastDimension = incomingShapes[idx][axis]
 
                             # Below algoritm of space to depth.
                             # 1-3-2A-B-1) Split the tensor on the needed dimensions.
@@ -6668,10 +6672,9 @@ class LayerProfile():
                             # 1-3-2A-B-3) Reshape and update the tensor.
                             incomingNodes[idx] = tf.reshape(tempTensor, [*VarConfig.setAsReshape([preShape.value for preShape in tempTensor.shape[:axis]]), newLastDimension])
 
-                            # 1-3-2A-2-A)  If it's subsampling, select the first channel.
-                            if self.incomingConfig.mergeDim == IncomingConfig.MergeDimTypes.SubSample:
-                                tempTensor = incomingNodes[idx][...,0:oriLastDimension]
-                                incomingNodes[idx] = tf.reshape(tempTensor, [*VarConfig.setAsReshape(tempTensor.shape), 1])
+                        # 1-3-2A-C)  If it's subsampling, select the first channel.
+                        if self.incomingConfig.mergeDim == IncomingConfig.MergeDimTypes.SubSample:
+                            incomingNodes[idx] = incomingNodes[idx][...,0:incomingShapes[idx][axis]]
 
                     # 1-3-2B) Handle incoming nodes according to the defined methods.  --- BETA
                     elif (self.incomingConfig in [IncomingConfig.MergeDimTypes.MaxPool, IncomingConfig.MergeDimTypes.MeanPool]):

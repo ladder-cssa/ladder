@@ -17,7 +17,7 @@
 
         Version 版本:
 
-            1903.03
+            1903.04
 
         Website & Docs 網站及文件庫:
         
@@ -121,10 +121,10 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable = no">
         <link rel="shortcut icon" href="favicon.png">
-        <link rel="stylesheet" type="text/css" href="style.css?v=1903.03.0" />
+        <link rel="stylesheet" type="text/css" href="style.css?v=1903.04.0" />
     </head>
     <body>
-        <script src="script.js?v=1903.03.0"></script>
+        <script src="script.js?v=1903.04.0"></script>
 
         <!-- Top navigation bar -->
         <nav id="appNav" class="start">
@@ -182,9 +182,9 @@
                     <button id="selDates" class="btn1"><div><div class="iconSVG"><img src="img/history.svg"></div><div class="lt" data-lt="dbTrials">Other Trials</div></div></button>
                 </div>
                 <div id="graphTools">
-                    <button id="trainLogBtn" data-for="dashBoardSVG" data-log="trainLog" class="btn1 activated"><div><div class="iconSVG"><img src="img/trainLog.svg"></div><div class="lt" data-lt="dbTrainLog">Train Logs</div></div></button>
-                    <button id="weightGraphBtn" data-for="weightGraphSVG" data-log="weightLog" class="btn1 inactive"><div><div class="iconSVG"><img src="img/weightGraph.svg"></div><div class="lt" data-lt="dbWeightGraph">Weight Graphs</div></div></button>
-                    <button id="traceLogBtn" data-for="traceLogDashboard" data-log="traceLog" class="btn1 inactive"><div><div class="iconSVG"><img src="img/traceLog.svg"></div><div class="lt" data-lt="dbTraceLog">Traced Items</div></div></button>
+                    <button id="trainLogBtn" data-for="dashBoardSVG" data-log="trainLog" class="btn1 activated leftmost"><div><div class="iconSVG"><img src="img/trainLog.svg"></div><div class="lt" data-lt="dbTrainLog">Train Logs</div></div></button>
+                    <button id="weightGraphBtn" data-for="weightGraphSVG" data-log="weightLog" class="btn1 inactive centerBtn"><div><div class="iconSVG"><img src="img/weightGraph.svg"></div><div class="lt" data-lt="dbWeightGraph">Weight Graphs</div></div></button>
+                    <button id="traceLogBtn" data-for="traceLogDashboard" data-log="traceLog" class="btn1 inactive rightmost"><div><div class="iconSVG"><img src="img/traceLog.svg"></div><div class="lt" data-lt="dbTraceLog">Traced Items</div></div></button>
                 </div>
                 <div id="dashBoardOptions">
                     <button id="dashBoardOptionsBtn" class="btn1"><div><div class="icon"><div class="iconSVG"><img src="img/settings.svg"/></div></div><div class="lt" data-lt="options">Options</div></div></button>
@@ -246,8 +246,8 @@
             <div id="editStart" class="noDisplay">
                 <div id="editStartTitle" class="lt" data-lt="startEdit">Start with a data source:</div>
                 <div id="startSourceType">
-                    <button id="startFromTable" class="btn1"><div><div class="iconSVG"><img src="img/dataTable.svg"></div><div class="lt" data-lt="tableSource">Table Source</div></div></button>
-                    <button id="startFromCIFAR10" class="btn1"><div><div class="iconSVG"><img src="img/image.svg"></div><div class="lt" data-lt="imgDatasets">Renowned Image Datasets</div></div></button>    
+                    <button id="startFromTable" class="btn1 leftmost"><div><div class="iconSVG"><img src="img/dataTable.svg"></div><div class="lt" data-lt="tableSource">Table Source</div></div></button>
+                    <button id="startFromCIFAR10" class="btn1 rightmost"><div><div class="iconSVG"><img src="img/image.svg"></div><div class="lt" data-lt="imgDatasets">Renowned Image Datasets</div></div></button>    
                 </div>
                 <div id="startSourceInfo" class="hide">
                     <div id="startSourceCtxWrapper"><div id="startSourceCtx">
@@ -393,23 +393,23 @@
                     <!-- Functional Buttons -->
                     <div id="functionalButtons">
                         <div id="editToolBar">
-                            <button id="editModelTopSave" class="btn1"><div><div class="iconSVG"><img src="img/save.svg"></div><div class="lt" data-lt="saveProject">Save Project</div></div></button>
-                            <button id="editModelTopView" class="btn1"><div><div class="iconSVG"><img src="img/code.svg"></div><div class="lt" data-lt="viewPythonCodes">View Python Codes</div></div></button>
+                            <button id="editModelTopSave" class="btn1 leftmost"><div><div class="iconSVG"><img src="img/save.svg"></div><div class="lt" data-lt="saveProject">Save Project</div></div></button>
+                            <button id="editModelTopView" class="btn1 rightmost"><div><div class="iconSVG"><img src="img/code.svg"></div><div class="lt" data-lt="viewPythonCodes">View Python Codes</div></div></button>
                         </div>
                         <div class="toolBarGroup noDisplay activated" id="attachOnBtns">
                             <div class="toolBarGroupIcon"><img src="img/attachTo.svg" /></div>
                             <div class="toolBarGroupBtns">
                                 <div class="toolBarGroupTitle"><span class="lt" id="toolboxAttLayerName"></span> <span class="lt" data-lt="attachOn">attach on...</span></div>
-                                <button id="attFinish" class="btn1"><div><div class="iconSVG"><img src="img/okGreen.svg"/></div><div class="lt" data-lt="finished">Finished</div></div></button>
-                                <button id="attCancel" class="btn1"><div><div class="iconSVG"><img src="img/cancelRed.svg"/></div><div class="lt" data-lt="cancel">Cancel</div></div></button>
+                                <button id="attFinish" class="btn1 leftmost"><div><div class="iconSVG"><img src="img/okGreen.svg"/></div><div class="lt" data-lt="finished">Finished</div></div></button>
+                                <button id="attCancel" class="btn1 rightmost"><div><div class="iconSVG"><img src="img/cancelRed.svg"/></div><div class="lt" data-lt="cancel">Cancel</div></div></button>
                             </div>
                         </div>
                         <div class="toolBarGroup noDisplay activated" id="connectToBtns">
                             <div class="toolBarGroupIcon"><img src="img/connectTo.svg" /></div>
                             <div class="toolBarGroupBtns">
                                 <div class="toolBarGroupTitle"><span class="lt" id="toolboxCntLayerName"></span> <span class="lt" data-lt="connectTo">connect to...</span></div>
-                                <button id="cntFinish" class="btn1"><div><div class="iconSVG"><img src="img/okGreen.svg"/></div><div class="lt" data-lt="finished">Finished</div></div></button>
-                                <button id="cntCancel" class="btn1"><div><div class="iconSVG"><img src="img/cancelRed.svg"/></div><div class="lt" data-lt="cancel">Cancel</div></div></button>
+                                <button id="cntFinish" class="btn1 leftmost"><div><div class="iconSVG"><img src="img/okGreen.svg"/></div><div class="lt" data-lt="finished">Finished</div></div></button>
+                                <button id="cntCancel" class="btn1 rightmost"><div><div class="iconSVG"><img src="img/cancelRed.svg"/></div><div class="lt" data-lt="cancel">Cancel</div></div></button>
                             </div>
                         </div>
                     </div>
@@ -427,19 +427,19 @@
                                 <button id="actionSelFeature" class="btn1"><div><div class="lt" data-lt="actionSelFeature">Select Features for Model Input...</div></div></button>
                             </div>
                             <div class="layerActions nextActionBtns btnRow noDisplay">
-                                <button id="actionAppendLayer" class="btn1"><div><div class="lt" data-lt="actionAppendLayer">Append Layer...</div></div></button>
-                                <button id="actionAttachLayer" class="noDisplay btn1"><div><div class="lt" data-lt="actionAttachLayer">Attach Layer...</div></div></button>
-                                <button id="actionSetTask" class="btn1"><div><div class="lt" data-lt="actionSetTask">Set Training Task...</div></div></button>
+                                <button id="actionAppendLayer" class="btn1 leftmost"><div><div class="lt" data-lt="actionAppendLayer">Append Layer...</div></div></button>
+                                <button id="actionAttachLayer" class="noDisplay btn1 centerBtn"><div><div class="lt" data-lt="actionAttachLayer">Attach Layer...</div></div></button>
+                                <button id="actionSetTask" class="btn1 rightmost"><div><div class="lt" data-lt="actionSetTask">Set Training Task...</div></div></button>
                             </div>
                             <div class="finalActions nextActionBtns btnRow noDisplay">
-                                <button id="actionSaveProj" class=" btn1"><div><div class="lt" data-lt="actionSaveProj">Save Project</div></div></button>
-                                <button id="actionSaveProg" class=" btn1"><div><div class="lt" data-lt="actionSaveProg">Save Training Programme</div></div></button>
-                                <button id="actionViewCodes" class=" btn1"><div><div class="lt" data-lt="viewPythonCodes">View Python Codes</div></div></button>
+                                <button id="actionSaveProj" class=" btn1 leftmost"><div><div class="lt" data-lt="actionSaveProj">Save Project</div></div></button>
+                                <button id="actionSaveProg" class=" btn1 centerBtn"><div><div class="lt" data-lt="actionSaveProg">Save Training Programme</div></div></button>
+                                <button id="actionViewCodes" class=" btn1 rightmost"><div><div class="lt" data-lt="viewPythonCodes">View Python Codes</div></div></button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="layer" id="layerItemTemp">
+                <div class="layer" id="layerItemTemp" aria-haspopup="true">
                     <div class="receiveNode">▼</div>
                     <div class="layerName lt" data-lt="">Table Source</div>
                     <div class="layerShape"><span class="lt" data-lt="propShpae">Shape:</span> <span class="shapeVal"></span></div>
@@ -472,12 +472,12 @@
                         <div class="btnRow right moreBtnRow"><button class="btn1 propAdvance"><div><div class="icon">⏷</div><div class="lt" data-lt="propAdvOpt">Advanced Options...</div></div></button></div>
                         <div class="propGroup canCollapse noDisplay">
                             <div class="propGroupName lt" data-lt="lrDecay">Learning Rate Decay</div>
-                            <div class="propRow"><label class="lt" data-lt="propEpochPerLR" for="propEpochPerLRSwitch">No. of Epoch per Decay:</label>
+                            <div class="propRow"><label class="lt" id="propEpochPerLRSwitchLabel" data-lt="propEpochPerLR" for="propEpochPerLRSwitch">No. of Epoch per Decay:</label>
                                 <select id="propEpochPerLRSwitch">
                                     <option class="lt" data-val="N" data-lt="propEpochPerLRNo">No decay</option>
                                     <option class="lt" data-val="Y" data-lt="propEpochPerLRMore">Decay for every...</option>
                                 </select>
-                                <input id="propEpochPerLR" type="text" class="val propVal noDisplay" data-prop-type="TrainingProfile" data-id="0" data-prop="numEpochsPerDecay" data-val-type="number" data-min="1" data-step="1" /><button id="cancelValidation" class="btn1 noDisplay">✖️</button></div>
+                                <input id="propEpochPerLR" type="text" class="val propVal hasMoreBtn noDisplay" data-prop-type="TrainingProfile" data-id="0" data-prop="numEpochsPerDecay" data-val-type="number" data-min="1" data-step="1" /><button id="cancelValidation" class="btn1 noDisplay"><div class="iconSVG"><img src="img/cancelRed.svg"></div></button></div>
                             <div class="propRow" id="propLRDecayRow"><label class="lt" data-lt="propLRDecay" for="propLRDecay">Decay Rate:</label><input id="propLRDecay" type="text" class="val propVal" data-prop-type="TrainingProfile" data-id="0" data-default="1" data-prop="learningRateDecayFactor" data-val-type="number" data-min="0" /></div>
                             <div class="propGroupName lt noDisplay" data-lt="expMvAvg">Exponential Moving Averages</div>
                             <div class="propRow noDisplay"><label class="lt" data-lt="propExpAvgLoss" for="propExpAvgLoss">Training Loss:</label><input id="propExpAvgLoss" type="text" class="val propVal" data-prop-type="TrainingProfile" data-id="0" data-prop="exponentialLossDecay" data-val-type="number" data-min="0" data-max="1"/></div>
@@ -493,7 +493,7 @@
                                 </select>
                             </div>
                             <div class="propRow" id="propValPropRow"><label class="lt" data-lt="propValProp" for="propValProp">Validation Proportion:</label><input id="propValProp" type="text" class="val propVal" data-prop-type="TrainingProfile" data-id="0" data-prop="crossValidationProp" data-val-type="number" data-min="0" data-max="100" placeholder="20" /><div class="propUnit">%</div></div>
-                            <div class="propRow" id="propValRoundRow"><label class="lt" data-lt="propValRound" for="propValRound">Validation Rounds:</label><input id="propValRound" type="text" class="val propVal" data-prop-type="TrainingProfile" data-id="0" data-prop="crossValidationCount" data-val-type="number" data-min="1" data-step="1" placeholder="1"/><button data-for="valRoundInfo" class="btn1 infoBtn"><div class="iconSVG"><img src="img/help.svg"/></div></button></div>
+                            <div class="propRow" id="propValRoundRow"><label class="lt" data-lt="propValRound" for="propValRound">Validation Rounds:</label><input id="propValRound" type="text" class="val propVal hasMoreBtn" data-prop-type="TrainingProfile" data-id="0" data-prop="crossValidationCount" data-val-type="number" data-min="1" data-step="1" placeholder="1"/><button data-for="valRoundInfo" class="btn1 infoBtn"><div class="iconSVG"><img src="img/help.svg"/></div></button></div>
                         </div>
                         <div class="propGroup">
                             <div class="propGroupName lt" data-lt="repeatedRuns">Repeated Runs</div>
@@ -501,7 +501,7 @@
                         </div>
                         <div class="propGroup">
                             <div class="propGroupName lt" data-lt="configs">Configurations</div>
-                            <div class="propRow"><label class="lt" data-lt="propLogFolder" for="propLogFolder">Log Folder:</label><input id="propLogFolder" type="text" class="val propVal" data-prop-type="Train" data-prop="folder" data-default="D:/tmp/" data-val-type="folderLoc" /><button data-for="logFolderInfo" class="btn1 infoBtn"><div class="iconSVG"><img src="img/help.svg"/></div></button></div>
+                            <div class="propRow"><label class="lt" data-lt="propLogFolder" for="propLogFolder">Log Folder:</label><input id="propLogFolder" type="text" class="val propVal hasMoreBtn" data-prop-type="Train" data-prop="folder" data-default="D:/tmp/" data-val-type="folderLoc" /><button data-for="logFolderInfo" class="btn1 infoBtn"><div class="iconSVG"><img src="img/help.svg"/></div></button></div>
                             <div class="propRow noDisplay"><label class="lt" data-lt="propRestorePath" for="propRestorePath">Restore Path:</label><input id="propRestorePath" type="text" class="val propVal" data-prop-type="Train" data-prop="restorePath" data-prop="restorePath" data-default="D:/tmp/" data-val-type="folderLoc" /></div>
                             <div class="propRow"><label class="lt" data-lt="propDevice" for="propDevice">Device:</label>
                                 <select id="propDevice" data-default="/cpu:0" class="propVal" data-prop-type="Train" data-prop="device">
@@ -517,7 +517,7 @@
                         </div>
                         <div class="propGroup">
                             <div class="propGroupName lt" data-lt="configTrace">Item Tracing</div>
-                            <div class="propRow"><label class="lt" data-lt="propTraceCount" for="propTraceCount">Trace Count:</label><input id="propTraceCount" type="text" class="val propVal" data-prop-type="Train" data-prop="traceRecord" data-default="0" data-val-type="number" data-min="0" data-step="1" /><button data-for="traceRecInfo" class="btn1 infoBtn"><div class="iconSVG"><img src="img/help.svg"/></div></button></div>
+                            <div class="propRow"><label class="lt" data-lt="propTraceCount" for="propTraceCount">Trace Count:</label><input id="propTraceCount" type="text" class="val propVal hasMoreBtn" data-prop-type="Train" data-prop="traceRecord" data-default="0" data-val-type="number" data-min="0" data-step="1" /><button data-for="traceRecInfo" class="btn1 infoBtn"><div class="iconSVG"><img src="img/help.svg"/></div></button></div>
                             <div class="propRow"><label class="lt" data-lt="propTraceFreq" for="propTraceFreq">Trace Freq.:</label><input id="propTraceFreq" type="text" class="val propVal" data-prop-type="Train" data-prop="traceFreq" data-default="-1" data-val-type="number" data-min="0" data-step="1" /></div>
                         </div>
                     </div>
@@ -546,7 +546,7 @@
                             <div class="propGroupName lt" data-lt="dataPart">Data Partitioning</div>
                             <div class="propRow">
                                 <label class="lt" data-lt="propStatus" for="propCVSource">Status:</label>
-                                <div class="val" id="propCVSource" type="lt"></div>
+                                <div class="val lt" id="propCVSource"></div>
                                 <button data-for="dataPartInfo" class="btn1 infoBtn"><div class="iconSVG"><img src="img/help.svg"/></div></button>
                             </div>
                             <div class="propRow" data-sub-class='["CSVSource","TableSource"]'><label class="lt" data-lt="propTestRatio" for="propTestRatio">Test Ratio:</label><input id="propTestRatio" type="text" class="val propVal" data-prop-type="TrainSource" data-prop="_testRatio" data-default="20" data-val-type="number" data-min="0" data-max="100" data-step="0.1" placeholder="20" /><div class="propUnit">%</div></div>
@@ -562,7 +562,7 @@
                         <div class="propWinName lt" id="propColConfigName" data-lt="" id="propTransfromDef"></div>
                         <div class="propGroup" data-sub-class='["TableSource", "CSVSource"]'>
                             <div class="propGroupName lt" data-lt="colSelection">Column Selection</div>
-                            <div class="propRow" data-sub-class='["CSVSource","TableSource"]'><label class="lt" data-lt="propColumns" for="propColumns">Columns:</label><input id="propColumns" type="text" class="val propVal" data-prop-type="ColConfig" data-preprocessing-step="Input" data-prop="sourceCol" data-default="" data-val-type="indexRange" placeholder="eg. [None:-1] / -1" /><button data-lt="select" data-for-prop="propColumns" data-for-id="propColumns" data-table-type="source" class="btn1 textOnly colSelBtn lt"></button></div>
+                            <div class="propRow" data-sub-class='["CSVSource","TableSource"]'><label class="lt" data-lt="propColumns" for="propColumns">Columns:</label><input id="propColumns" type="text" class="val propVal hasMoreBtn" data-prop-type="ColConfig" data-preprocessing-step="Input" data-prop="sourceCol" data-default="" data-val-type="indexRange" placeholder="eg. [None:-1] / -1" /><button data-lt="select" data-for-prop="propColumns" data-for-id="propColumns" data-table-type="source" class="btn1 textOnly colSelBtn lt"></button></div>
                         </div>
                         <div class="propGroup" data-sub-class='["TableSource", "CSVSource"]' id="propTxCirGroup">
                             <div class="propGroupName lt" data-lt="dppKeyTranx">Transformations</div>
@@ -580,7 +580,7 @@
                             <div class="propGroupName lt" data-lt="onehot">One-Hot Encoding</div>
                             <div class="propRow">
                                 <label class="lt" data-lt="propColumns" for="propOneHot">Columns:</label>
-                                <input id="propOneHot" type="text" class="val propVal" data-prop-type="ColConfig" data-prop="onehot" data-default="" data-val-type="indexRange" placeholder="-1" /><button data-lt="select" data-for-prop="propOneHot" data-for-id="propOneHot" data-table-type="colConfig" data-preprocessing-step="CircularDataDefined" class="btn1 textOnly colSelBtn lt"></button>
+                                <input id="propOneHot" type="text" class="val propVal hasMoreBtn" data-prop-type="ColConfig" data-prop="onehot" data-default="" data-val-type="indexRange" placeholder="-1" /><button data-lt="select" data-for-prop="propOneHot" data-for-id="propOneHot" data-table-type="colConfig" data-preprocessing-step="CircularDataDefined" class="btn1 textOnly colSelBtn lt"></button>
                             </div>
                         </div><div class="propGroup">
                             <div class="propGroupName lt" data-lt="recordGeneration">Record Generation</div>
@@ -588,7 +588,7 @@
                             <div class="propRow" id="propImgOutHRow" data-sub-class='["ImageSource"]'><label class="lt" data-lt="propImgOutH" for="propImgOutH">Crop As Height:</label><input id="propImgOutH" type="text" class="val propVal" data-prop-type="ColConfig" data-prop="_outH" data-default="" data-val-type="number" data-step="1" data-min="1" placeholder="32" /><div class="propUnit">px</div></div>
                             <div class="propRow">
                                 <label class="lt" data-lt="dataType" for="propImgSource">Data Type:</label>
-                                <select id="propImgSource" data-default="None" class="propVal" data-prop-type="ColConfig" data-prop="dtype">
+                                <select id="propImgSource" data-default="None" class="propVal hasMoreBtn" data-prop-type="ColConfig" data-prop="dtype">
                                     <option data-val="" class="lt" data-lt="dTypeAuto">Auto (Float)</option>
                                     <option data-val="tf.float32" class="lt" data-lt="dTypeFloat">Float</option>
                                     <option data-val="tf.int64" class="lt" data-lt="dTypeInt">Integer</option>
@@ -672,7 +672,7 @@
                         <div class="propGroup" data-sub-class='["FinalLayer", "Layer-CNNLayer","Layer-BasicLayer","Layer-DCNNLayer"]'>
                             <div class="propGroupName lt" data-lt="learningParams">Learning Parameters</div>
                             <div class="propRow"><label class="lt" data-lt="weightL" for="propLTWeight">Weight:</label>
-                                <select class="val propVal" id="propLTWeight" data-prop-type="VarConfig.Initializer" data-prop="_type" data-id="linearTransform.weightConfig.initializer" data-default="TruncatedNormal">
+                                <select class="val propVal hasMoreBtn" id="propLTWeight" data-prop-type="VarConfig.Initializer" data-prop="_type" data-id="linearTransform.weightConfig.initializer" data-default="TruncatedNormal">
                                     <optgroup class="lt" data-lt="initializer" label="Initializer" data-lt-type='["label"]'>
                                         <option class="lt" data-lt="viConstant" data-val="Constant">Constant</option>
                                         <option class="lt" data-lt="viZeros" data-val="Zeros">Zeros</option>
@@ -693,7 +693,7 @@
                                 <button class="btn1 varConfigBtn moreConfig lt" data-row-initializer="propLTWeight" data-id="linearTransform.weightConfig" data-lt="moreSettings" data-lt-type='["title"]'><div class="iconSVG"><img src="img/settings.svg"/></div></button>
                             </div>
                             <div class="propRow"><label class="lt" data-lt="biasL" for="propLTBias">Bias:</label>
-                                <select class="val propVal" id="propLTBias" data-prop-type="VarConfig.Initializer" data-prop="_type" data-id="linearTransform.biasConfig.initializer" data-default="Constant">
+                                <select class="val propVal hasMoreBtn" id="propLTBias" data-prop-type="VarConfig.Initializer" data-prop="_type" data-id="linearTransform.biasConfig.initializer" data-default="Constant">
                                         <optgroup class="lt" data-lt="initializer" label="Initializer" data-lt-type='["label"]'>
                                             <option class="lt" data-lt="viConstant" data-val="Constant">Constant</option>
                                             <option class="lt" data-lt="viZeros" data-val="Zeros">Zeros</option>
@@ -795,7 +795,7 @@
                 <div id="appOrigin" class="center lt" data-lt="appOrigin"></div>
                 <div><strong class="lt" data-lt="appWeb">More Info:</strong>&nbsp;&nbsp;&nbsp;<a data-href="http://cssa.cc.ncku.edu.tw/ladder/" class="langLink lt" data-lt="appOffWeb" target="_blank">Ladder Official Homepage</a></div>
                 <div><strong class="lt" data-lt="appWebHelp"><span>Help</span>:</strong>&nbsp;&nbsp;&nbsp;<a data-href="http://cssa.cc.ncku.edu.tw/ladder/getStarted/FAQ.html" class="langLink lt" data-lt="appWebFAQ" target="_blank">FAQ</a></div>
-                <div><strong>GitHub:</strong>&nbsp;&nbsp;&nbsp;<a href="https://github.com/ladder-cssa/ladder/">ladder-cssa/ladder</a></div>
+                <div><strong>GitHub:</strong>&nbsp;&nbsp;&nbsp;<a href="https://github.com/ladder-cssa/ladder/" target="_blank">ladder-cssa/ladder</a></div>
                 <h2 class="lt" data-lt="setProjLead">Project Leader</h2>
                 <div id="appLead" class="center lt" data-lt="appLead"></div>
                 <div id="appLab" class="center lt" data-lt="appLab"></div>
@@ -1000,8 +1000,8 @@
                     <div class="cMenuWarnTitle"><div class="actionTitle lt" data-lt="selFeatures">Select Feature and Target Features</div><div class="actionClose closeBtn"><div class="iconSVG"><img src="img/cancel.svg"/></div></div></div>
                     <div class="cMenuCtx">
                         <div class="actionMsg lt" data-lt="selFeaturesInfo"></div>
-                        <div class="propRow"><label class="lt" data-lt="propInputCols" for="ctxInputCols">Feature Columns:</label><input id="ctxInputCols" type="text" data-for-col-config="input" class="val" data-default="" data-val-type="indexRange" data-sel-len="0" required placeholder="None:-1" /><button data-lt="select" data-for-prop="propInputCols" data-for-id="ctxInputCols" data-table-type="source" class="btn1 textOnly colSelBtn lt"></button></div>
-                        <div class="propRow"><label class="lt" data-lt="propTargetCols" for="ctxTargetCols">Target Columns:</label><input id="ctxTargetCols" type="text" data-for-col-config="target" class="val" data-default="" data-val-type="indexRange" data-sel-len="0" placeholder="-1" /><button data-lt="select" data-for-prop="propTargetCols" data-for-id="ctxTargetCols" data-table-type="source" class="btn1 textOnly colSelBtn lt"></button></div>
+                        <div class="propRow"><label class="lt" data-lt="propInputCols" for="ctxInputCols">Feature Columns:</label><input id="ctxInputCols" type="text" data-for-col-config="input" class="val hasMoreBtn" data-default="" data-val-type="indexRange" data-sel-len="0" required placeholder="None:-1" /><button data-lt="select" data-for-prop="propInputCols" data-for-id="ctxInputCols" data-table-type="source" class="btn1 textOnly colSelBtn lt"></button></div>
+                        <div class="propRow"><label class="lt" data-lt="propTargetCols" for="ctxTargetCols">Target Columns:</label><input id="ctxTargetCols" type="text" data-for-col-config="target" class="val hasMoreBtn" data-default="" data-val-type="indexRange" data-sel-len="0" placeholder="-1" /><button data-lt="select" data-for-prop="propTargetCols" data-for-id="ctxTargetCols" data-table-type="source" class="btn1 textOnly colSelBtn lt"></button></div>
                         <div class="btnRow right">
                             <button class="btn1 closeBtn" id="selFeaturesCancel"><div><div class="lt" data-lt="cancel">Cancel</div></div></button>
                             <button class="btn2 actionBtn" id="selFeaturesConfirm"><div><div class="lt" data-lt="confirm">Confirm</div></div></button>
@@ -1033,7 +1033,7 @@
                 <div class="ctx">
                     <div class="cMenuWarnTitle"><div class="actionTitle lt" data-lt="defCirData"></div><div class="actionClose closeBtn" id="warnClose"><div class="iconSVG"><img src="img/cancel.svg"/></div></div></div>
                     <div class="cMenuCtx">
-                        <div class="propRow"><label class="lt" data-lt="propCirCol" for="defCirColSelCols">Cicular Columns:</label><input id="defCirColSelCols" type="text" class="val " data-default="" data-val-type="indexRange" data-sel-len="0" required placeholder="[0]" /><button data-lt="select" data-for-prop="propCirCol" data-for-id="defCirColSelCols" data-table-type="colConfig" data-preprocessing-step="Transformed" class="btn1 textOnly colSelBtn lt"></button></div>
+                        <div class="propRow"><label class="lt" data-lt="propCirCol" for="defCirColSelCols">Cicular Columns:</label><input id="defCirColSelCols" type="text" class="val hasMoreBtn" data-default="" data-val-type="indexRange" data-sel-len="0" required placeholder="[0]" /><button data-lt="select" data-for-prop="propCirCol" data-for-id="defCirColSelCols" data-table-type="colConfig" data-preprocessing-step="Transformed" class="btn1 textOnly colSelBtn lt"></button></div>
                         <div class="propRow"><label class="lt" data-lt="propMinVal" for="defCirColMin">Minimum Value:</label><input id="defCirColMin" type="text" class="val" data-default="" data-val-type="number" required/></div>
                         <div class="propRow"><label class="lt" data-lt="propMaxVal" for="defCirColMax">Maximum Value:</label><input id="defCirColMax" type="text" class="val" data-default="" data-val-type="number" required/></div>
                         <div class="btnRow right">
@@ -1049,7 +1049,7 @@
                 <div class="ctx">
                     <div class="cMenuWarnTitle"><div class="actionTitle lt" data-lt="addTxmT"></div><div class="actionClose closeBtn" id="warnClose"><div class="iconSVG"><img src="img/cancel.svg"/></div></div></div>
                     <div class="cMenuCtx">
-                        <div class="propRow"><label class="lt" data-lt="propTxmCol" for="defTxmSelCols">Transformed Columns:</label><input id="defTxmSelCols" type="text" class="val " data-default="" data-val-type="indexRange" data-sel-len="0" required placeholder="[0]" /><button data-lt="select" data-for-prop="propTxmCol" data-for-id="defTxmSelCols" data-table-type="colConfig" data-preprocessing-step="Input" class="btn1 textOnly colSelBtn lt"></button></div>
+                        <div class="propRow"><label class="lt" data-lt="propTxmCol" for="defTxmSelCols">Transformed Columns:</label><input id="defTxmSelCols" type="text" class="val hasMoreBtn" data-default="" data-val-type="indexRange" data-sel-len="0" required placeholder="[0]" /><button data-lt="select" data-for-prop="propTxmCol" data-for-id="defTxmSelCols" data-table-type="colConfig" data-preprocessing-step="Input" class="btn1 textOnly colSelBtn lt"></button></div>
                         <div class="propRow"><label class="lt" data-lt="propTransSel" for="defTransSel">Transformation:</label>
                             <select id="defTransSel" data-default="normMinMax">
                                 <option class="lt" data-lt="txNormMinMax" data-val="normMinMax">Normalization (using range)</option>
@@ -1118,7 +1118,7 @@
                 <div class="ctx">
                     <div class="cMenuTitle lt" data-lt="finLayerT">Add a Task</div>
                     <div class="propRow"><label class="lt" data-lt="propTaskType" for="appLayerType">Task Type:</label>
-                        <select id="finLayerType" class="taskSwitcher">
+                        <select id="finLayerType" class="taskSwitcher hasMoreBtn">
                             <option class="lt" data-val="Regressor" data-lt="Regressor">Regressor</option>
                             <option class="lt" data-val="Classifier" data-lt="Classifier">Classifier</option>
                         </select>
@@ -1134,8 +1134,8 @@
                         </select>
                     </div>
                     <div class="btnRow right">
-                        <button class="btn1 closeBtn" id="addFinalCancel"><div><div class="lt" data-lt="cancel">Cancel</div></div></button>
-                        <button class="btn2" id="addFinalConfirm"><div><div class="lt" data-lt="confirm">Confirm</div></div></button>
+                        <button class="btn1 closeBtn leftmost" id="addFinalCancel"><div><div class="lt" data-lt="cancel">Cancel</div></div></button>
+                        <button class="btn2 rightmost" id="addFinalConfirm"><div><div class="lt" data-lt="confirm">Confirm</div></div></button>
                     </div>
                 </div>
             </div>
@@ -1198,7 +1198,7 @@
         <div class="contextmenu hide noDisplay fromCenter" id="codePreview" data-at="[-0.5,0]">
             <div class="ctxWrapper">
                 <div class="ctx">
-                    <div class="cMenuTitle lt" data-lt="pyProgT">Python Programme</div>
+                    <div class="cMenuTitle lt" data-lt="pyProgT">Python Program</div>
                     <div class="cMenuCtx">
                         <div class="actionMsg">
                             <span class="lt" data-lt="pyProgInstruction"></span><br />
@@ -1208,7 +1208,7 @@
                         <div class="btnRow right">
                             <div class="checkbox" data-default="" id="finalEmbedNeuralSimplycode" data-val="" data-val-type="checkbox"><div class="checkboxTick"><div class="iconSVG"><img src="img/ok.svg"/></div></div><div class="lt" data-lt="finalEmbedNeuralSimplycode">Embed Neural Simplycode</div></div>
                             <button class="btn1 closeBtn" id="viewPythonBack"><div><div class="lt" data-lt="back">Back</div></div></button>
-                            <button class="btn2" id="viewPythonSave"><div><div class="iconSVG"><img src="img/save.svg"></div><div class="lt" data-lt="save">Save</div></div></button>
+                            <button class="btn2 actionBtn" id="viewPythonSave"><div><div class="iconSVG"><img src="img/save.svg"></div><div class="lt" data-lt="save">Save</div></div></button>
                         </div>
                     </div>
                 </div>

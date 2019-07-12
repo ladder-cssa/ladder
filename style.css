@@ -16,7 +16,7 @@
 
         Version 版本:
 
-            1903.03
+            1903.04
 
         Website & Docs 網站及文件庫:
         
@@ -117,7 +117,7 @@
 
 
 
-/* #region --- Accent Colors - Flexibility to be changed by JavaScript --- UPDATED (Dexter) 20181221 */
+/* #region --- Accent Colors - Flexibility to be changed by JavaScript --- UPDATED (Dexter) 20190408 */
 :root {
     --bg-color: hsl(0,0%,95%);
     --bg-tspr-color: hsla(0,0%,95%,.3);
@@ -133,6 +133,7 @@
     --bg-border-color: var(--bg-darker-color);
     --top-color: hsl(0,0%,10%);
     --top-tslc-color: hsla(0,0%,10%,.5);
+    --top-tspr-color: hsla(0,0%,10%,.3);
     --accent-color: hsl(250,40%,60%);
     --accent-active-color: var(--accent-color);
     --accent-darker-color: hsl(250,40%,50%);
@@ -154,7 +155,7 @@
     --accent2-color: hsl(27,96%,53%);
     --accent3-color: hsl(128,52%,47%);
 }
-@supports (not (-webkit-backdrop-filter: blur(20px))) and (not (backdrop-filter: blur(20px))) {
+@supports (not (-webkit-backdrop-filter: blur(25px))) and (not (backdrop-filter: blur(25px))) {
     :root {
         --bg-acry-color: var(--bg-opq-color);
         --accent-acry-color: var(--accent-opq-color);
@@ -165,7 +166,7 @@
 }
 /* #endregion */
 
-/* #region --- Body and Core Styling --- UPDATED (Dexter) 20190222 */
+/* #region --- Body and Core Styling --- UPDATED (Dexter) 20190513 */
 body {
     background-color: var(--bg-color); color: var(--top-color);
     margin: 0; padding: 0; line-height: 1.5em;
@@ -201,7 +202,16 @@ button {
     border: 1px solid transparent; outline: none;
     font-family: inherit; font-size: inherit; color: inherit; line-height: inherit;
     display: block; padding: 0 .5rem; box-sizing: content-box;
-    transition: all ease-in-out .3s;
+    transition: all ease-in-out .3s; border-radius: .25rem;
+}
+button.leftmost {
+    border-radius: .25rem 0 0 .25rem;
+}
+button.centerBtn {
+    border-radius: 0 0 0 0;
+}
+button.rightmost {
+    border-radius: 0 .25rem .25rem 0rem;
 }
 button:hover {
     border-color: var(--accent-border-tslc-color);
@@ -219,17 +229,21 @@ button:active>div {
 input:not([type=range]), textarea, select {
     background-color: transparent;
     background-image: none;
-    border: 1px solid var(--accent-border-tslc-color);
+    border: 1px solid var(--accent-border-tslc-color); border-radius: .25rem;
     font-family: inherit; font-size: inherit; color: inherit; line-height: inherit;
     transition: border ease-in-out .3s, background-color ease-in-out .25s;
     min-width: 0;
     padding: .25rem .5rem;
+}
+input:focus, textarea:focus, select:focus {
+    outline: none;
 }
 select {
     transition: border ease-in-out .3s;
 }
 input:not([type=range]):active, textarea:active, select:active, input:not([type=range]):focus, textarea:focus, select:focus {
     background-color: var(--bg-color);
+    transition-duration: .05s;
 }
 input:not([type=range]):hover, textarea:hover, select:hover, input:not([type=range]):focus, textarea:focus, select:focus {
     border-color: var(--accent-border-opq-color);
@@ -272,7 +286,7 @@ option:active, option:focus, option:checked {
 
 /* #endregion */
 
-/* #region --- Top navigation bar and core content   --- UPDATED (Dexter) 20181220 */
+/* #region --- Top navigation bar and core content   --- UPDATED (Dexter) 20190509 */
 #appNav {
     position: fixed; z-index: 2;
     top: 0; left: 0;
@@ -301,7 +315,7 @@ option:active, option:focus, option:checked {
 #appNav.start #rightTools {transform: translate(0, .5em); }
 
 #rightTools {margin: 0 2% 0 auto; height: 100%; display: flex; align-items: center;}
-#appNav button {width: 3em; height: 3em; padding: 0; display: flex; justify-content: center; align-items: center; border: 0;  }
+#appNav button {width: 3em; height: 3em; padding: 0; display: flex; justify-content: center; align-items: center; border: 0; border-radius: 0; }
 #appNav button>.svgIcon {width: 2em; height: 2em; border-radius: 100%; display: flex; justify-content: center; align-items: center; transition: background-color ease-in-out .5s; }
 #appNav button>.svgIcon>img {width: 1.75em; height: 1.75em; transition: transform ease-in-out .5s, filter ease-in-out .25s; filter: saturate(0) brightness(2); }
 #appNav button:hover>.svgIcon>img { transform: scale(1.2); }
@@ -326,7 +340,7 @@ option:active, option:focus, option:checked {
     width: 12rem; 
     background-color: var(--accent-acry-color);
     color: var(--accent-top-color);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
     transition: right ease-in-out .35s;
 }
 #appNav.start~#settings {top: .5rem;}
@@ -390,7 +404,7 @@ a.settingsLink {
 
 /* #endregion */
 
-/* #region --- Start Screen --- UPDATED (Dexter) 20190224 */
+/* #region --- Start Screen --- UPDATED (Dexter) 20190506 */
 #startScreen {
     position: fixed; width: 100%; height: calc(100% - .5rem); z-index: 1;
     top: 0.5rem; border: 0px dashed var(--accent-border-color);
@@ -415,12 +429,12 @@ a.settingsLink {
     width: 100%; 
     display: flex; justify-content: center; align-items: center;
 }
-.ssBtn {width: 15%; min-width: 12em; max-width: 13em; height: 22em; margin: 1em .75em; background-color: var(--bg-lighter-color); border: 1px solid var(--accent-border-color);
-        transition: border ease-in-out .25s, box-shadow ease-in-out .25s; box-sizing: border-box;}
+.ssBtn {width: 15%; min-width: 12em; max-width: 13em; height: 22em; margin: 1em .75em; background-color: var(--bg-lighter-color); border: 1px solid var(--bg-darker-color);
+    transition: border ease-in-out .5s, box-shadow ease-in-out .25s; box-sizing: border-box; border-radius: .25rem;}
 .ssBtn>img {width: 7em; height: 7em; transition: all ease-in-out .5s; }
 .ssBtn>div {margin-top: 2em; display: flex; flex-direction: column; justify-content: center; align-items: center; }
 .ssBtnTxtHL {font-size: 2em; line-height: 1.7em; color: var(--accent-text); font-weight: 200; }
-.ssBtn:hover {background-color: var(--bg-lighter-color); box-shadow: .35em .25em 1.2em hsla(0,0%,0%,.2);}
+.ssBtn:hover {background-color: var(--bg-lighter-color); border-color: var(--accent-color); box-shadow: 0em .6em 1.5em hsla(0,0%,0%,.2);}
 .ssBtn:hover>img {transform: scale(1.2);}
 @media (max-width: 42rem) {
     #ssBtns {flex-direction: column;}
@@ -505,7 +519,7 @@ a.settingsLink {
     width: 25rem; height: calc(100% - 3rem);
     border-left: 1px solid var(--bg-border-color);
     background-color: var(--bg-lighter-acry-color);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
     display: flex; justify-content: center; align-items: center; flex-wrap: nowrap;
     overflow: hidden;
     transition: width ease-in-out .35s;
@@ -590,7 +604,7 @@ a.settingsLink {
 }
 /* #endregion --- Common Widgets --- Button Rows */
 
-/* #region --- Common Widgets --- Common Button Styles --- UPDATED (Dexter) 20181221 */
+/* #region --- Common Widgets --- Common Button Styles --- UPDATED (Dexter) 20190506 */
 button.btn1.activated, button.btn2 {
     border-color: var(--accent-active-color);
     background-color: var(--accent-active-acry-color);
@@ -627,7 +641,7 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 }
 /* #endregion --- Common Widgets --- Common Button Styles */
 
-/* #region --- Common Widgets --- Property Rows --- UPDATED (Dexter) 20180821*/
+/* #region --- Common Widgets --- Property Rows --- UPDATED (Dexter) 20190513 */
 .propRow {
     display: flex; align-items: center; justify-content: center;
     width: 90%; padding: .25rem 5%;
@@ -641,13 +655,17 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 .propRow>input, .propRow>select, .propRow>.checkbox, .propRow>div.val {
     flex-grow: 1; align-self: stretch;
 }
+.propRow>input.hasMoreBtn, .propRow>select.hasMoreBtn {
+    border-radius: .25rem 0 0 .25rem;
+}
 .propRow>div.val {
-    padding: .25rem .5rem;
+    padding: .3rem .5rem;
 }
 .propRow>input~button,.propRow>select~button {
     align-self: stretch;
     width: 2.5rem; flex-shrink: 0;
     padding: 0;
+    border-radius: 0 .25rem .25rem 0;
 }
 .propRow>input~button.textOnly,.propRow>select~button.textOnly {
     align-self: stretch;
@@ -676,10 +694,10 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 }
 .propListItem>div:first-child {
     text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    flex-grow: 1;
+    margin-right: .5em;
 }
 .propListItem>.rmv {
-    opacity: 0; width: 2.5rem; text-align: center;
+    opacity: 0; width: 2.5rem; text-align: center; margin-left: auto;
     transition: all ease-in-out .3s;
 }
 .propListItem:hover>.rmv {
@@ -689,7 +707,7 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
     width:90%; margin: 0 5%; display: flex; justify-content: center;
 }
 .propTable {
-    width:90%; margin: 0 5%; overflow: auto; display: flex; max-height: 25em;
+    width:90%; margin: .25em 5%; overflow: auto; display: flex; max-height: 25em;
 }
 .propTable>div {
     margin: 0 auto;
@@ -728,9 +746,9 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 }
 /* #endregion --- Common Widgets --- Property Rows */
 
-/* #region --- Common Widgets --- Customized Property Rows */
+/* #region --- Common Widgets --- Customized Property Rows --- UPDATED (Dexter) 20190412 */
 .propListItem .txCols {
-    flex-grow: 1; margin: 0 .25rem;
+    margin: 0 .25rem; min-width: 30%;
 }
 .propListItem .txType {
     flex-grow: 0;
@@ -787,9 +805,9 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 }
 /* #endregion --- Common Widgets --- Checkbox */
 
-/* #region --- Common Widgets --- Spreadsheet --- UPDATED (Dexter) 20181207 */
+/* #region --- Common Widgets --- Spreadsheet --- UPDATED (Dexter) 20190513 */
 .spreadsheet {
-    position: relative;
+    position: relative; touch-action: none;
     display: flex; flex-direction: column;
 }
 .spreadsheet>div {
@@ -836,7 +854,7 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
     box-sizing: border-box; border: 2px solid transparent;
     pointer-events: none;
     content: "";
-    border-color: var(--accent-border-tslc-color);
+    border-color: var(--accent-border-tslc-color); border-radius: .25rem;
     transition: all ease-in-out .15s;
 }
 .spreadsheet.focused .focusRing {
@@ -978,7 +996,7 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 
 /* #endregion --- Edit Project --- Input Start Screen */
 
-/* #region --- Edit Project --- Core Editing Environment --- UPDATED (Dexter) 20181221 */
+/* #region --- Edit Project --- Core Editing Environment --- UPDATED (Dexter) 20190513 */
 #editCore {
     width: 100%; height: 100%; bottom: 0; left: 0;
     display: flex; flex-wrap: wrap; flex-direction: column;
@@ -993,11 +1011,11 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
     margin: .25rem .5rem; height: 2rem; flex-shrink: 0;
     display: flex; justify-content: left; align-items: center;
     background-color: var(--bg-acry-color);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
 }
 .toolBarGroup {
     margin: 0 .25rem; color: white; height: 2.5rem; padding: 0 .5rem;
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
     display: flex; align-items: center; justify-content: left; flex-shrink: 0;
 }
 #attachOnBtns, #connectToBtns {
@@ -1014,8 +1032,8 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
     display: flex; justify-content: center; align-items: center;
 }
 #editProp {
-    width: 24rem; height: calc(100% - 1em); margin: .5em; background-color: var(--bg-lighter-acry-color);
-    box-sizing: border-box; border: 1px solid var(--bg-border-color); border-radius: .75em;
+    width: 24rem; height: calc(100% - 1em); margin: .5em; background-color: var(--bg-lighter-acry-color); border-radius: .25rem;
+    box-sizing: border-box; border: 1px solid var(--bg-border-color); box-shadow: 0.75em 0.5em 1.5em var(--top-tspr-color);
 }
 #editProp.connectionMode input, #editProp.connectionMode textarea, #editProp.connectionMode select,
 #editProp.connectionMode div.checkbox, #editProp.connectionMode button.moreConfig {
@@ -1033,7 +1051,7 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 }
 @media (max-width: 45rem) {
     #editProp {
-        position: fixed; height: calc(100% - 4em); width: calc(100% - 1em); z-index: 2; right: 0; transform: translate(0%, 0);
+        position: fixed; height: calc(-3em + 100%); width: 100%; margin: 0; border-radius: 0; box-shadow: none; z-index: 2; right: 0; transform: translate(0%, 0);
         backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); transition: all ease-in-out .5s;
     }
     #editGraph {
@@ -1051,7 +1069,7 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
     }
     .toolBarGroup>.toolBarGroupIcon {
         width: 3.5em; box-sizing: border-box; 
-        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
         transition: all ease-in-out .25s;
     }
     .toolBarGroup:not(.activated):not(:hover)>.toolBarGroupIcon {
@@ -1072,7 +1090,7 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
         position: absolute; margin: 0; left: 0; z-index: 2; top: 2.5em;
         width: 100%; height: auto; flex-wrap: wrap;
         background-color: var(--toolboxColor);
-        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
         padding-bottom: .5rem; justify-content: center;
     }
     .toolBarGroup .toolBarGroupBtns .toolBarGroupTitle {
@@ -1096,7 +1114,7 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 }
 /* #endregion --- Edit Project --- Core Editing Environment */
 
-/* #region --- Edit Project --- Model Graph --- UPDATED (Dexter) 20190213 */
+/* #region --- Edit Project --- Model Graph --- UPDATED (Dexter) 20190410 */
 #editGraphWrapper {
     width: 100%; max-height: 100%; 
     overflow-y: auto; overflow-x: hidden;
@@ -1129,12 +1147,12 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 }
 .layer:hover {
     border-color: var(--accent-darker-color);
-    box-shadow: .5rem .5rem 2rem var(--top-tslc-color);
+    box-shadow: .5rem .5rem 2rem var(--top-tspr-color);
 }
 .layer:active {
     transform: scale(.95);
     transition-duration: .03s;
-    box-shadow: .35rem .35rem 1.5rem var(--top-tslc-color);
+    box-shadow: .35rem .35rem 1.5rem var(--top-tspr-color);
 }
 .colConfigRow .layer {
     width: 13rem; background-color: var(--bg-darker-color);
@@ -1196,7 +1214,7 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
     display: none;
 }
 
-.layerConn { width: 3rem; height: calc(2px + 5.5rem);}
+.layerConn, .taskConn { width: 3rem; height: calc(2px + 5.5rem);}
 
 .edgeRow {
     width: 100%; height: 3rem;
@@ -1206,6 +1224,10 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 }
 .edgeRow>svg>path, .layerConn>path {
     stroke: var(--top-color);
+    opacity: .6;
+}
+.edgeRow>svg>path.task, .taskConn>path {
+    stroke: var(--accent3-color);
     opacity: .6;
 }
 
@@ -1222,7 +1244,7 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 }
 /* #endregion --- Edit Project --- Model Graph */
 
-/* #region --- Edit Project --- Properties Pane --- UPDATED (Dexter) 20181211 */
+/* #region --- Edit Project --- Properties Pane --- UPDATED (Dexter) 20190506 */
 .editPropHeading {
     width: 95%; height: 2.5rem; line-height: 2.5rem; padding: 0 2.5%;
     color: var(--accent-text);
@@ -1231,7 +1253,7 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
     font-weight: 700;
 }
 .propWin {
-    width: 100%; height: calc(100% - 3.25rem);
+    width: 100%; height: calc(100% - 2.5rem);
     overflow-x: hidden; overflow-y: auto;
 }
 .propWinName {
@@ -1259,27 +1281,29 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
     width: 17rem;
 }
 #propInfo .ctx>div {
-    margin: .5rem 1rem;
+    margin: .75rem 1.5rem;
 }
 
 /* #endregion --- Edit Project --- Properties Pane */
 
-/* #region --- Edit Project --- Context Flyouts --- UPDATED (Dexter) 20181221 */
+/* #region --- Edit Project --- Context Flyouts --- UPDATED (Dexter) 20190506 */
 #selFeatures {width: 25rem;}
 .cMenuTitle {width: 90%; margin: .5rem 5%; font-size: 1.25rem; line-height: 1.75em;}
-.cMenuWarnTitle {width: 100%; display: flex; height: 1.75rem; height: 1.75rem; }
-.actionTitle { flex-grow:1; margin: .25rem 5%; line-height: 1.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .85rem; font-weight: 800; }
-.actionClose { color: var(--accent-border-color); height: 100%; width: 3rem; transition: all ease-in-out .25s; text-align: center; display: flex; justify-content: center; align-items: center;}
+.cMenuWarnTitle {width: 100%; display: flex; height: 3rem; align-items: center; }
+.actionTitle { flex-grow:1; margin: .25rem 1rem; line-height: 2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .85rem; font-weight: 800; }
+.actionClose { color: var(--accent-border-color); height: 1.8rem; width: 1.8rem; margin-right: .75rem; border-radius: 100%; transition: all ease-in-out .25s; text-align: center; display: flex; justify-content: center; align-items: center;}
 .actionClose:hover { background-color: var(--accent-border-color); color: var(--accent-top-color); }
 .actionClose:active { font-size: .8rem; }
 .closeBtn > .iconSVG {display: flex; justify-content: center; align-items: center;}
 .closeBtn > .iconSVG img { width: 1.5em; height: 1.5em; filter: var(--accent-filter);transition: all ease-in-out .25s; }
 .closeBtn:hover > .iconSVG img, .closeBtn:active > .iconSVG img {filter: var(--accent-top-filter);}
+.actionBtn {margin-left: .5rem;}
 
 .actionMsg {margin: 1rem 0; line-height: 1.75em; }
 .warnMsg {text-align: center; display: flex; align-items: center; justify-content: center;}
-.cMenuCtx { width: 90%; margin: .25rem 5%; }
-#appLayerCtx, #addFinalCtx, #defCirColCtx, #addTxmCtx, #varConfigCtx {width: 21rem;}
+.cMenuCtx { width: 90%; margin: .5rem 5%; }
+#appLayerCtx, #addFinalCtx, #defCirColCtx, #varConfigCtx {width: 21rem;}
+#addTxmCtx {width: 23rem;}
 #appLayerCtx label, #addFinalCtx label {width: 5rem;}
 #codePreview {width: 100%;}
 #codePreview>.cMenuTitle {margin: .75rem 5%;}
@@ -1288,6 +1312,7 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 #imgPreview {width: 40rem; max-width: 100%;}
 #graphImgEle {width: 100%;}
 #warningMsg {width: 25rem; max-width: 100%;}
+
 /* #endregion --- Edit Project --- Context Flyouts */
 
 /* #region --- Results Folder --- Core Environment */
@@ -1470,8 +1495,8 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 .traceLogHeaderInfo {
     position: sticky;
     background-color: var(--bg-acry-color);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
     top: 0;
 }
 .traceLogType, .traceLogHeaders {
@@ -1515,8 +1540,8 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
     margin: 1rem 10%;
     border: 1px solid var(--bg-border-color);
     background-color: var(--bg-acry-color);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1536,7 +1561,7 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 .notification {
 	flex-shrink: 0; position: relative;flex-grow: 1; overflow: hidden; transition: all ease-in-out .35s;
 	width: 100%; background-color: var(--accent-acry-color); color: var(--accent-top-color); margin-top: .5rem; 
-	display: flex; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+	display: flex; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
 	animation: nfIn .35s ease-in-out backwards;
 }
 .notification .icon {
@@ -1558,7 +1583,7 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 #notificationTemplate {display: none;}
 /* #endregion --- Common Widgets --- Notifications*/
 
-/* #region --- Common Widgets --- Context Menus and Flyouts */
+/* #region --- Common Widgets --- Context Menus and Flyouts --- UPDATED 20190509 */
 .contextmenu {
 	width: 15rem; height: 0rem; z-index: 10; overflow: visible; display: flex; flex-direction: column;
     position: fixed; right: 0; bottom: 0; justify-content: flex-start; flex-wrap: nowrap;
@@ -1569,22 +1594,26 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 .contextmenu.fromCenter {
     justify-content: center;
 }
-.contextmenu.compact {
-    width: 13rem;
-}
 .contextmenu.btnOnly .ctx {
-    padding: .25rem 0;
+    padding: .5rem 0;
+}
+.contextmenu.btnOnly button {
+    border-radius: 0;
 }
 .contextmenu .ctx>button, .contextmenu .ctx>button:hover, .contextmenu .ctx>button:active {
-    width: 100%; height: 2.25rem; line-height: 2.25rem; display: flex;
+    width: calc(100% - 1em); height: 2.25rem; line-height: 2.25rem; display: flex;
     border-left: 0; border-right: 0;
     display: flex; align-items: center;
+}
+.contextmenu .ctx>button:active:hover {
+    transition-duration: .05s;
 }
 .contextmenu .ctx>button:not(:hover):not(:active):not(.activated) {
     border-color: transparent;
 }
 .contextmenu .ctx>button:hover:not(:active):not(.activated) {
     background-color: var(--bg-darker-acry-color);
+    border-color: transparent;
 }
 .contextmenu .ctx>button>.icon {
     width: 2.5rem; min-width: 2.5rem; font-size: .9rem;
@@ -1600,7 +1629,7 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
     max-width: calc(100% - 2.25rem); font-size: .9rem;
 }
 .cmSeperator {
-    width: 80%; height: 1px; margin: .2rem 10%;
+    width: calc(100% - 3.5rem); height: 1px; margin: .25rem .5rem .25rem 3rem;
     background-color: var(--bg-darker-color);
 }
 .contextmenu.compact .ctx>button {
@@ -1612,20 +1641,28 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 .contextmenu>.ctxWrapper {
     overflow:hidden; flex-shrink: 0; flex-grow: 1; width: 100%;
     display: flex; flex-direction: column; justify-content: flex-end; flex-wrap: nowrap;
-    transition: all ease-in-out .3s;
+    transition: all ease-in-out .25s; transform-origin: 0 0;
     box-sizing: border-box;
-    border: 1px solid var(--accent-border-color);
+    border: 1px solid var(--bg-darker-color); 
+    box-shadow: .23em .2em 1.25em var(--top-tspr-color);
 }
 .contextmenu.fromCenter>.ctxWrapper {
-    justify-content: center;
+    justify-content: center; transform-origin: 50% 50%;
 }
 .contextmenu.hide>.ctxWrapper {
     flex-shrink: 1;
+    /** transform: scale(.9); --- TODO - Not ready to implement due to backdrop-filter/transformation conflict in new Edge/Chrome.**/
+}
+.contextmenu.hide.out>.ctxWrapper {
+    flex-shrink: 0; opacity: 0; transition-duration: .13s; transform: none;
 }
 .contextmenu .ctx {
     width: 100%; flex-shrink: 0; flex-grow: 1;
     background-color: var(--bg-lighter-acry-color);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+}
+.contextmenu.hideOut>.ctxWrapper .ctx {
+    backdrop-filter: none; -webkit-backdrop-filter: none;
 }
 .contextmenu .ctx.menu>div{
     height: 1.75rem; 
@@ -1633,6 +1670,7 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 .contextmenu.compact .ctx.menu>div{
     height: 1.25rem; 
 }
+#cmSource {width: 17em; }
 /* #endregion --- Common Widgets --- Context Menus and Flyouts */
 
 /* #region --- Common Widgets --- Customized Context Menus and Flyouts */

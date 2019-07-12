@@ -19,7 +19,7 @@
 
         Version 版本:
 
-            1903.03
+            1903.04
 
         Website & Docs 網站及文件庫:
         
@@ -282,6 +282,92 @@ class Matrix {
             return [];
         }
     }
+
+    /**
+     * Copy an array in-depth.   --- UPDATED (Dexter) 20190323
+     * @param {Array} ary - Array of data.
+     * @returns {Array} - Copied array.
+     */
+    static copy(ary) {
+        if (ary instanceof Array) {
+            var newAry = [...ary];
+            if (newAry[0] instanceof Array) {
+                return newAry.map(a=>Matrix.copy(a));
+            } else {
+                return newAry;
+            }
+        } else {
+            throw "Given object is not in an n-dimensional array. It cannot be used with Matrix.copy() function.";
+        }
+    }
+
+    /**
+     * Select an array by index range selections.   --- UPDATED (Dexter) 20190505
+     * @param {Array} ary - Array of data.
+     * @param {Array<String>} selections - The selection list according to each dimension, with each selection string parsable by @IndexRange.parse method.
+     * @returns {Array} - The requested array.
+     */
+    static selection(ary, selections = [":"]) {
+        if (selections.length >= 1 && ary instanceof Array) {
+            // Get the shape of the requested array.
+            var shape = Matrix.getShape(ary);
+
+            // Get the selection string of this dimension.
+            var rangeStr = selections[0];
+            
+            // Prepare a new array copy.
+            var newAry;
+
+            // Slice the array if needed.
+            if (rangeStr == ":" || rangeStr == "None:None") {
+                newAry = Matrix.copy(ary);
+            } else if (rangeStr.includes(":")) {
+                var rangeSel = rangeStr.split(":").map(str=>str.trim());
+                if (rangeSel[0] == "None" || rangeSel[0] == "") rangeSel[0] = 0;
+                if (rangeSel[1] == "None" || rangeSel[1] == "") rangeSel[1] = ary.length;
+                rangeSel = rangeSel.map(n=>Number(n)).map(n=>Math.min(Math.max((n<0 ? (ary.length + n) : n), 0), ary.length));
+                newAry = ary.slice(...rangeSel);
+            } else {
+                let indices = IndexRange.parse(ary.length, rangeStr);
+                newAry = ary.filter((row,i)=>indices.includes(i));
+            }
+            
+            // If there is no more inner array, return this level of array. Otherwise, selection is applied in inner arrays.
+            if (shape.length == 1) return newAry;
+            else return newAry.map(innerArray => Matrix.selection(innerArray, selections.slice(1)));
+        } else {
+            // If no selection string is specified, just copy the array.
+            return Matrix.copy(ary);
+        }
+    }
+
+    /**
+     * Transform an array in-place by a function partially by index range selections.   --- UPDATED (Dexter) 20190323
+     * @param {*} ary - Array of data.
+     * @param {Array<String>} selections - The selection list according to each dimension, with each selection string parsable by @IndexRange.parse method.
+     * @param {Function} ftn - Value mapping function.
+     */
+    static mapSelection(ary, selections = [":"], ftn = v=>v) {
+        if (selections.length >= 1 && ary instanceof Array) {
+            var selCol = selections[0];
+            var shape = Matrix.getShape(ary);
+            var indices = IndexRange.parse(shape[0], selCol);
+            if (shape.length == 1) {
+                for (let idx of indices) {
+                    ary[idx] = ftn(ary[idx]);
+                }
+            } else if (shape.length > 1) {
+                for (let idx of indices) {
+                    Matrix.mapSelection(ary[idx], selections.slice(1), ftn);
+                }
+            }
+        } else if (ary instanceof Array) {
+            ary.forEach((v,i,a)=>{
+                if (v instanceof Array) Matrix.mapSelection(ary[idx], [], ftn);
+                else a[i] = ftn(v);
+            });
+        }
+    }
 }
 
 /** An enumeration object.   --- UPDATED (Desxter) 20181128 */
@@ -386,7 +472,7 @@ class Theme {
     }
 
     /**
-     * Get a predifined theme array.   --- UPDATED (Dexter) 20190209
+     * Get a predifined theme array.   --- UPDATED (Dexter) 20190408
      * @param {String} key - A pre-defined theme name.
      * @returns {Array<Array<String>>} - A 2D theme array, with CSS variable name and value pair.
      */
@@ -406,6 +492,7 @@ class Theme {
             ["--bg-border-color", "var(--bg-darker-color)"],
             ["--top-color", "hsl(0,0%,10%)"],
             ["--top-tslc-color", "hsla(0,0%,10%,.5)"],
+            ["--top-tspr-color", "hsla(0,0%,10%,.3)"],
             ["--accent-color", "hsl(250,40%,60%)"],
             ["--accent-active-color", "var(--accent-acry-color)"],
             ["--accent-darker-color", "hsl(250,40%,50%)"],
@@ -437,6 +524,7 @@ class Theme {
             ["--bg-border-color", "var(--bg-darker-color)"],
             ["--top-color", "hsl(0,0%,90%)"],
             ["--top-tslc-color", "hsla(0,0%,90%,.5)"],
+            ["--top-tspr-color", "hsla(0,0%,90%,.3)"],
             ["--accent-color", "hsl(250,40%,60%)"],
             ["--accent-active-color", "var(--accent-acry-color)"],
             ["--accent-darker-color", "hsl(250,40%,50%)"],
@@ -467,6 +555,7 @@ class Theme {
             ["--bg-darker-opq-color", "hsla(0,0%,15%,.9)"],
             ["--top-color", "hsl(0,0%,80%)"],
             ["--top-tslc-color", "hsla(0,0%,80%,.5)"],
+            ["--top-tspr-color", "hsla(0,0%,80%,.3)"],
             ["--accent-color", "hsl(180,0%,16%)"],
             ["--accent-active-color", "hsl(180,40%,60%)"],
             ["--bg-border-color", "var(--accent-active-color)"],
@@ -514,7 +603,18 @@ class App {
     static get uid() { return this._uid; } static set uid(v) { this._uid = v; }
 
     /**
-     * App preparation during the parsing of this script before DOM is loaded.   --- UPDATED (Dexter) 20180523
+     * Get accessible modules by a string.  --- UPDATED (Dexter) 20190406
+     * @param {String} moduleName - The module name.
+     * @param {Class} - The requested module.
+     */
+    static Modules(moduleName) {
+        return ({"DataPreprocessing": DataPreprocessing,
+                "ModelNode": ModelNode,
+                "Train": Train, "Source": Source})[moduleName];
+    }
+
+    /**
+     * App preparation during the parsing of this script before DOM is loaded.   --- UPDATED (Dexter) 20190317
      */
     static prepare() {
         // Initialize necessary global app varialbles
@@ -1005,6 +1105,14 @@ class App {
     }
 
     /**
+     * Go back to the start screen.   --- UPDATED (Dexter) 20180523
+     * @param {Event} e - A `click` event.
+     */
+    static backToStart(e) {
+        App.gotoPage("startScreen");
+    }
+
+    /**
      * Get the image folder location.   --- UPDATED (Dexter) 20190317
      * @returns {String} - The image folder location.
      */
@@ -1031,14 +1139,6 @@ class App {
     }
 
     /**
-     * Go back to the start screen.   --- UPDATED (Dexter) 20180523
-     * @param {Event} e - A `click` event.
-     */
-    static backToStart(e) {
-        App.gotoPage("startScreen");
-    }
-
-    /**
      * Creates a global unique ID through integer increment.   --- UPDATED (Dexter) 20180523
      * @returns {Number} - A new unique ID.
      */
@@ -1055,7 +1155,7 @@ class App {
     }
 
     /**
-     * An async function for getting the `NeuralSimplycode` source file.   --- UPDATED (Dexter) 20180523
+     * An async function for getting the `NeuralSimplycode` source file.   --- UPDATED (Dexter) 20190317
      * @returns {Promise<String>} - Finishes after getting and parsing the `NeuralSimplycode` sourcefile, and resolve the source file. Resolve `import NeuralSimplycode\n` in case no NeuralSimplycode embedding is preferred.
      */
     static async getNeuralSimplycode() {
@@ -1089,7 +1189,7 @@ class App {
      * Control the count of children elements, which is useful in preparing a list with varied item counts.   --- UPDATED (Dexter) 20181120
      * @param {Element} forObj - The parent element.
      * @param {Number} length - The target number of children.
-     * @param {Element} templateObj - The template children element that would be cloned.
+     * @param {Element} templateObj - The template children element that would be cloned. ID will be removed automatically; "noDisplay" class will be removed automatically.
      * @param {String} className - The class of children to consider.
      * @param {Function} onCreate - A function that apply on every newly created elements.
      * @param {Function} onLoop - A function to loop all finally appearing children.
@@ -1130,21 +1230,42 @@ class App {
 
     
     /**
-     * For each single HTML element, apply the value onto the UI. This is typically used during the option showing of sidebar.   --- UPDATED (Dexter) 20180726
+     * For each single HTML element, apply the value onto the UI. This is typically used during the option showing of sidebar.   --- UPDATED (Dexter) 2019507
      * @param {Element} ele - An HTML element of showing the value of a property.
      * @param {(Number|String|Boolean)} toValue - The value to be set.
      */
     static applyPropVal(ele, toValue) {
         // Determine what element is this, and apply the value to show for the user
         if (ele.localName == "input") {
-            ele.value = (toValue == undefined || toValue == null)? "" : toValue;
+            if (ele.dataset.valType == "percentage") {
+                // If it's percentage, multiply by 100.
+                ele.value = (toValue == undefined || toValue == null)? "" : (toValue * 100);
+            } else {
+                // Otherwise, just fill in the value.
+                ele.value = (toValue == undefined || toValue == null)? "" : toValue;
+            }
         } else if (ele.localName == "select") {
             if (toValue instanceof Array) {
+                // Select the index fulfulling all the requirements.
                 ele.selectedIndex = [...ele.getElementsByTagName("option")].findIndex(opt=>toValue.every(([key,value])=>opt.dataset[key] == value));
             } else {
+                if (ele.dataset.enum && ele.dataset.enumModule && !isNaN(Number(toValue))) {
+                    // Get the enumeration.
+                    var enumVal = App.Modules(ele.dataset.enumModule)
+                    var enumPos = ele.dataset.enum.split(".");
+                    for (let subClass of enumPos) {
+                        enumVal = enumVal[subClass];
+                    }
+    
+                    // Convert to value into enumeration values
+                    toValue = enumVal.getName(toValue);
+                } 
+
+                // Select the index that is matched with the value.
                 ele.selectedIndex = [...ele.getElementsByTagName("option")].findIndex(opt=>(toValue == null ? opt.dataset.val == "" : opt.dataset.val == toValue));
             }
         } else if (ele.classList.contains("checkbox")) {
+            // Tick or untick the check box according to toValue is 1 or nothing/0.
             ele.classList[toValue ? "add": "remove"]("ticked");
             ele.dataset.val = toValue ? "1" : "";
         }
@@ -3861,7 +3982,7 @@ class Train {
     }
 
     /**
-     * Set the property of this Train or one of its objects like layers, sources, etc.   --- UPDATED (Dexter) 20190129
+     * Set the property of this Train or one of its objects like layers, sources, etc.   --- UPDATED (Dexter) 20190712
      * @param {Element} ele - An HTML element of the user-interacting properties changes
      * @param {String} propType - The property type, like a train, training source, layer, etc.
      * @param {String} prop - The property name
@@ -3873,7 +3994,7 @@ class Train {
         if (propType == "Train") {
             if (prop == "device") {
                 // CNN dilation is not supported in CPU calculation.
-                if (toValue.startsWith("/cpu") && [...this.layerProfiles.values()].some(lp=>lp.convDilation != 0)) InputBox.showError(ele, "dilationDeviceErr", true);
+                if (toValue.startsWith("/cpu") && [...this.layerProfiles.values()].some(lp=>("convDilation" in lp) && lp.convDilation != 0)) InputBox.showError(ele, "dilationDeviceErr", true);
                 else this[prop] = toValue;
             } else {
                 // If it's referring to "Train", the property is updating on this Train object.
@@ -3953,8 +4074,8 @@ class Train {
             if (["layerUnits", "convFilterWidth", "convDilation", "convPadding", "_convStrideX", "_convStrideY"].includes(prop)) {
                 // If it's changing shape-related property, this would need model tracing.
                 var configChanges = {};
-                if (prop == "_convStrideX") configChanges["convStride"] = [toValue, layer["convStride"][1]];
-                if (prop == "_convStrideY") configChanges["convStride"] = [layer["convStride"][0], toValue];
+                if (prop == "_convStrideY") configChanges["convStride"] = [toValue, layer["convStride"][1]];
+                if (prop == "_convStrideX") configChanges["convStride"] = [layer["convStride"][0], toValue];
                 configChanges[prop] = toValue;
                 var applyApplicable = layer.applyShapeChanges(undefined, configChanges);
                 if (applyApplicable.result) this._project.drawTrain();
@@ -6526,7 +6647,7 @@ class BasicLayer extends ModelNode.Layer.Config {
 /** Class representing a convolutional layer.   --- UPDATED (Dexter) 20180524 */
 class CNNLayer extends ModelNode.Layer.Config {
     /**
-     * Create a convolutional layer.   --- UPDATED (Dexter) 20190221
+     * Create a convolutional layer.   --- UPDATED (Dexter) 20190708
      * @param {String} name - The name of this layer.
      * @param {Number} layerUnits - The number of hidden units in this layer.
      * @param {Number} convFilterWidth - The convolutional layer filter width.
@@ -6568,7 +6689,7 @@ class CNNLayer extends ModelNode.Layer.Config {
         /** @type {Boolean} - Whether transpose is required for the referenced weight. */
         this.refLayerTranspose = refLayerTranspose;
         this._type = "CNNLayer";
-        [this._convStrideX, this._convStrideY] = convStride;
+        [this._convStrideY, this._convStrideX] = convStride;
     }
 
     /**
@@ -6650,7 +6771,7 @@ class CNNLayer extends ModelNode.Layer.Config {
     }
 
     /**
-     * Get the shape of layer-specific-processed tensor of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20181127
+     * Get the shape of layer-specific-processed tensor of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20190708
      * @param {(Number|String)[]} preprocessedIncomingShape - A shape array of pre-proccessed incoming shape.
      * @returns {Array} - Return the shape of the tensor after layer-specific operation.
      */
@@ -6664,7 +6785,7 @@ class CNNLayer extends ModelNode.Layer.Config {
 
         // Determine whether CNN padding is used.
         if (convPadding) {
-            return [...preprocessedIncomingShape.slice(0,-1), layerUnits];
+            return [preprocessedIncomingShape[0], Math.ceil(preprocessedIncomingShape[1] / convStride[0]), Math.ceil(preprocessedIncomingShape[2] / convStride[1]), layerUnits];
         } else {
             // If no padding is used, the shape will be changed according to the CNN filter and dilation configurations.
             var height = preprocessedIncomingShape[1];
@@ -6696,7 +6817,7 @@ class CNNLayer extends ModelNode.Layer.Config {
 /** Class representing a DCNN Layer.   --- UPDATED (Dexter) 20180819 */
 class DCNNLayer extends ModelNode.Layer.Config {
     /**
-     * Create a DCNN layer.   --- UPDATED (Dexter) 20190221
+     * Create a DCNN layer.   --- UPDATED (Dexter) 20190708
      * @param {String} name - The name of this layer.
      * @param {Number} layerUnits - The number of hidden units in this layer.
      * @param {Number} convFilterWidth - The deconvolution filter width.
@@ -6737,7 +6858,7 @@ class DCNNLayer extends ModelNode.Layer.Config {
         /** @type {Boolean} - Whether transpose is required for the referenced weight. */
         this.refLayerTranspose = refLayerTranspose;
         this._type = "DCNNLayer";
-        [this._convStrideX, this._convStrideY] = convStride;
+        [this._convStrideY, this._convStrideX] = convStride;
     }
     
     /**
@@ -11072,8 +11193,8 @@ class Project {
                 App.applyPropVal($("appLayerCount"),refLayer.getPreprocessedIncomingShape().slice(-1));
                 App.applyPropVal($("appTransRefWeight"),true);
                 App.applyPropVal($("appDilation"),refLayer.convDilation);
-                App.applyPropVal($("appStrideX"),refLayer.convStride[0]);
-                App.applyPropVal($("appStrideY"),refLayer.convStride[1]);
+                App.applyPropVal($("appStrideY"),refLayer.convStride[0]);
+                App.applyPropVal($("appStrideX"),refLayer.convStride[1]);
                 App.applyPropVal($("appPadding"),refLayer.convPadding);
                 $("appTransRefWeight").classList.remove("inactive");
             }
@@ -13747,7 +13868,7 @@ class ContextMenu {
     }
 
     /**
-     * Update the position fo the context menu / flyout.   --- UPDATED (Dexter) 20180819
+     * Update the position fo the context menu / flyout.   --- UPDATED (Dexter) 20190504
      * @param {String} id - The id of the HTML element of the context menu / flyout
      * @param {Object} pos - The position or details of showing this context menu / flyout
      * @param {Number} pos.x - The pageX of the position to be shown
@@ -13757,7 +13878,7 @@ class ContextMenu {
         // Get the element and remove the "hide" class.
         var ele = $(id);
 
-        ele.classList.remove("hide");
+        ele.classList.remove("hide", "out");
         if (ele.classList.contains("contextmenu")) {
             // If no position is given, derive the position from existing position.
             if (pos != null && !pos.x) {
@@ -13805,7 +13926,7 @@ class ContextMenu {
     }
 
     /**
-     * Close a specific context menu / flyout.   --- UPDATED (Dexter) 20180807
+     * Close a specific context menu / flyout.   --- UPDATED (Dexter) 20190504
      * @param {String} id - The id of the HTML element of the context menu / flyout
      * @param {Boolean} manualClose - Whether this is a manual close which is not triggered by the document "pointerdown" event
      */
@@ -13815,7 +13936,7 @@ class ContextMenu {
         ContextMenu.list = ContextMenu.list.filter(ele=>ele.id != id);
 
         // Hide the context menu, remove the protection, and add a event to allow it to be fully closed.
-        ele.classList.add("hide");
+        ele.classList.add("hide", "out");
         ele.removeEventListener("pointerdown", ContextMenu.closeToThis, false);
         ele.addEventListener("transitionend", ContextMenu.endClose, false);
         ele.dispatchEvent(new Event("closestart"));
@@ -13873,13 +13994,14 @@ class ContextMenu {
     }
 
     /**
-     * Fully close the context menu / flyout.   --- UPDATED (Dexter) 20181205
+     * Fully close the context menu / flyout.   --- UPDATED (Dexter) 20190504
      * @param {Event} e - A transitionend event typically from the ending of closing a context menu / flyout
      */
     static endClose(e) {
         if (e.target == this || e.target.classList.contains("ctxWrapper")) {
             // Don't display the element anymore.
             this.classList.add("noDisplay");
+            this.classList.remove("out");
             this.dispatchEvent(new Event("closeend"));
             this.removeEventListener("transitionend", ContextMenu.endClose, false);
 
