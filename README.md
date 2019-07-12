@@ -1,7 +1,7 @@
 # Ladder
 
 An easy-to-use and professional tool for the public to build artificial neural network models for data mining.
-給眾輕易而專業的建立類神經網絡模型進行資料分析
+給大眾輕易而專業的建立類神經網絡模型進行資料分析
 
 Notes: Inline remarks are written in English as priority.<br/>
 注意: 行內註解只以英文撰寫。
@@ -19,7 +19,7 @@ Notes: Inline remarks are written in English as priority.<br/>
 
   Version 版本:
 
-  1903.02
+  1903.04
 
   Website & Docs 網站及文件庫:
 
@@ -31,6 +31,17 @@ Notes: Inline remarks are written in English as priority.<br/>
 
 # Updates 更新 (English Only 只提供英文版)
   
+  1903.04   Jul-12, 2019 (Dexter)
+  * Effective for NeuralSimplycode.py, script.js, index.html, style.css, lang.csv
+  - [UI] Overall updates for a cleaner user interface.
+  - [Bug Fixed] [Web App Logic] Using GPU could not be switched back 
+    to using CPU in most of the scenarios.
+  - [Bug Fixed] [Web App Logic] Incorrect tensor shape calculation
+    was made for cases with strides and keeping same dimensions on
+    convolutional and deconvolutional layers. 
+    <strong>Thank you for reporting bugs!</strong>
+  - Other miscelleneous updates.
+
   1903.03   Apr-08, 2019 (Dexter)
   * Effective for NeuralSimplycode.py, script.js, index.html, style.css, lang.csv
   - [Bug Fixed] [UI] Updates on some icons which may not be 
