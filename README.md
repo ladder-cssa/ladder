@@ -33,6 +33,7 @@ Notes: Inline remarks are written in English as priority.<br/>
   
   1903.05   Jul-28, 2019 (Dexter)
   * Effective for NeuralSimplycode.py, script.js, index.html, style.css, lang.csv
+  * <strong>New Version requires TensorFlow v1.14</strong>
   - [Feature] Deconvolutional Layer now utilizes Convolutional 2D 
     Transpose TensorFlow algorithm by default.
   - [Feature] Selecting "CPU" as training device in Ladder Web App 
