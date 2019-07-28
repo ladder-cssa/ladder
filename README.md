@@ -60,6 +60,7 @@ Notes: Inline remarks are written in English as priority.<br/>
     type value internally in Ladder Web App.
   - [Bug Fixed] Task layers like regressors could not enable
     layer attaching from context menu buttons in Ladder Web App.
+  - [Bug Fixed] CIFAR-10 dataset was not able to read correctly.
   - Other miscelleneous updates, including variables naming
     to be better following NOM definitions.
   
