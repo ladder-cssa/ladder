@@ -17,7 +17,7 @@
 
         Version 版本:
 
-            1903.04
+            1903.05
 
         Website & Docs 網站及文件庫:
         
@@ -172,7 +172,7 @@
         </div>
 
         <!-- Results Visualization -->
-        <div id="projectFolder" class="page noDisplay">
+        <div id="projectFolder" class="page hide noDisplay">
             <!-- Functional Buttons  -->
             <div id="timeline" class="topActions">
                 <div id="currentResults">
@@ -240,439 +240,482 @@
             </div>
         </div>
 
-        <!-- Model Editing -->
-        <div id="editModel" class="page noDisplay">
-            <!-- Editing Start Screen:  To select input source -->
-            <div id="editStart" class="noDisplay">
-                <div id="editStartTitle" class="lt" data-lt="startEdit">Start with a data source:</div>
-                <div id="startSourceType">
-                    <button id="startFromTable" class="btn1 leftmost"><div><div class="iconSVG"><img src="img/dataTable.svg"></div><div class="lt" data-lt="tableSource">Table Source</div></div></button>
-                    <button id="startFromCIFAR10" class="btn1 rightmost"><div><div class="iconSVG"><img src="img/image.svg"></div><div class="lt" data-lt="imgDatasets">Renowned Image Datasets</div></div></button>    
-                </div>
-                <div id="startSourceInfo" class="hide">
-                    <div id="startSourceCtxWrapper"><div id="startSourceCtx">
-                        <div id="startAsTable">
-                            <div class="startSourceGuide lt" data-lt="startTableSpec">1.  Data Specification</div>
-                            <div class="startSourceSubCtx">
-                                <div class="startSourceSubCtxSec">
-                                    <div class="startSourceSubCtxSecTitle lt" data-lt="startTableSpecInfo">Fill in information</div>
-                                    <div class="startSourceSubCtxSecInstruction lt" data-lt="startColInstruction">If you don't submit a file or data here, fill in the info describing your dataset.</div>
-                                    <div class="propRow attrVal">
-                                        <label class="lt" data-lt="colCount" for="startColCount">Column Count</label><input class="val" id="startColCount" required type="text" data-val-type="number" data-min="0" data-step="1" />
-                                    </div>
-                                </div>
-                                <div class="startSourceSubCtxOR lt" data-lt="OR">OR</div>
-                                <div class="startSourceSubCtxSec">
-                                    <div class="startSourceSubCtxSecTitle lt" data-lt="startTableSpecUpload">Upload a sample</div>
-                                    <div class="startSourceSubCtxSecInstruction lt" data-lt="startCSVInstruction">Select a CSV file of your dataset (including test data).</div>
-                                    <div class="propRow attrVal">
-                                        <label class="lt" data-lt="propEncoding" for="startEncoding">Encoding:</label>
-                                        <select id="startEncoding" data-default="utf8">
-                                            <optgroup class="lt" data-lt="encoding" data-lt-type='["label"]'>
-                                                <option data-val="utf8">UTF-8</option>
-                                                <option data-val="utf-8-sig">UTF-8 with BOM</option>
-                                            </optgroup>
-                                            <optgroup class="lt" data-lt="ecdChi" data-lt-type='["label"]'>
-                                                <option data-val="big5">Big 5</option>
-                                                <option data-val="big5-hkscs" data-lt="ecdBig5HK" class="lt"></option>
-                                            </optgroup>
-                                            <optgroup class="lt" data-lt="ecdJp" data-lt-type='["label"]'>
-                                                <option data-val="eucjp" data-js-val="euc-jp">EUC-JP</option>
-                                                <option data-val="iso-2022-jp">ISO-2022-JP</option>
-                                                <option data-val="shift_jis">Shift-JIS</option>
-                                            </optgroup>
-                                            <optgroup class="lt" data-lt="ecdKn" data-lt-type='["label"]'>
-                                                <option data-val="korean">EUC-KR</option>
-                                            </optgroup>
-                                            <optgroup class="lt" data-lt="ecdCn" data-lt-type='["label"]'>
-                                                <option data-val="gbk">GBK</option>
-                                                <option data-val="gb18030">gb18030</option>
-                                            </optgroup>
-                                            <optgroup class="lt" data-lt="ecdSingle" data-lt-type='["label"]'>
-                                                <option data-val="cp866">IBM866 / CP866</option>
-                                                <option data-val="iso-8859-2">ISO-8859-2</option>
-                                                <option data-val="iso-8859-3">ISO-8859-3</option>
-                                                <option data-val="iso-8859-4">ISO-8859-4</option>
-                                                <option data-val="cyrillic">ISO-8859-5</option>
-                                                <option data-val="iso-8859-6">ISO-8859-6</option>
-                                                <option data-val="iso-8859-7">ISO-8859-7</option>
-                                                <option data-val="iso-8859-8">ISO-8859-8</option>
-                                                <option data-val="iso-8859-10">ISO-8859-10</option>
-                                                <option data-val="iso-8859-11">ISO-8859-11 / Windows-874</option>
-                                                <option data-val="iso-8859-13">ISO-8859-13</option>
-                                                <option data-val="iso-8859-14">ISO-8859-14</option>
-                                                <option data-val="iso-8859-15">ISO-8859-15</option>
-                                                <option data-val="iso-8859-16">ISO-8859-16</option>
-                                                <option data-val="koi8_r">KOI8-R</option>
-                                                <option data-val="koi8_u" data-js-val="koi8-u">KOI8-U</option>
-                                                <option data-val="macintosh">Macintosh</option>
-                                                <option data-val="windows-1250">Windows-1250 / cp1250</option>
-                                                <option data-val="windows-1251">Windows-1251 / cp1251</option>
-                                                <option data-val="windows-1252">Windows-1252 / cp1252</option>
-                                                <option data-val="windows-1253">Windows-1253 / cp1253</option>
-                                                <option data-val="windows-1254">Windows-1253 / cp1254</option>
-                                                <option data-val="windows-1255">Windows-1253 / cp1255</option>
-                                                <option data-val="windows-1256">Windows-1253 / cp1256</option>
-                                                <option data-val="windows-1257">Windows-1253 / cp1257</option>
-                                                <option data-val="windows-1258">Windows-1253 / cp1258</option>
-                                            </optgroup>
-                                            <optgroup class="lt" data-lt="ecdMisc" data-lt-type='["label"]'>
-                                                <option data-val="iso2022_kr">ISO-2022-KR</option>
-                                                <option data-val="hz-gb-2312">hz-gb-2312</option>
-                                                <option data-val="UTF-16BE">UTF-16BE</option>
-                                                <option data-val="UTF-16LE">UTF-16LE</option>
-                                            </optgroup>
-                                        </select>
-                                    </div>
-                                    <div class="propRow attrVal">
-                                        <label class="lt" data-lt="propImport" for="startSourceLocationFile">Import:</label>
-                                        <button id="startSourceLocationBtn" class="btn1"><div><div class="iconSVG"><img src="img/folder.svg"></div><div class="lt" data-lt="selFileOnDevice">Select a file on this device...</div></div></button>
-                                        <input id="startSourceLocationFile" type="file" accept=".csv" class="noDisplay"/>
-                                    </div>
-                                </div>
-                                <div class="startSourceSubCtxOR lt" data-lt="OR">OR</div>
-                                <div class="startSourceSubCtxSec">
-                                    <div class="startSourceSubCtxSecTitle lt" data-lt="startTableSpecPaste">Paste a sample</div>
-                                    <div class="startSourceSubCtxSecInstruction lt" data-lt="startPasteInstruction">Click cell A1 and click Ctrl+V to paste.</div>
-                                    <div id="startSourceSpreadSheet">
-                                        <div id="pasteSourceTable" class=""></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="startSourceGuide lt" data-lt="startTableLoc">2.  Data File Location</div>
-                            <div class="startSourceSubCtx col">
-                                <div class="startSourceSubCtx">
-                                    <div class="startSourceSubCtxSec">
-                                        <div class="propRow attrVal" id="startSourceLocProp">
-                                            <label class="lt" data-lt="propFileLoc" for="startSourceLocation">File Location:</label><input class="val" id="startSourceLocation" type="text" data-loc-warn="startLocWarn" data-val-type="fileLoc" data-file-type='["csv"]'/>
-                                        </div>
-                                        <div id="startLocWarn" class="noDisplay lt" data-lt="startLocWarn">If not a full path is given, you'll need to save your programme at where the above data file locates.</div>
-                                    </div>
-                                    <div class="startSourceSubCtxOR lt" data-lt="OR">OR</div>
-                                    <div class="startSourceSubCtxSec inactive" id="startEmbedDataSec">
-                                        <div class="propRow attrVal" id="startSourceLocProp">
-                                            <div class="checkbox" data-default="" id="startEmbedData" data-val="" data-val-type="checkbox"><div class="checkboxTick"><div class="iconSVG"><img src="img/ok.svg"/></div></div><div class="lt" data-lt="embedStartData">Embed data above</div></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div><div class="checkbox ticked" data-default="1" id="startHasHeader" data-val="1" data-val-type="checkbox"><div class="checkboxTick"><div class="iconSVG"><img src="img/ok.svg"/></div></div><div class="lt" data-lt="includeHeader">Include Header</div></div></div>
-                            </div>
-                            
-                        </div>
-                        <div id="startAsCIFAR" class="noDisplay">
-                            <div class="startSourceGuide lt" data-lt="startImageLoc">Fill the image folder location</div>
-                            <div class="startSourceSubCtx col">
-                                <div class="startSourceSubCtxSec">
-                                    <div class="propRow">
-                                        <label class="lt" data-lt="startImageData" for="startImageData">Renowned Dataset:</label>
-                                        <select id="startImageData" data-default="cifar10" class="propVal" data-prop-type="TrainSource" data-prop="sourceType">
-                                            <option class="lt" data-val="cifar10" data-lt="cifar10">CIFAR-10</option>
-                                            <option class="lt" data-val="mnist" data-lt="mnist">MNIST</option>
-                                        </select>
-                                    </div>
-                                    <div class="propRow">
-                                        <label class="lt" data-lt="propFolderLoc" for="startImageLocation">Folder Location:</label><input class="val" id="startImageLocation" type="text" placeholder="D:/datasets/cifar-10/" data-loc-warn="startLocWarnImg" data-val-type="folderLoc"/>
-                                    </div>
-                                    <div id="startLocWarnImg" class="lt" data-lt="startLocWarn">If not a full path is given, you'll need to save your programme at where the above data file locates.</div>
-                                    <div id="startImgStructure" class="lt" data-lt="checkFileStructure">Please check if you have the files and folders ready in the following structure:</div>
-                                    <div class="propList propDirectory" id="propFolderLocations"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="btnRow" id="startFinish">
-                             <button id="startEditGOBtn" class="btn1"><div><div class="iconSVG"><img src="img/start.svg"></div><div class="lt" data-lt="startNow">Start now!</div></div></button>    
-                        </div>
-                    </div></div>
-                </div>
+        <!-- NOM Trainer -->
+        <div id="nomTrainer" class="page hide noDisplay">
+            
+        </div>
+
+        <!-- Editing Start Screen:  To select input source -->
+        <div id="editStart" class="page hide noDisplay">
+            <div id="editStartTitle" class="lt" data-lt="startEdit">Start with a data source:</div>
+            <div id="startSourceType">
+                <button id="startFromTable" class="btn1 leftmost"><div><div class="iconSVG"><img src="img/dataTable.svg"></div><div class="lt" data-lt="tableSource">Table Source</div></div></button>
+                <button id="startFromCIFAR10" class="btn1 rightmost"><div><div class="iconSVG"><img src="img/image.svg"></div><div class="lt" data-lt="imgDatasets">Renowned Image Datasets</div></div></button>    
             </div>
-
-            <!-- Core Editing Environment -->
-            <div id="editCore" class="noDisplay">
-                <!-- Model Graph -->
-                <div id="editGraph">
-                    <!-- Functional Buttons -->
-                    <div id="functionalButtons">
-                        <div id="editToolBar">
-                            <button id="editModelTopSave" class="btn1 leftmost"><div><div class="iconSVG"><img src="img/save.svg"></div><div class="lt" data-lt="saveProject">Save Project</div></div></button>
-                            <button id="editModelTopView" class="btn1 rightmost"><div><div class="iconSVG"><img src="img/code.svg"></div><div class="lt" data-lt="viewPythonCodes">View Python Codes</div></div></button>
-                        </div>
-                        <div class="toolBarGroup noDisplay activated" id="attachOnBtns">
-                            <div class="toolBarGroupIcon"><img src="img/attachTo.svg" /></div>
-                            <div class="toolBarGroupBtns">
-                                <div class="toolBarGroupTitle"><span class="lt" id="toolboxAttLayerName"></span> <span class="lt" data-lt="attachOn">attach on...</span></div>
-                                <button id="attFinish" class="btn1 leftmost"><div><div class="iconSVG"><img src="img/okGreen.svg"/></div><div class="lt" data-lt="finished">Finished</div></div></button>
-                                <button id="attCancel" class="btn1 rightmost"><div><div class="iconSVG"><img src="img/cancelRed.svg"/></div><div class="lt" data-lt="cancel">Cancel</div></div></button>
-                            </div>
-                        </div>
-                        <div class="toolBarGroup noDisplay activated" id="connectToBtns">
-                            <div class="toolBarGroupIcon"><img src="img/connectTo.svg" /></div>
-                            <div class="toolBarGroupBtns">
-                                <div class="toolBarGroupTitle"><span class="lt" id="toolboxCntLayerName"></span> <span class="lt" data-lt="connectTo">connect to...</span></div>
-                                <button id="cntFinish" class="btn1 leftmost"><div><div class="iconSVG"><img src="img/okGreen.svg"/></div><div class="lt" data-lt="finished">Finished</div></div></button>
-                                <button id="cntCancel" class="btn1 rightmost"><div><div class="iconSVG"><img src="img/cancelRed.svg"/></div><div class="lt" data-lt="cancel">Cancel</div></div></button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="editGraphWrapper" class="graphWrapper">
-                        <div class="sourceRow graphRow">
-                            
-                        </div>
-                        <div class="edgeRow" >
-                            <svg class="edgeSVG"></svg>
-                        </div>
-                        <div class="nextAction graphRow">
-                            <div class="nextActionTitle lt" data-lt="graphActions">Actions:</div>
-                            <div class="sourceActions nextActionBtns btnRow">
-                                <button id="actionSelFeature" class="btn1"><div><div class="lt" data-lt="actionSelFeature">Select Features for Model Input...</div></div></button>
-                            </div>
-                            <div class="layerActions nextActionBtns btnRow noDisplay">
-                                <button id="actionAppendLayer" class="btn1 leftmost"><div><div class="lt" data-lt="actionAppendLayer">Append Layer...</div></div></button>
-                                <button id="actionAttachLayer" class="noDisplay btn1 centerBtn"><div><div class="lt" data-lt="actionAttachLayer">Attach Layer...</div></div></button>
-                                <button id="actionSetTask" class="btn1 rightmost"><div><div class="lt" data-lt="actionSetTask">Set Training Task...</div></div></button>
-                            </div>
-                            <div class="finalActions nextActionBtns btnRow noDisplay">
-                                <button id="actionSaveProj" class=" btn1 leftmost"><div><div class="lt" data-lt="actionSaveProj">Save Project</div></div></button>
-                                <button id="actionSaveProg" class=" btn1 centerBtn"><div><div class="lt" data-lt="actionSaveProg">Save Training Programme</div></div></button>
-                                <button id="actionViewCodes" class=" btn1 rightmost"><div><div class="lt" data-lt="viewPythonCodes">View Python Codes</div></div></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="layer" id="layerItemTemp" aria-haspopup="true">
-                    <div class="receiveNode">▼</div>
-                    <div class="layerName lt" data-lt="">Table Source</div>
-                    <div class="layerShape"><span class="lt" data-lt="propShpae">Shape:</span> <span class="shapeVal"></span></div>
-                    <div class="layerPred"><span class="lt" data-lt="propPred">Prediction on:</span> <span class="predDppNode lt"></span></div>
-                    <div class="outputNode">▼</div>
-                </div>
-
-                <!-- Property Window -->
-                <div id="editProp" class="collapsed">
-                    <div class="editPropHeading"><span class="lt" data-lt="properties">Properties</span><span> - </span><span id="propTitle" class="lt"></span></div>
-                    <div id="propWinTrain" class="propWin">
-                        <div class="propWinName lt" id="propTrainName" data-lt="training">Model Training</div>
-                        <!-- Multiple Build not supported -->
-                        <div class="propGroup">
-                            <div class="propGroupName lt" data-lt="trainingProfile">Training Profile</div>
-                            <div class="propRow"><label class="lt" data-lt="propEpochCount" for="propEpochCount">No. of Epoch:</label><input id="propEpochCount" type="text" class="val propVal" data-prop-type="TrainingProfile" data-id="0" data-prop="noOfEpoch" data-val-type="number" data-min="1" data-step="1" /></div>
-                            <div class="propRow"><label class="lt" data-lt="propLearningRate" for="propLearningRate">Learning Rate:</label><input id="propLearningRate" type="text" class="val propVal" data-prop-type="TrainingProfile" data-id="0" data-prop="initialLearningRate" data-val-type="number" /></div>
-                            <div class="propRow"><label class="lt" data-lt="propOptimizer" for="propOptimizer">Optimizer:</label>
-                                <select id="propOptimizer" data-default="None" class="propVal" data-prop-type="TrainingProfile" data-prop="optimizer" data-id="0">
-                                    <option data-val="rmsprop">RMSProp</option>
-                                    <option data-val="adam">Adam</option>
-                                    <option data-val="grad">Gradient Descent</option>
-                                    <option data-val="momentum">Momentum</option>
-                                    <option data-val="adagrad">Adagrad</option>
-                                    <option data-val="adadelta">Adadelta</option>
-                                    <option data-val="ftrl">FTRL</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="btnRow right moreBtnRow"><button class="btn1 propAdvance"><div><div class="icon">⏷</div><div class="lt" data-lt="propAdvOpt">Advanced Options...</div></div></button></div>
-                        <div class="propGroup canCollapse noDisplay">
-                            <div class="propGroupName lt" data-lt="lrDecay">Learning Rate Decay</div>
-                            <div class="propRow"><label class="lt" id="propEpochPerLRSwitchLabel" data-lt="propEpochPerLR" for="propEpochPerLRSwitch">No. of Epoch per Decay:</label>
-                                <select id="propEpochPerLRSwitch">
-                                    <option class="lt" data-val="N" data-lt="propEpochPerLRNo">No decay</option>
-                                    <option class="lt" data-val="Y" data-lt="propEpochPerLRMore">Decay for every...</option>
-                                </select>
-                                <input id="propEpochPerLR" type="text" class="val propVal hasMoreBtn noDisplay" data-prop-type="TrainingProfile" data-id="0" data-prop="numEpochsPerDecay" data-val-type="number" data-min="1" data-step="1" /><button id="cancelValidation" class="btn1 noDisplay"><div class="iconSVG"><img src="img/cancelRed.svg"></div></button></div>
-                            <div class="propRow" id="propLRDecayRow"><label class="lt" data-lt="propLRDecay" for="propLRDecay">Decay Rate:</label><input id="propLRDecay" type="text" class="val propVal" data-prop-type="TrainingProfile" data-id="0" data-default="1" data-prop="learningRateDecayFactor" data-val-type="number" data-min="0" /></div>
-                            <div class="propGroupName lt noDisplay" data-lt="expMvAvg">Exponential Moving Averages</div>
-                            <div class="propRow noDisplay"><label class="lt" data-lt="propExpAvgLoss" for="propExpAvgLoss">Training Loss:</label><input id="propExpAvgLoss" type="text" class="val propVal" data-prop-type="TrainingProfile" data-id="0" data-prop="exponentialLossDecay" data-val-type="number" data-min="0" data-max="1"/></div>
-                            <div class="propRow noDisplay"><label class="lt" data-lt="propExpAvgVar" for="propExpAvgVar">Training Variables:</label><input id="propExpAvgVar" type="text" class="val propVal" data-prop-type="TrainingProfile" data-id="0" data-prop="exponentialVarDecay" data-val-type="number" data-min="0" data-max="1"/></div>
-                        </div>
-                        <div class="propGroup">
-                            <div class="propGroupName lt" data-lt="crossVal">Cross Validation</div>
-                            <div class="propRow"><label class="lt" data-lt="propType" for="propCrossValType">Type:</label>
-                                <select id="propCrossValType" data-default="None" class="propVal" data-prop-type="TrainingProfile" data-prop="crossValidationType" data-id="0">
-                                    <option class="lt" data-lt="None" data-val="None">None</option>
-                                    <option class="lt" data-lt="crossValKFold" data-val="fold">K-Fold</option>
-                                    <option class="lt" data-lt="crossValRand" data-val="rand">Repeated Random</option>
-                                </select>
-                            </div>
-                            <div class="propRow" id="propValPropRow"><label class="lt" data-lt="propValProp" for="propValProp">Validation Proportion:</label><input id="propValProp" type="text" class="val propVal" data-prop-type="TrainingProfile" data-id="0" data-prop="crossValidationProp" data-val-type="number" data-min="0" data-max="100" placeholder="20" /><div class="propUnit">%</div></div>
-                            <div class="propRow" id="propValRoundRow"><label class="lt" data-lt="propValRound" for="propValRound">Validation Rounds:</label><input id="propValRound" type="text" class="val propVal hasMoreBtn" data-prop-type="TrainingProfile" data-id="0" data-prop="crossValidationCount" data-val-type="number" data-min="1" data-step="1" placeholder="1"/><button data-for="valRoundInfo" class="btn1 infoBtn"><div class="iconSVG"><img src="img/help.svg"/></div></button></div>
-                        </div>
-                        <div class="propGroup">
-                            <div class="propGroupName lt" data-lt="repeatedRuns">Repeated Runs</div>
-                            <div class="propRow"><label class="lt" data-lt="count" for="propRunTime">Count:</label><input id="propRunTime" type="text" class="val propVal" data-prop-type="Train" data-prop="runCount" data-default="1" data-val-type="number" data-min="1" data-step="1"/></div>
-                        </div>
-                        <div class="propGroup">
-                            <div class="propGroupName lt" data-lt="configs">Configurations</div>
-                            <div class="propRow"><label class="lt" data-lt="propLogFolder" for="propLogFolder">Log Folder:</label><input id="propLogFolder" type="text" class="val propVal hasMoreBtn" data-prop-type="Train" data-prop="folder" data-default="D:/tmp/" data-val-type="folderLoc" /><button data-for="logFolderInfo" class="btn1 infoBtn"><div class="iconSVG"><img src="img/help.svg"/></div></button></div>
-                            <div class="propRow noDisplay"><label class="lt" data-lt="propRestorePath" for="propRestorePath">Restore Path:</label><input id="propRestorePath" type="text" class="val propVal" data-prop-type="Train" data-prop="restorePath" data-prop="restorePath" data-default="D:/tmp/" data-val-type="folderLoc" /></div>
-                            <div class="propRow"><label class="lt" data-lt="propDevice" for="propDevice">Device:</label>
-                                <select id="propDevice" data-default="/cpu:0" class="propVal" data-prop-type="Train" data-prop="device">
-                                    <option class="lt" data-lt="cpu" data-val="/cpu:0">CPU</option>
-                                    <option class="lt" data-lt="gpu" data-val="/gpu:0">GPU</option>
-                                </select>
-                            </div>
-                            <div class="propRow"><label class="lt" data-lt="propLogFreq" for="propLogFreq">Log Freq.:</label><input id="propLogFreq" type="text" class="val propVal" data-prop-type="Train" data-prop="logFreq" data-default="-1" data-val-type="number" data-min="0" data-step="1"/></div>
-                            <div class="propRow"><label class="lt" data-lt="propSaveFreq" for="propSaveFreq">Save Freq.:</label><input id="propSaveFreq" type="text" class="val propVal" data-prop-type="Train" data-prop="saveFreq" data-default="0" data-val-type="number" data-min="0" data-step="1" /></div>
-                            <div class="propRow"><label class="lt" data-lt="propTestFreq" for="propTestFreq">Test Freq.:</label><input id="propTestFreq" type="text" class="val propVal" data-prop-type="Train" data-prop="testFreq" data-default="-1" data-val-type="number" data-min="0" data-step="1" /></div>
-                            <div class="propRow"><label class="lt" data-lt="propWeightFreq" for="propWeightFreq">Weight Freq.:</label><input id="propWeightFreq" type="text" class="val propVal" data-prop-type="Train" data-prop="weightLogFreq" data-default="0" data-val-type="number" data-min="-1" data-step="1" /></div>
-                            <div class="propRow noDisplay"><label class="lt" data-lt="propFilterFreq" for="propFilterFreq">Filter Freq.:</label><input id="propFilterFreq" type="text" class="val propVal" data-prop-type="Train" data-prop="filterFreq"  data-default="0" data-val-type="number" data-min="0" data-step="1" /></div>
-                        </div>
-                        <div class="propGroup">
-                            <div class="propGroupName lt" data-lt="configTrace">Item Tracing</div>
-                            <div class="propRow"><label class="lt" data-lt="propTraceCount" for="propTraceCount">Trace Count:</label><input id="propTraceCount" type="text" class="val propVal hasMoreBtn" data-prop-type="Train" data-prop="traceRecord" data-default="0" data-val-type="number" data-min="0" data-step="1" /><button data-for="traceRecInfo" class="btn1 infoBtn"><div class="iconSVG"><img src="img/help.svg"/></div></button></div>
-                            <div class="propRow"><label class="lt" data-lt="propTraceFreq" for="propTraceFreq">Trace Freq.:</label><input id="propTraceFreq" type="text" class="val propVal" data-prop-type="Train" data-prop="traceFreq" data-default="-1" data-val-type="number" data-min="0" data-step="1" /></div>
-                        </div>
-                    </div>
-                    <div id="propWinTrainSource" class="propWin">
-                        <div class="propWinName lt" id="propSourceName" data-lt=""></div>
-                        <div class="propGroup" data-sub-class='["ImageSource","TableSource"]'>
-                            <div class="propGroupName lt" data-lt="Source">Data Source</div>
-                            <div class="propRow" data-sub-class='["ImageSource"]'><label class="lt" data-lt="propImgSource" for="propImgSource">Image Type:</label>
-                                <select id="propImgSource" data-default="cifar10" class="propVal" data-prop-type="TrainSource" data-prop="sourceType">
-                                    <option data-val="cifar10">CIFAR-10</option>
-                                    <option data-val="mnist">MNIST</option>
-                                </select>
-                            </div>
-                            <div class="propRow" data-sub-class='["ImageSource"]'><label class="lt" data-lt="propFolderLoc" for="propImgFolder">File Location:</label><input id="propImgFolder" type="text" class="val propVal" data-prop-type="TrainSource" data-prop="coreDataDir" data-default="0" data-val-type="folderLoc" /></div>
-                            <div class="propRow" data-sub-class='["CSVSource"]'><label class="lt" data-lt="propFileLoc" for="propCSVPath">File Location:</label><input id="propCSVPath" type="text" class="val propVal" data-prop-type="TrainSource" data-prop="path" data-default="" data-val-type="fileLoc" /></div>
-                            <div class="propRow" data-sub-class='["CSVSource"]'><label class="lt" data-lt="propEncoding" for="propEncoding">Encoding:</label><input id="propEncoding" type="text" class="val propVal" data-prop-type="TrainSource" data-prop="encoding" data-default="" readonly/></div>
-                        </div><div class="propGroup">
-                            <div class="propGroupName lt" data-lt="recordGeneration">Record Generation</div>
-                            <div class="propRow"><label class="lt" data-lt="propBatchSize" for="propBatchSize">Batch Size:</label><input id="propBatchSize" type="text" class="val propVal" data-prop-type="TrainSource" data-prop="batchSize" data-default="" data-val-type="number" data-min="0" data-step="1" placeholder="200" /></div>
-                            <div class="propRow">
-                                <label class="lt" data-lt="propShuffle" for="propShuffleSource">Shuffle:</label>
-                                <div class="checkbox propVal" data-prop-type="TrainSource" data-prop="shuffle" data-default="" id="propShuffleSource" data-val="" data-val-type="checkbox"><div class="checkboxTick"><div class="iconSVG"><img src="img/ok.svg"/></div></div><div class="lt yes" data-lt="yes">Yes</div><div class="lt no" data-lt="no">No</div></div>
-                            </div>
-                        </div>
-                        <div class="propGroup" id="sourceCrossVal">
-                            <div class="propGroupName lt" data-lt="dataPart">Data Partitioning</div>
-                            <div class="propRow">
-                                <label class="lt" data-lt="propStatus" for="propCVSource">Status:</label>
-                                <div class="val lt" id="propCVSource"></div>
-                                <button data-for="dataPartInfo" class="btn1 infoBtn"><div class="iconSVG"><img src="img/help.svg"/></div></button>
-                            </div>
-                            <div class="propRow" data-sub-class='["CSVSource","TableSource"]'><label class="lt" data-lt="propTestRatio" for="propTestRatio">Test Ratio:</label><input id="propTestRatio" type="text" class="val propVal" data-prop-type="TrainSource" data-prop="_testRatio" data-default="20" data-val-type="number" data-min="0" data-max="100" data-step="0.1" placeholder="20" /><div class="propUnit">%</div></div>
-                        </div>
-                        <div class="propGroup" id="propDataSourcePreviewGroup">
-                            <div class="propGroupName lt" data-lt="dppKeyDataPrev">Data Preview</div>
-                            <div class="propTable">
-                                <div id="dataSourcePreview"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="propWinColConfig" class="propWin">
-                        <div class="propWinName lt" id="propColConfigName" data-lt="" id="propTransfromDef"></div>
-                        <div class="propGroup" data-sub-class='["TableSource", "CSVSource"]'>
-                            <div class="propGroupName lt" data-lt="colSelection">Column Selection</div>
-                            <div class="propRow" data-sub-class='["CSVSource","TableSource"]'><label class="lt" data-lt="propColumns" for="propColumns">Columns:</label><input id="propColumns" type="text" class="val propVal hasMoreBtn" data-prop-type="ColConfig" data-preprocessing-step="Input" data-prop="sourceCol" data-default="" data-val-type="indexRange" placeholder="eg. [None:-1] / -1" /><button data-lt="select" data-for-prop="propColumns" data-for-id="propColumns" data-table-type="source" class="btn1 textOnly colSelBtn lt"></button></div>
-                        </div>
-                        <div class="propGroup" data-sub-class='["TableSource", "CSVSource"]' id="propTxCirGroup">
-                            <div class="propGroupName lt" data-lt="dppKeyTranx">Transformations</div>
-                            <div class="propList" id="propTranxList">
-                                <div class="propListItem" id="colConfigTxTemp"><div class="txType lt" data-lt-temp="$$$: "></div><div class="txCols"></div><div class="rmv"><div class="iconSVG"><img class="tmpImg" data-src="cancelRed.svg"/></div></div></div>
-                                <div class="btnRow"><button id="addTransCol" class="btn1"><div><div class="lt" data-lt="addTxm">Add a Transformation...</div></div></button></div>
-                            </div>
-                            <div class="propGroupName lt" data-lt="dppKeyCir">Circular Data</div>
-                            <div class="propList" id="propCirList">
-                                <div class="propListItem" id="colConfigCirTemp"><div class="cirCol"></div><div class="rmv"><div class="iconSVG"><img class="tmpImg" data-src="cancelRed.svg"/></div></div></div>
-                                <div class="btnRow"><button id="defCirCol" class="btn1" ><div><div class="lt" data-lt="defCir">Define Circular Data...</div></div></button></div>
-                            </div>
-                        </div>
-                        <div class="propGroup" data-sub-class='["TableSource", "CSVSource"]'>
-                            <div class="propGroupName lt" data-lt="onehot">One-Hot Encoding</div>
-                            <div class="propRow">
-                                <label class="lt" data-lt="propColumns" for="propOneHot">Columns:</label>
-                                <input id="propOneHot" type="text" class="val propVal hasMoreBtn" data-prop-type="ColConfig" data-prop="onehot" data-default="" data-val-type="indexRange" placeholder="-1" /><button data-lt="select" data-for-prop="propOneHot" data-for-id="propOneHot" data-table-type="colConfig" data-preprocessing-step="CircularDataDefined" class="btn1 textOnly colSelBtn lt"></button>
-                            </div>
-                        </div><div class="propGroup">
-                            <div class="propGroupName lt" data-lt="recordGeneration">Record Generation</div>
-                            <div class="propRow" id="propImgOutWRow" data-sub-class='["ImageSource"]'><label class="lt" data-lt="propImgOutW" for="propImgOutW">Crop As Width:</label><input id="propImgOutW" type="text" class="val propVal" data-prop-type="ColConfig" data-prop="_outW" data-default="" data-val-type="number" data-step="1" data-min="1" placeholder="32" /><div class="propUnit">px</div></div>
-                            <div class="propRow" id="propImgOutHRow" data-sub-class='["ImageSource"]'><label class="lt" data-lt="propImgOutH" for="propImgOutH">Crop As Height:</label><input id="propImgOutH" type="text" class="val propVal" data-prop-type="ColConfig" data-prop="_outH" data-default="" data-val-type="number" data-step="1" data-min="1" placeholder="32" /><div class="propUnit">px</div></div>
-                            <div class="propRow">
-                                <label class="lt" data-lt="dataType" for="propImgSource">Data Type:</label>
-                                <select id="propImgSource" data-default="None" class="propVal hasMoreBtn" data-prop-type="ColConfig" data-prop="dtype">
-                                    <option data-val="" class="lt" data-lt="dTypeAuto">Auto (Float)</option>
-                                    <option data-val="tf.float32" class="lt" data-lt="dTypeFloat">Float</option>
-                                    <option data-val="tf.int64" class="lt" data-lt="dTypeInt">Integer</option>
-                                </select>
-                                <button data-for="colConfigDataTypeInfo" class="btn1 infoBtn"><div class="iconSVG"><img src="img/help.svg"/></div></button>
-                            </div>
-                        </div><div class="propGroup" data-sub-class='["TableSource", "CSVSource"]'>
-                            <div class="propGroup" id="propDataPreviewGroup">
-                                <div class="propGroupName lt" data-lt="dppKeyDataPrev">Data Preview</div>
-                                <div class="propTable">
-                                    <div id="colDataPreview"></div>
+            <div id="startSourceInfo" class="hide">
+                <div id="startSourceCtxWrapper"><div id="startSourceCtx">
+                    <div id="startAsTable">
+                        <div class="startSourceGuide lt" data-lt="startTableSpec">1.  Data Specification</div>
+                        <div class="startSourceSubCtx">
+                            <div class="startSourceSubCtxSec">
+                                <div class="startSourceSubCtxSecTitle lt" data-lt="startTableSpecInfo">Fill in information</div>
+                                <div class="startSourceSubCtxSecInstruction lt" data-lt="startColInstruction">If you don't submit a file or data here, fill in the info describing your dataset.</div>
+                                <div class="propRow attrVal">
+                                    <label class="lt" data-lt="colCount" for="startColCount">Column Count</label><input class="val" id="startColCount" required type="text" data-val-type="number" data-min="0" data-step="1" />
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div id="propWinLayer" class="propWin">
-                        <div class="propWinName lt" id="propLayerName" data-lt=""></div>
-                        <div class="propGroup">
-                            <div class="propGroupName lt" data-lt="layerInfo">Layer Operations</div>
-                            <div class="propRow"><label class="lt" data-lt="propLayerType" for="propLayerType">Layer Type:</label><div class="val lt" id="propLayerType" type="lt"></div></div>
-                            <div class="propGroup noDisplay" id="propLayerRefRows">
-                                <div class="propRow"><label class="lt" data-lt="propParamShare" for="propLayerRef">Parameter Sharing:</label>
-                                    <select class="val propVal" id="propLayerRef" data-prop-type="Layer" data-prop="refLayerName" data-default="None">
-                                        <option class="lt" data-lt="None" data-val="">None</option>
-                                    </select>
-                                </div>
-                                <div class="propRow" id="propTransRefWeightRow"><label class="lt" data-lt="propTransRefWeight" for="propTransRefWeight">Transpose Ref. Weight:</label>
-                                    <div class="checkbox propVal" data-prop-type="Layer" data-prop="refLayerTranspose" data-default="1" id="propTransRefWeight" data-val="" data-val-type="checkbox"><div class="checkboxTick"><div class="iconSVG"><img src="img/ok.svg"/></div></div><div class="lt yes" data-lt="yes">Yes</div><div class="lt no" data-lt="no">No</div></div>
-                                </div>
-                            </div>
-                            <div class="propRow" data-sub-class='["Layer-CNNLayer","Layer-BasicLayer","Layer-DCNNLayer"]'><label class="lt" data-lt="propHiddenSize" for="propHiddenSize">Hidden Size:</label><input id="propHiddenSize" type="text" class="val propVal" data-prop-type="Layer" data-prop="layerUnits" data-default="" data-val-type="number" data-min="1" data-step="1" /></div>
-                            <div class="propGroup" data-sub-class='["Layer-CNNLayer","Layer-DCNNLayer"]'>
-                                <div class="propRow" data-sub-class='["Layer-CNNLayer","Layer-DCNNLayer"]'><label class="lt" data-lt="propFilterWidth" for="propFilterWidth">Filter Width:</label><input id="propFilterWidth" type="text" class="val propVal" data-prop-type="Layer" data-prop="convFilterWidth" data-default="" data-val-type="number" data-min="1" data-step="1" placeholder="3" /><div class="propUnit">px</div></div>
-                                <div class="propRow" data-sub-class='["Layer-CNNLayer","Layer-DCNNLayer"]'><label class="lt" data-lt="propStrideX" for="propStrideX">Stride-x:</label><input id="propStrideX" type="text" class="val propVal" data-prop-type="Layer" data-prop="_convStrideX" data-default="1" data-val-type="number" data-min="1" data-step="1" placeholder="0" /><div class="propUnit">px</div></div>
-                                <div class="propRow" data-sub-class='["Layer-CNNLayer","Layer-DCNNLayer"]'><label class="lt" data-lt="propStrideY" for="propStrideY">Stride-y:</label><input id="propStrideY" type="text" class="val propVal" data-prop-type="Layer" data-prop="_convStrideY" data-default="1" data-val-type="number" data-min="1" data-step="1" placeholder="0" /><div class="propUnit">px</div></div>
-                                <div class="propRow" data-sub-class='["Layer-CNNLayer","Layer-DCNNLayer"]' id="propDilationRow"><label class="lt" data-lt="propDilation" for="propDilation">Dilation:</label><input id="propDilation" type="text" class="val propVal" data-prop-type="Layer" data-prop="convDilation" data-default="" data-val-type="number" data-min="0" data-step="1" placeholder="0" /><div class="propUnit">px</div></div>
-                                <div class="propRow" data-sub-class='["Layer-CNNLayer","Layer-DCNNLayer"]'><label class="lt" data-lt="propPadding" for="propPadding">Keep Dimension:</label>
-                                    <div class="checkbox propVal" data-prop-type="Layer" data-prop="convPadding" data-default="" id="propPadding" data-val="" data-val-type="checkbox"><div class="checkboxTick"><div class="iconSVG"><img src="img/ok.svg"/></div></div><div class="lt yes" data-lt="yes">Yes</div><div class="lt no" data-lt="no">No</div></div>
-                                </div>
-                                <div class="propRow" data-sub-class='["Layer-DCNNLayer"]'><label class="lt" data-lt="propPaddingMethod" for="propDCNNPadding">Padding / Resize:</label>
-                                    <select class="val propVal" id="propDCNNPadding" data-prop-type="DCNNLayer.PaddingTypes" data-prop="dconvPadding" data-default="Bicubic">
-                                        <optgroup class="lt" data-lt="initializer" label="Initializer" data-lt-type='["label"]'>
-                                            <option class="lt" data-lt="zeroPadding" data-val="Zeros">Zero Padding</option>
-                                            <option class="lt" data-lt="rsBicubic" data-val="Bicubic">Resize (Bicubic)</option>
-                                            <option class="lt" data-lt="rsBilinear" data-val="Bilinear">Resize (Bi-linear)</option>
-                                            <option class="lt" data-lt="rsNN" data-val="NearestNeighbor">Resize (Nearest Neighbor)</option>
+                            <div class="startSourceSubCtxOR lt" data-lt="OR">OR</div>
+                            <div class="startSourceSubCtxSec">
+                                <div class="startSourceSubCtxSecTitle lt" data-lt="startTableSpecUpload">Upload a sample</div>
+                                <div class="startSourceSubCtxSecInstruction lt" data-lt="startCSVInstruction">Select a CSV file of your dataset (including test data).</div>
+                                <div class="propRow attrVal">
+                                    <label class="lt" data-lt="propEncoding" for="startEncoding">Encoding:</label>
+                                    <select id="startEncoding" data-default="utf8">
+                                        <optgroup class="lt" data-lt="encoding" data-lt-type='["label"]'>
+                                            <option data-val="utf8">UTF-8</option>
+                                            <option data-val="utf-8-sig">UTF-8 with BOM</option>
+                                        </optgroup>
+                                        <optgroup class="lt" data-lt="ecdChi" data-lt-type='["label"]'>
+                                            <option data-val="big5">Big 5</option>
+                                            <option data-val="big5-hkscs" data-lt="ecdBig5HK" class="lt"></option>
+                                        </optgroup>
+                                        <optgroup class="lt" data-lt="ecdJp" data-lt-type='["label"]'>
+                                            <option data-val="eucjp" data-js-val="euc-jp">EUC-JP</option>
+                                            <option data-val="iso-2022-jp">ISO-2022-JP</option>
+                                            <option data-val="shift_jis">Shift-JIS</option>
+                                        </optgroup>
+                                        <optgroup class="lt" data-lt="ecdKn" data-lt-type='["label"]'>
+                                            <option data-val="korean">EUC-KR</option>
+                                        </optgroup>
+                                        <optgroup class="lt" data-lt="ecdCn" data-lt-type='["label"]'>
+                                            <option data-val="gbk">GBK</option>
+                                            <option data-val="gb18030">gb18030</option>
+                                        </optgroup>
+                                        <optgroup class="lt" data-lt="ecdSingle" data-lt-type='["label"]'>
+                                            <option data-val="cp866">IBM866 / CP866</option>
+                                            <option data-val="iso-8859-2">ISO-8859-2</option>
+                                            <option data-val="iso-8859-3">ISO-8859-3</option>
+                                            <option data-val="iso-8859-4">ISO-8859-4</option>
+                                            <option data-val="cyrillic">ISO-8859-5</option>
+                                            <option data-val="iso-8859-6">ISO-8859-6</option>
+                                            <option data-val="iso-8859-7">ISO-8859-7</option>
+                                            <option data-val="iso-8859-8">ISO-8859-8</option>
+                                            <option data-val="iso-8859-10">ISO-8859-10</option>
+                                            <option data-val="iso-8859-11">ISO-8859-11 / Windows-874</option>
+                                            <option data-val="iso-8859-13">ISO-8859-13</option>
+                                            <option data-val="iso-8859-14">ISO-8859-14</option>
+                                            <option data-val="iso-8859-15">ISO-8859-15</option>
+                                            <option data-val="iso-8859-16">ISO-8859-16</option>
+                                            <option data-val="koi8_r">KOI8-R</option>
+                                            <option data-val="koi8_u" data-js-val="koi8-u">KOI8-U</option>
+                                            <option data-val="macintosh">Macintosh</option>
+                                            <option data-val="windows-1250">Windows-1250 / cp1250</option>
+                                            <option data-val="windows-1251">Windows-1251 / cp1251</option>
+                                            <option data-val="windows-1252">Windows-1252 / cp1252</option>
+                                            <option data-val="windows-1253">Windows-1253 / cp1253</option>
+                                            <option data-val="windows-1254">Windows-1253 / cp1254</option>
+                                            <option data-val="windows-1255">Windows-1253 / cp1255</option>
+                                            <option data-val="windows-1256">Windows-1253 / cp1256</option>
+                                            <option data-val="windows-1257">Windows-1253 / cp1257</option>
+                                            <option data-val="windows-1258">Windows-1253 / cp1258</option>
+                                        </optgroup>
+                                        <optgroup class="lt" data-lt="ecdMisc" data-lt-type='["label"]'>
+                                            <option data-val="iso2022_kr">ISO-2022-KR</option>
+                                            <option data-val="hz-gb-2312">hz-gb-2312</option>
+                                            <option data-val="UTF-16BE">UTF-16BE</option>
+                                            <option data-val="UTF-16LE">UTF-16LE</option>
                                         </optgroup>
                                     </select>
                                 </div>
-                                <div class="propRow" data-sub-class='["Layer-CNNLayer"]'><label class="lt" data-lt="propCNNPadding" for="propCNNPadding">Padding Method:</label><div class="val lt" id="propCNNPadding" data-lt="zeroPadding" type="lt">Zero Padding</div></div>
+                                <div class="propRow attrVal">
+                                    <label class="lt" data-lt="propImport" for="startSourceLocationFile">Import:</label>
+                                    <button id="startSourceLocationBtn" class="btn1"><div><div class="iconSVG"><img src="img/folder.svg"></div><div class="lt" data-lt="selFileOnDevice">Select a file on this device...</div></div></button>
+                                    <input id="startSourceLocationFile" type="file" accept=".csv" class="noDisplay"/>
+                                </div>
+                            </div>
+                            <div class="startSourceSubCtxOR lt" data-lt="OR">OR</div>
+                            <div class="startSourceSubCtxSec">
+                                <div class="startSourceSubCtxSecTitle lt" data-lt="startTableSpecPaste">Paste a sample</div>
+                                <div class="startSourceSubCtxSecInstruction lt" data-lt="startPasteInstruction">Click cell A1 and click Ctrl+V to paste.</div>
+                                <div id="startSourceSpreadSheet">
+                                    <div id="pasteSourceTable" class=""></div>
+                                </div>
                             </div>
                         </div>
-                        <div class="propGroup" data-sub-class='["FinalLayer"]'>
-                            <div class="propGroupName lt" data-lt="taskDetails">Task Details</div>
-                            <div class="propRow"><label class="lt" data-lt="propMes" for="propMes">Measurement:</label><div class="val" id="propMes" type="lt"></div></div>
-                            <div class="propRow"><label class="lt" data-lt="propPred" for="propPred">Predict on:</label>
-                                <select class="val propVal" id="propPred" data-prop-type="Layer" data-prop="predictOn">
-                                </select>
+                        <div class="startSourceGuide lt" data-lt="startTableLoc">2.  Data File Location</div>
+                        <div class="startSourceSubCtx col">
+                            <div class="startSourceSubCtx">
+                                <div class="startSourceSubCtxSec">
+                                    <div class="propRow attrVal" id="startSourceLocProp">
+                                        <label class="lt" data-lt="propFileLoc" for="startSourceLocation">File Location:</label><input class="val" id="startSourceLocation" type="text" data-loc-warn="startLocWarn" data-val-type="fileLoc" data-file-type='["csv"]'/>
+                                    </div>
+                                    <div id="startLocWarn" class="noDisplay lt" data-lt="startLocWarn">If not a full path is given, you'll need to save your programme at where the above data file locates.</div>
+                                </div>
+                                <div class="startSourceSubCtxOR lt" data-lt="OR">OR</div>
+                                <div class="startSourceSubCtxSec inactive" id="startEmbedDataSec">
+                                    <div class="propRow attrVal" id="startSourceLocProp">
+                                        <div class="checkbox" data-default="" id="startEmbedData" data-val="" data-val-type="checkbox"><div class="checkboxTick"><div class="iconSVG"><img src="img/ok.svg"/></div></div><div class="lt" data-lt="embedStartData">Embed data above</div></div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="propRow" data-sub-class='["FinalLayer-Classifier"]'><label class="lt" data-lt="propClassCount" for="propClassCount">No. of Classes:</label><input id="propClassCount" type="text" class="val propVal" data-prop-type="Layer" data-prop="classCount" data-default="" data-val-type="number" data-min="1" data-step="1" placeholder="10" /></div>
+                            <div><div class="checkbox ticked" data-default="1" id="startHasHeader" data-val="1" data-val-type="checkbox"><div class="checkboxTick"><div class="iconSVG"><img src="img/ok.svg"/></div></div><div class="lt" data-lt="includeHeader">Include Header</div></div></div>
                         </div>
-                        <div class="propGroup" id="propIncomingConfigGroup">
-                            <div class="propGroupName lt" data-lt="incomingCollections">Incoming Collections</div>
-                            <div class="propRow"><label class="lt" data-lt="method" for="propICMethod">Method:</label>
-                                <select class="val propVal" id="propICMethod" data-prop-type="IncomingConfig" data-prop="method" data-default="Concat">
-                                    <option class="lt" data-lt="ICConcat" data-val="Concat">Concatenate</option>
-                                    <option class="lt" data-lt="ICSum" data-val="Sum">Sum</option>
-                                    <option class="lt" data-lt="ICMultiply" data-val="Multiply">Multiply</option>
-                                    <option class="lt" data-lt="ICBlend" data-val="Blend">Blend</option>
-                                </select>
-                            </div>
-                            <div class="propRow"><label class="lt" data-lt="propMerge" for="propICMerge">Merging:</label>
-                                <select class="val propVal" id="propICMerge" data-prop-type="IncomingConfig" data-prop="mergeDim" data-default="Subsample">
-                                    <option class="lt" data-lt="ICSubsample" data-val="SubSample">Sub-sample</option>
-                                    <option class="lt" data-lt="ICSptDpth" data-val="SpaceToDepth">Space to Depth</option>
-                                    <option class="lt" data-lt="ICMaxPool" data-val="MaxPool">Max Pool</option>
-                                    <option class="lt" data-lt="ICMeanPool" data-val="MeanPool">Mean Pool</option>
-                                </select>
+                        
+                    </div>
+                    <div id="startAsCIFAR" class="noDisplay">
+                        <div class="startSourceGuide lt" data-lt="startImageLoc">Fill the image folder location</div>
+                        <div class="startSourceSubCtx col">
+                            <div class="startSourceSubCtxSec">
+                                <div class="propRow">
+                                    <label class="lt" data-lt="startImageData" for="startImageData">Renowned Dataset:</label>
+                                    <select id="startImageData" data-default="cifar10" class="propVal" data-prop-type="TrainSource" data-prop="sourceType">
+                                        <option class="lt" data-val="cifar10" data-lt="cifar10">CIFAR-10</option>
+                                        <option class="lt" data-val="mnist" data-lt="mnist">MNIST</option>
+                                    </select>
+                                </div>
+                                <div class="propRow">
+                                    <label class="lt" data-lt="propFolderLoc" for="startImageLocation">Folder Location:</label><input class="val" id="startImageLocation" type="text" placeholder="D:/datasets/cifar-10/" data-loc-warn="startLocWarnImg" data-val-type="folderLoc"/>
+                                </div>
+                                <div id="startLocWarnImg" class="lt" data-lt="startLocWarn">If not a full path is given, you'll need to save your programme at where the above data file locates.</div>
+                                <div id="startImgStructure" class="lt" data-lt="checkFileStructure">Please check if you have the files and folders ready in the following structure:</div>
+                                <div class="propList propDirectory" id="propFolderLocations"></div>
                             </div>
                         </div>
-                        <div class="propGroup" data-sub-class='["FinalLayer", "Layer-CNNLayer","Layer-BasicLayer","Layer-DCNNLayer"]'>
-                            <div class="propGroupName lt" data-lt="learningParams">Learning Parameters</div>
-                            <div class="propRow"><label class="lt" data-lt="weightL" for="propLTWeight">Weight:</label>
-                                <select class="val propVal hasMoreBtn" id="propLTWeight" data-prop-type="VarConfig.Initializer" data-prop="_type" data-id="linearTransform.weightConfig.initializer" data-default="TruncatedNormal">
+                    </div>
+                    <div class="btnRow" id="startFinish">
+                         <button id="startEditGOBtn" class="btn1"><div><div class="iconSVG"><img src="img/start.svg"></div><div class="lt" data-lt="startNow">Start now!</div></div></button>    
+                    </div>
+                </div></div>
+            </div>
+        </div>
+
+        <!-- Model Editing: Core Editing Environment -->
+        <div id="editModel" class="page hide noDisplay">
+            <!-- Model Graph -->
+            <div id="editGraph">
+                <!-- Functional Buttons -->
+                <div id="functionalButtons">
+                    <div id="editToolBar">
+                        <button id="editModelTopSave" class="btn1 leftmost"><div><div class="iconSVG"><img src="img/save.svg"></div><div class="lt" data-lt="saveProject">Save Project (NOM)</div></div></button>
+                        <button id="editModelTopView" class="btn1 rightmost"><div><div class="iconSVG"><img src="img/code.svg"></div><div class="lt" data-lt="trainNow">Train Now</div></div></button>
+                    </div>
+                    <div class="toolBarGroup noDisplay activated" id="attachOnBtns">
+                        <div class="toolBarGroupIcon"><img src="img/attachTo.svg" /></div>
+                        <div class="toolBarGroupBtns">
+                            <div class="toolBarGroupTitle"><span class="lt" id="toolboxAttLayerName"></span> <span class="lt" data-lt="attachOn">attach on...</span></div>
+                            <button id="attFinish" class="btn1 leftmost"><div><div class="iconSVG"><img src="img/okGreen.svg"/></div><div class="lt" data-lt="finished">Finished</div></div></button>
+                            <button id="attCancel" class="btn1 rightmost"><div><div class="iconSVG"><img src="img/cancelRed.svg"/></div><div class="lt" data-lt="cancel">Cancel</div></div></button>
+                        </div>
+                    </div>
+                    <div class="toolBarGroup noDisplay activated" id="connectToBtns">
+                        <div class="toolBarGroupIcon"><img src="img/connectTo.svg" /></div>
+                        <div class="toolBarGroupBtns">
+                            <div class="toolBarGroupTitle"><span class="lt" id="toolboxCntLayerName"></span> <span class="lt" data-lt="connectTo">connect to...</span></div>
+                            <button id="cntFinish" class="btn1 leftmost"><div><div class="iconSVG"><img src="img/okGreen.svg"/></div><div class="lt" data-lt="finished">Finished</div></div></button>
+                            <button id="cntCancel" class="btn1 rightmost"><div><div class="iconSVG"><img src="img/cancelRed.svg"/></div><div class="lt" data-lt="cancel">Cancel</div></div></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="editGraphWrapper" class="graphWrapper">
+                    <div class="sourceRow graphRow">
+                        
+                    </div>
+                    <div class="edgeRow" >
+                        <svg class="edgeSVG"></svg>
+                    </div>
+                    <div class="nextAction graphRow">
+                        <div class="nextActionTitle lt" data-lt="graphActions">Actions:</div>
+                        <div class="sourceActions nextActionBtns btnRow">
+                            <button id="actionSelFeature" class="btn1"><div><div class="lt" data-lt="actionSelFeature">Select Features for Model Input...</div></div></button>
+                        </div>
+                        <div class="layerActions nextActionBtns btnRow noDisplay">
+                            <button id="actionAppendLayer" class="btn1 leftmost"><div><div class="lt" data-lt="actionAppendLayer">Append Layer...</div></div></button>
+                            <button id="actionAttachLayer" class="noDisplay btn1 centerBtn"><div><div class="lt" data-lt="actionAttachLayer">Attach Layer...</div></div></button>
+                            <button id="actionSetTask" class="btn1 rightmost"><div><div class="lt" data-lt="actionSetTask">Set Training Task...</div></div></button>
+                        </div>
+                        <div class="finalActions nextActionBtns btnRow noDisplay">
+                            <button id="actionSaveProj" class=" btn1 leftmost"><div><div class="lt" data-lt="actionSaveProj">Save Project</div></div></button>
+                            <button id="actionSaveProg" class=" btn1 centerBtn"><div><div class="lt" data-lt="actionSaveProg">Save Training Programme</div></div></button>
+                            <button id="actionViewCodes" class=" btn1 rightmost"><div><div class="lt" data-lt="trainNow">Train Now</div></div></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layer" id="layerItemTemp" aria-haspopup="true">
+                <div class="receiveNode">▼</div>
+                <div class="layerName lt" data-lt="">Table Source</div>
+                <div class="layerShape"><span class="lt" data-lt="propShpae">Shape:</span> <span class="shapeVal"></span></div>
+                <div class="layerPred"><span class="lt" data-lt="propPred">Prediction on:</span> <span class="predDppNode lt"></span></div>
+                <div class="outputNode">▼</div>
+            </div>
+
+            <!-- Property Window -->
+            <div id="editProp" class="collapsed">
+                <div class="editPropHeading"><span class="lt" data-lt="properties">Properties</span><span> - </span><span id="propTitle" class="lt"></span></div>
+                <div id="propWinTrain" class="propWin">
+                    <div class="propWinName lt" id="propTrainName" data-lt="training">Model Training</div>
+                    <!-- Multiple Build not supported -->
+                    <div class="propGroup">
+                        <div class="propGroupName lt" data-lt="trainingProfile">Training Profile</div>
+                        <div class="propRow"><label class="lt" data-lt="propEpochCount" for="propEpochCount">No. of Epoch:</label><input id="propEpochCount" type="text" class="val propVal" data-prop-type="TrainingProfile" data-id="0" data-prop="noOfEpoch" data-val-type="number" data-min="1" data-step="1" /></div>
+                        <div class="propRow"><label class="lt" data-lt="propLearningRate" for="propLearningRate">Learning Rate:</label><input id="propLearningRate" type="text" class="val propVal" data-prop-type="TrainingProfile" data-id="0" data-prop="initialLearningRate" data-val-type="number" /></div>
+                        <div class="propRow"><label class="lt" data-lt="propOptimizer" for="propOptimizer">Optimizer:</label>
+                            <select id="propOptimizer" data-default="None" class="propVal" data-prop-type="TrainingProfile" data-prop="optimizer" data-id="0">
+                                <option data-val="rmsprop">RMSProp</option>
+                                <option data-val="adam">Adam</option>
+                                <option data-val="grad">Gradient Descent</option>
+                                <option data-val="momentum">Momentum</option>
+                                <option data-val="adagrad">Adagrad</option>
+                                <option data-val="adadelta">Adadelta</option>
+                                <option data-val="ftrl">FTRL</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="btnRow right moreBtnRow"><button class="btn1 propAdvance"><div><div class="icon">⏷</div><div class="lt" data-lt="propAdvOpt">Advanced Options...</div></div></button></div>
+                    <div class="propGroup canCollapse noDisplay">
+                        <div class="propGroupName lt" data-lt="lrDecay">Learning Rate Decay</div>
+                        <div class="propRow"><label class="lt" id="propEpochPerLRSwitchLabel" data-lt="propEpochPerLR" for="propEpochPerLRSwitch">No. of Epoch per Decay:</label>
+                            <select id="propEpochPerLRSwitch">
+                                <option class="lt" data-val="N" data-lt="propEpochPerLRNo">No decay</option>
+                                <option class="lt" data-val="Y" data-lt="propEpochPerLRMore">Decay for every...</option>
+                            </select>
+                            <input id="propEpochPerLR" type="text" class="val propVal hasMoreBtn noDisplay" data-prop-type="TrainingProfile" data-id="0" data-prop="numEpochsPerDecay" data-val-type="number" data-min="1" data-step="1" /><button id="cancelValidation" class="btn1 noDisplay"><div class="iconSVG"><img src="img/cancelRed.svg"></div></button></div>
+                        <div class="propRow" id="propLRDecayRow"><label class="lt" data-lt="propLRDecay" for="propLRDecay">Decay Rate:</label><input id="propLRDecay" type="text" class="val propVal" data-prop-type="TrainingProfile" data-id="0" data-default="1" data-prop="learningRateDecayFactor" data-val-type="number" data-min="0" /></div>
+                        <div class="propGroupName lt noDisplay" data-lt="expMvAvg">Exponential Moving Averages</div>
+                        <div class="propRow noDisplay"><label class="lt" data-lt="propExpAvgLoss" for="propExpAvgLoss">Training Loss:</label><input id="propExpAvgLoss" type="text" class="val propVal" data-prop-type="TrainingProfile" data-id="0" data-prop="exponentialLossDecay" data-val-type="number" data-min="0" data-max="1"/></div>
+                        <div class="propRow noDisplay"><label class="lt" data-lt="propExpAvgVar" for="propExpAvgVar">Training Variables:</label><input id="propExpAvgVar" type="text" class="val propVal" data-prop-type="TrainingProfile" data-id="0" data-prop="exponentialVarDecay" data-val-type="number" data-min="0" data-max="1"/></div>
+                    </div>
+                    <div class="propGroup">
+                        <div class="propGroupName lt" data-lt="crossVal">Cross Validation</div>
+                        <div class="propRow"><label class="lt" data-lt="propType" for="propCrossValType">Type:</label>
+                            <select id="propCrossValType" data-default="None" class="propVal" data-prop-type="TrainingProfile" data-prop="crossValidationType" data-id="0">
+                                <option class="lt" data-lt="None" data-val="None">None</option>
+                                <option class="lt" data-lt="crossValKFold" data-val="fold">K-Fold</option>
+                                <option class="lt" data-lt="crossValRand" data-val="rand">Repeated Random</option>
+                            </select>
+                        </div>
+                        <div class="propRow" id="propValPropRow"><label class="lt" data-lt="propValProp" for="propValProp">Validation Proportion:</label><input id="propValProp" type="text" class="val propVal" data-prop-type="TrainingProfile" data-id="0" data-prop="crossValidationProp" data-val-type="number" data-min="0" data-max="100" placeholder="20" /><div class="propUnit">%</div></div>
+                        <div class="propRow" id="propValRoundRow"><label class="lt" data-lt="propValRound" for="propValRound">Validation Rounds:</label><input id="propValRound" type="text" class="val propVal hasMoreBtn" data-prop-type="TrainingProfile" data-id="0" data-prop="crossValidationCount" data-val-type="number" data-min="1" data-step="1" placeholder="1"/><button data-for="valRoundInfo" class="btn1 infoBtn"><div class="iconSVG"><img src="img/help.svg"/></div></button></div>
+                    </div>
+                    <div class="propGroup">
+                        <div class="propGroupName lt" data-lt="repeatedRuns">Repeated Runs</div>
+                        <div class="propRow"><label class="lt" data-lt="count" for="propRunTime">Count:</label><input id="propRunTime" type="text" class="val propVal" data-prop-type="Train" data-prop="runCount" data-default="1" data-val-type="number" data-min="1" data-step="1"/></div>
+                    </div>
+                    <div class="propGroup">
+                        <div class="propGroupName lt" data-lt="configs">Configurations</div>
+                        <div class="propRow"><label class="lt" data-lt="propLogFolder" for="propLogFolder">Log Folder:</label><input id="propLogFolder" type="text" class="val propVal hasMoreBtn" data-prop-type="Train" data-prop="folder" data-default="D:/tmp/" data-val-type="folderLoc" /><button data-for="logFolderInfo" class="btn1 infoBtn"><div class="iconSVG"><img src="img/help.svg"/></div></button></div>
+                        <div class="propRow noDisplay"><label class="lt" data-lt="propRestorePath" for="propRestorePath">Restore Path:</label><input id="propRestorePath" type="text" class="val propVal" data-prop-type="Train" data-prop="restorePath" data-prop="restorePath" data-default="D:/tmp/" data-val-type="folderLoc" /></div>
+                        <div class="propRow"><label class="lt" data-lt="propDevice" for="propDevice">Device:</label>
+                            <select id="propDevice" data-default="/cpu:0" class="propVal" data-prop-type="Train" data-prop="device">
+                                <option class="lt" data-lt="cpu" data-val="/cpu:0">CPU</option>
+                                <option class="lt" data-lt="gpu" data-val="/gpu:0">GPU</option>
+                            </select>
+                        </div>
+                        <div class="propRow"><label class="lt" data-lt="propLogFreq" for="propLogFreq">Log Freq.:</label><input id="propLogFreq" type="text" class="val propVal" data-prop-type="Train" data-prop="logFreq" data-default="-1" data-val-type="number" data-min="0" data-step="1"/></div>
+                        <div class="propRow"><label class="lt" data-lt="propSaveFreq" for="propSaveFreq">Save Freq.:</label><input id="propSaveFreq" type="text" class="val propVal" data-prop-type="Train" data-prop="saveFreq" data-default="0" data-val-type="number" data-min="0" data-step="1" /></div>
+                        <div class="propRow"><label class="lt" data-lt="propTestFreq" for="propTestFreq">Test Freq.:</label><input id="propTestFreq" type="text" class="val propVal" data-prop-type="Train" data-prop="testFreq" data-default="-1" data-val-type="number" data-min="0" data-step="1" /></div>
+                        <div class="propRow"><label class="lt" data-lt="propWeightFreq" for="propWeightFreq">Weight Freq.:</label><input id="propWeightFreq" type="text" class="val propVal" data-prop-type="Train" data-prop="weightLogFreq" data-default="0" data-val-type="number" data-min="-1" data-step="1" /></div>
+                        <div class="propRow noDisplay"><label class="lt" data-lt="propFilterFreq" for="propFilterFreq">Filter Freq.:</label><input id="propFilterFreq" type="text" class="val propVal" data-prop-type="Train" data-prop="filterFreq"  data-default="0" data-val-type="number" data-min="0" data-step="1" /></div>
+                    </div>
+                    <div class="propGroup">
+                        <div class="propGroupName lt" data-lt="configTrace">Item Tracing</div>
+                        <div class="propRow"><label class="lt" data-lt="propTraceCount" for="propTraceCount">Trace Count:</label><input id="propTraceCount" type="text" class="val propVal hasMoreBtn" data-prop-type="Train" data-prop="traceRecord" data-default="0" data-val-type="number" data-min="0" data-step="1" /><button data-for="traceRecInfo" class="btn1 infoBtn"><div class="iconSVG"><img src="img/help.svg"/></div></button></div>
+                        <div class="propRow"><label class="lt" data-lt="propTraceFreq" for="propTraceFreq">Trace Freq.:</label><input id="propTraceFreq" type="text" class="val propVal" data-prop-type="Train" data-prop="traceFreq" data-default="-1" data-val-type="number" data-min="0" data-step="1" /></div>
+                    </div>
+                </div>
+                <div id="propWinTrainSource" class="propWin">
+                    <div class="propWinName lt" id="propSourceName" data-lt=""></div>
+                    <div class="propGroup" data-sub-class='["ImageSource","TableSource"]'>
+                        <div class="propGroupName lt" data-lt="Source">Data Source</div>
+                        <div class="propRow" data-sub-class='["ImageSource"]'><label class="lt" data-lt="propImgSource" for="propImgSource">Image Type:</label>
+                            <select id="propImgSource" data-default="cifar10" class="propVal" data-prop-type="TrainSource" data-prop="sourceType">
+                                <option data-val="cifar10">CIFAR-10</option>
+                                <option data-val="mnist">MNIST</option>
+                            </select>
+                        </div>
+                        <div class="propRow" data-sub-class='["ImageSource"]'><label class="lt" data-lt="propFolderLoc" for="propImgFolder">File Location:</label><input id="propImgFolder" type="text" class="val propVal" data-prop-type="TrainSource" data-prop="coreDataDir" data-default="0" data-val-type="folderLoc" /></div>
+                        <div class="propRow" data-sub-class='["CSVSource"]'><label class="lt" data-lt="propFileLoc" for="propCSVPath">File Location:</label><input id="propCSVPath" type="text" class="val propVal" data-prop-type="TrainSource" data-prop="path" data-default="" data-val-type="fileLoc" /></div>
+                        <div class="propRow" data-sub-class='["CSVSource"]'><label class="lt" data-lt="propEncoding" for="propEncoding">Encoding:</label><input id="propEncoding" type="text" class="val propVal" data-prop-type="TrainSource" data-prop="encoding" data-default="" readonly/></div>
+                    </div><div class="propGroup">
+                        <div class="propGroupName lt" data-lt="recordGeneration">Record Generation</div>
+                        <div class="propRow"><label class="lt" data-lt="propBatchSize" for="propBatchSize">Batch Size:</label><input id="propBatchSize" type="text" class="val propVal" data-prop-type="TrainSource" data-prop="batchSize" data-default="" data-val-type="number" data-min="0" data-step="1" placeholder="200" /></div>
+                        <div class="propRow">
+                            <label class="lt" data-lt="propShuffle" for="propShuffleSource">Shuffle:</label>
+                            <div class="checkbox propVal" data-prop-type="TrainSource" data-prop="shuffle" data-default="" id="propShuffleSource" data-val="" data-val-type="checkbox"><div class="checkboxTick"><div class="iconSVG"><img src="img/ok.svg"/></div></div><div class="lt yes" data-lt="yes">Yes</div><div class="lt no" data-lt="no">No</div></div>
+                        </div>
+                    </div>
+                    <div class="propGroup" id="sourceCrossVal">
+                        <div class="propGroupName lt" data-lt="dataPart">Data Partitioning</div>
+                        <div class="propRow">
+                            <label class="lt" data-lt="propStatus" for="propCVSource">Status:</label>
+                            <div class="val lt" id="propCVSource"></div>
+                            <button data-for="dataPartInfo" class="btn1 infoBtn"><div class="iconSVG"><img src="img/help.svg"/></div></button>
+                        </div>
+                        <div class="propRow" data-sub-class='["CSVSource","TableSource"]'><label class="lt" data-lt="propTestRatio" for="propTestRatio">Test Ratio:</label><input id="propTestRatio" type="text" class="val propVal" data-prop-type="TrainSource" data-prop="_testRatio" data-default="20" data-val-type="number" data-min="0" data-max="100" data-step="0.1" placeholder="20" /><div class="propUnit">%</div></div>
+                    </div>
+                    <div class="propGroup" id="propDataSourcePreviewGroup">
+                        <div class="propGroupName lt" data-lt="dppKeyDataPrev">Data Preview</div>
+                        <div class="propTable">
+                            <div id="dataSourcePreview"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="propWinColConfig" class="propWin">
+                    <div class="propWinName lt" id="propColConfigName" data-lt="" id="propTransfromDef"></div>
+                    <div class="propGroup" data-sub-class='["TableSource", "CSVSource"]'>
+                        <div class="propGroupName lt" data-lt="colSelection">Column Selection</div>
+                        <div class="propRow" data-sub-class='["CSVSource","TableSource"]'><label class="lt" data-lt="propColumns" for="propColumns">Columns:</label><input id="propColumns" type="text" class="val propVal hasMoreBtn" data-prop-type="ColConfig" data-preprocessing-step="Input" data-prop="sourceCol" data-default="" data-val-type="indexRange" placeholder="eg. [None:-1] / -1" /><button data-lt="select" data-for-prop="propColumns" data-for-id="propColumns" data-table-type="source" class="btn1 textOnly colSelBtn lt"></button></div>
+                    </div>
+                    <div class="propGroup" data-sub-class='["TableSource", "CSVSource"]' id="propTxCirGroup">
+                        <div class="propGroupName lt" data-lt="dppKeyTranx">Transformations</div>
+                        <div class="propList" id="propTranxList">
+                            <div class="propListItem" id="colConfigTxTemp"><div class="txType lt" data-lt-temp="$$$: "></div><div class="txCols"></div><div class="rmv"><div class="iconSVG"><img class="tmpImg" data-src="cancelRed.svg"/></div></div></div>
+                            <div class="btnRow"><button id="addTransCol" class="btn1"><div><div class="lt" data-lt="addTxm">Add a Transformation...</div></div></button></div>
+                        </div>
+                        <div class="propGroupName lt" data-lt="dppKeyCir">Circular Data</div>
+                        <div class="propList" id="propCirList">
+                            <div class="propListItem" id="colConfigCirTemp"><div class="cirCol"></div><div class="rmv"><div class="iconSVG"><img class="tmpImg" data-src="cancelRed.svg"/></div></div></div>
+                            <div class="btnRow"><button id="defCirCol" class="btn1" ><div><div class="lt" data-lt="defCir">Define Circular Data...</div></div></button></div>
+                        </div>
+                    </div>
+                    <div class="propGroup" data-sub-class='["TableSource", "CSVSource"]'>
+                        <div class="propGroupName lt" data-lt="onehot">One-Hot Encoding</div>
+                        <div class="propRow">
+                            <label class="lt" data-lt="propColumns" for="propOneHot">Columns:</label>
+                            <input id="propOneHot" type="text" class="val propVal hasMoreBtn" data-prop-type="ColConfig" data-prop="onehot" data-default="" data-val-type="indexRange" placeholder="-1" /><button data-lt="select" data-for-prop="propOneHot" data-for-id="propOneHot" data-table-type="colConfig" data-preprocessing-step="CircularDataDefined" class="btn1 textOnly colSelBtn lt"></button>
+                        </div>
+                    </div><div class="propGroup">
+                        <div class="propGroupName lt" data-lt="recordGeneration">Record Generation</div>
+                        <div class="propRow" id="propImgOutWRow" data-sub-class='["ImageSource"]'><label class="lt" data-lt="propImgOutW" for="propImgOutW">Crop As Width:</label><input id="propImgOutW" type="text" class="val propVal" data-prop-type="ColConfig" data-prop="_outW" data-default="" data-val-type="number" data-step="1" data-min="1" placeholder="32" /><div class="propUnit">px</div></div>
+                        <div class="propRow" id="propImgOutHRow" data-sub-class='["ImageSource"]'><label class="lt" data-lt="propImgOutH" for="propImgOutH">Crop As Height:</label><input id="propImgOutH" type="text" class="val propVal" data-prop-type="ColConfig" data-prop="_outH" data-default="" data-val-type="number" data-step="1" data-min="1" placeholder="32" /><div class="propUnit">px</div></div>
+                        <div class="propRow">
+                            <label class="lt" data-lt="dataType" for="propImgSource">Data Type:</label>
+                            <select id="propImgSource" data-default="None" class="propVal hasMoreBtn" data-prop-type="ColConfig" data-prop="dtype">
+                                <option data-val="" class="lt" data-lt="dTypeAuto">Auto (Float)</option>
+                                <option data-val="tf.float32" class="lt" data-lt="dTypeFloat">Float</option>
+                                <option data-val="tf.int64" class="lt" data-lt="dTypeInt">Integer</option>
+                            </select>
+                            <button data-for="colConfigDataTypeInfo" class="btn1 infoBtn"><div class="iconSVG"><img src="img/help.svg"/></div></button>
+                        </div>
+                    </div><div class="propGroup" data-sub-class='["TableSource", "CSVSource"]'>
+                        <div class="propGroup" id="propDataPreviewGroup">
+                            <div class="propGroupName lt" data-lt="dppKeyDataPrev">Data Preview</div>
+                            <div class="propTable">
+                                <div id="colDataPreview"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="propWinLayer" class="propWin">
+                    <div class="propWinName lt" id="propLayerName" data-lt=""></div>
+                    <div class="propGroup">
+                        <div class="propGroupName lt" data-lt="layerInfo">Layer Operations</div>
+                        <div class="propRow"><label class="lt" data-lt="propLayerType" for="propLayerType">Layer Type:</label><div class="val lt" id="propLayerType" type="lt"></div></div>
+                        <div class="propGroup noDisplay" id="propLayerRefRows">
+                            <div class="propRow"><label class="lt" data-lt="propParamShare" for="propLayerRef">Parameter Sharing:</label>
+                                <select class="val propVal" id="propLayerRef" data-prop-type="Layer" data-prop="refLayerName" data-default="None">
+                                    <option class="lt" data-lt="None" data-val="">None</option>
+                                </select>
+                            </div>
+                            <div class="propRow" id="propTransRefWeightRow"><label class="lt" data-lt="propTransRefWeight" for="propTransRefWeight">Transpose Ref. Weight:</label>
+                                <div class="checkbox propVal" data-prop-type="Layer" data-prop="refLayerTranspose" data-default="1" id="propTransRefWeight" data-val="" data-val-type="checkbox"><div class="checkboxTick"><div class="iconSVG"><img src="img/ok.svg"/></div></div><div class="lt yes" data-lt="yes">Yes</div><div class="lt no" data-lt="no">No</div></div>
+                            </div>
+                        </div>
+                        <div class="propRow" data-sub-class='["Layer-Convolution","Layer-FullyConnected","Layer-Deconvolution", "Layer-Convolution1D", "Layer-Deonvolution1D"]'><label class="lt" data-lt="propHiddenSize" for="propHiddenSize">Hidden Size:</label><input id="propHiddenSize" type="text" class="val propVal" data-prop-type="Layer" data-prop="layerUnits" data-default="" data-val-type="number" data-min="1" data-step="1" /></div>
+                        <div class="propGroup" data-sub-class='["Layer-Convolution","Layer-Deconvolution", "Layer-Convolution1D", "Layer-Deonvolution1D"]'>
+                            <div class="propRow" data-sub-class='["Layer-Convolution","Layer-Deconvolution", "Layer-Convolution1D", "Layer-Deonvolution1D"]'><label class="lt" data-lt="propFilterWidth" for="propFilterWidth">Filter Width:</label><input id="propFilterWidth" type="text" class="val propVal" data-prop-type="Layer" data-prop="convFilterWidth" data-default="" data-val-type="number" data-min="1" data-step="1" placeholder="3" /><div class="propUnit">px</div></div>
+                            <div class="propRow" data-sub-class='["Layer-Convolution","Layer-Deconvolution"]'><label class="lt" data-lt="propStrideX" for="propStrideX">Stride-x:</label><input id="propStrideX" type="text" class="val propVal" data-prop-type="Layer" data-prop="_convStrideX" data-default="1" data-val-type="number" data-min="1" data-step="1" placeholder="0" /><div class="propUnit">px</div></div>
+                            <div class="propRow" data-sub-class='["Layer-Convolution","Layer-Deconvolution"]'><label class="lt" data-lt="propStrideY" for="propStrideY">Stride-y:</label><input id="propStrideY" type="text" class="val propVal" data-prop-type="Layer" data-prop="_convStrideY" data-default="1" data-val-type="number" data-min="1" data-step="1" placeholder="0" /><div class="propUnit">px</div></div>
+                            <div class="propRow" data-sub-class='["Layer-Convolution","Layer-Deconvolution", "Layer-Convolution1D", "Layer-Deonvolution1D"]' id="propDilationRow"><label class="lt" data-lt="propDilation" for="propDilation">Dilation:</label><input id="propDilation" type="text" class="val propVal" data-prop-type="Layer" data-prop="convDilation" data-default="1" data-val-type="number" data-min="1" data-step="1" placeholder="1" /><div class="propUnit">px</div></div>
+                            <div class="propRow" data-sub-class='["Layer-Convolution","Layer-Deconvolution", "Layer-Convolution1D", "Layer-Deonvolution1D"]'><label class="lt" data-lt="propPadding" for="propPadding">Keep Dimension:</label>
+                                <div class="checkbox propVal" data-prop-type="Layer" data-prop="convPadding" data-default="" id="propPadding" data-val="" data-val-type="checkbox"><div class="checkboxTick"><div class="iconSVG"><img src="img/ok.svg"/></div></div><div class="lt yes" data-lt="yes">Yes</div><div class="lt no" data-lt="no">No</div></div>
+                            </div>
+                            <div class="propRow" data-sub-class='["Layer-Deconvolution"]'><label class="lt" data-lt="propAlgorithm" for="propDeconvAlgorithm">Algorithm:</label>
+                                <select class="val propVal" id="propDeconvAlgorithm" data-prop-type="Layer" data-enum-module="ModelNode" data-enum="Layer.Deconvolution.AlgorithmTypes" data-prop="dconvAlgorithm" data-default="Conv2DTranspose">
+                                    <optgroup class="lt" data-lt="algorithmsTitle" label="Algorithms" data-lt-type='["label"]'>
+                                        <option class="lt" data-lt="conv2DTranspose" data-val="Conv2DTranspose">Convolutional Transpose</option>
+                                        <option class="lt" data-lt="scaleThenConv2D" data-val="ScaleThenConv2D">Upscaling Then Convolution</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div class="propGroup" id="deconvOptions">
+                                <div class="propRow" data-sub-class='["Layer-Deconvolution"]'><label class="lt" data-lt="propDeconvPadding" for="propDeconvPadding">Padding:</label>
+                                    <select class="val propVal" id="propDeconvPadding" data-prop-type="Layer" data-enum-module="ModelNode" data-enum="Layer.Deconvolution.PaddingTypes" data-prop="dconvPadding" data-default="Stretch">
+                                        <optgroup class="lt" data-lt="dconvPaddingTypes" label="Padding Types" data-lt-type='["label"]'>
+                                            <option class="lt" data-lt="zeroPadding" data-val="Zeros">Zero Padding</option>
+                                            <option class="lt" data-lt="strecth" data-val="Stretch">Stretch</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                                <div class="propRow" data-sub-class='["Layer-Deconvolution"]'><label class="lt" data-lt="propDeconvUpscale" for="propDeconvUpscale">Upscale:</label>
+                                    <select class="val propVal" id="propDeconvUpscale" data-prop-type="Layer" data-enum-module="ModelNode" data-enum="Layer.Deconvolution.UpscaleTypes" data-prop="dconvUpscale" data-default="Bicubic">
+                                        <optgroup class="lt" data-lt="dconvUpscaleTypes" label="Upscale Types" data-lt-type='["label"]'>
+                                            <option class="lt" data-lt="txImgResizeBicubic" data-val="Bicubic">Bicubic</option>
+                                            <option class="lt" data-lt="txImgResizeBilinear" data-val="Bilinear">Bi-linear</option>
+                                            <option class="lt" data-lt="txImgResizeNN" data-val="NearestNeighbor">Nearest Neighbor</option>
+                                            <option class="lt" data-lt="zeroPadding" data-val="PadZeros">Zero Padding</option>
+                                            <option class="lt" data-lt="dconvResizeInsertZeros" data-val="InsertZeros">Inserting Zeros</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="propRow" data-sub-class='["Layer-Convolution", "Layer-Convolution1D", "Layer-Deonvolution1D"]'><label class="lt" data-lt="propCNNPadding" for="propCNNPadding">Padding Method:</label><div class="val lt" id="propCNNPadding" data-lt="zeroPadding" type="lt">Zero Padding</div></div>
+                        </div>
+                    </div>
+                    <div class="propGroup" data-sub-class='["FinalLayer"]'>
+                        <div class="propGroupName lt" data-lt="taskDetails">Task Details</div>
+                        <div class="propRow"><label class="lt" data-lt="propMes" for="propMes">Measurement:</label><div class="val" id="propMes" type="lt"></div></div>
+                        <div class="propRow"><label class="lt" data-lt="propPred" for="propPred">Predict on:</label>
+                            <select class="val propVal" id="propPred" data-prop-type="Layer" data-prop="predictOn">
+                            </select>
+                        </div>
+                        <div class="propRow" data-sub-class='["FinalLayer-Classifier"]'><label class="lt" data-lt="propClassCount" for="propClassCount">No. of Classes:</label><input id="propClassCount" type="text" class="val propVal" data-prop-type="Layer" data-prop="classCount" data-default="" data-val-type="number" data-min="1" data-step="1" placeholder="10" /></div>
+                    </div>
+                    <div class="propGroup" id="propIncomingConfigGroup">
+                        <div class="propGroupName lt" data-lt="incomingCollections">Incoming Collections</div>
+                        <div class="propRow"><label class="lt" data-lt="method" for="propICMethod">Method:</label>
+                            <select class="val propVal" id="propICMethod" data-prop-type="IncomingConfig" data-prop="method" data-default="Concat">
+                                <option class="lt" data-lt="ICConcat" data-val="Concat">Concatenate</option>
+                                <option class="lt" data-lt="ICSum" data-val="Sum">Sum</option>
+                                <option class="lt" data-lt="ICMultiply" data-val="Multiply">Multiply</option>
+                                <option class="lt" data-lt="ICBlend" data-val="Blend">Blend</option>
+                            </select>
+                        </div>
+                        <div class="propRow"><label class="lt" data-lt="propMerge" for="propICMerge">Merging:</label>
+                            <select class="val propVal" id="propICMerge" data-prop-type="IncomingConfig" data-prop="mergeDim" data-default="Subsample">
+                                <option class="lt" data-lt="ICSubsample" data-val="SubSample">Sub-sample</option>
+                                <option class="lt" data-lt="ICSptDpth" data-val="SpaceToDepth">Space to Depth</option>
+                                <option class="lt" data-lt="ICMaxPool" data-val="MaxPool">Max Pool</option>
+                                <option class="lt" data-lt="ICMeanPool" data-val="MeanPool">Mean Pool</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="propGroup" data-sub-class='["FinalLayer", "Layer-Convolution","Layer-FullyConnected","Layer-Deconvolution"]'>
+                        <div class="propGroupName lt" data-lt="learningParams">Learning Parameters</div>
+                        <div class="propRow"><label class="lt" data-lt="weightL" for="propLTWeight">Weight:</label>
+                            <select class="val propVal hasMoreBtn" id="propLTWeight" data-prop-type="VarConfig.Initializer" data-prop="_type" data-id="linearTransform.weightConfig.initializer" data-default="TruncatedNormal">
+                                <optgroup class="lt" data-lt="initializer" label="Initializer" data-lt-type='["label"]'>
+                                    <option class="lt" data-lt="viConstant" data-val="Constant">Constant</option>
+                                    <option class="lt" data-lt="viZeros" data-val="Zeros">Zeros</option>
+                                    <option class="lt" data-lt="viOnes" data-val="Ones">Ones</option>
+                                    <option class="lt" data-lt="viRandNorm" data-val="RandomNormal">Random Normal</option>
+                                    <option class="lt" data-lt="viTrunNorm" data-val="TruncatedNormal">Truncated Normal</option>
+                                    <option class="lt" data-lt="viRandUni" data-val="RandomUniform">Random Uniform</option>
+                                    <option class="lt" data-lt="viOtgl" data-val="Orthogonal">Orthogonal</option>
+                                    <option class="lt" data-lt="viIdty" data-val="Identity">Identity</option>
+                                    <option class="lt" data-val="GlorotNormal">Glorot Normal</option>
+                                    <option class="lt" data-val="GlorotUniform">Glorot Uniform</option>
+                                    <option class="lt" data-val="HeNormal">He Normal</option>
+                                    <option class="lt" data-val="HeUniform">He Uniform</option>
+                                    <option class="lt" data-val="LecunNormal">Lecun Normal</option>
+                                    <option class="lt" data-val="LecunUniform">Lecun Uniform</option>
+                                </optgroup>
+                            </select>
+                            <button class="btn1 varConfigBtn moreConfig lt" data-row-initializer="propLTWeight" data-id="linearTransform.weightConfig" data-lt="moreSettings" data-lt-type='["title"]'><div class="iconSVG"><img src="img/settings.svg"/></div></button>
+                        </div>
+                        <div class="propRow"><label class="lt" data-lt="biasL" for="propLTBias">Bias:</label>
+                            <select class="val propVal hasMoreBtn" id="propLTBias" data-prop-type="VarConfig.Initializer" data-prop="_type" data-id="linearTransform.biasConfig.initializer" data-default="Constant">
                                     <optgroup class="lt" data-lt="initializer" label="Initializer" data-lt-type='["label"]'>
                                         <option class="lt" data-lt="viConstant" data-val="Constant">Constant</option>
                                         <option class="lt" data-lt="viZeros" data-val="Zeros">Zeros</option>
@@ -689,75 +732,53 @@
                                         <option class="lt" data-val="LecunNormal">Lecun Normal</option>
                                         <option class="lt" data-val="LecunUniform">Lecun Uniform</option>
                                     </optgroup>
-                                </select>
-                                <button class="btn1 varConfigBtn moreConfig lt" data-row-initializer="propLTWeight" data-id="linearTransform.weightConfig" data-lt="moreSettings" data-lt-type='["title"]'><div class="iconSVG"><img src="img/settings.svg"/></div></button>
-                            </div>
-                            <div class="propRow"><label class="lt" data-lt="biasL" for="propLTBias">Bias:</label>
-                                <select class="val propVal hasMoreBtn" id="propLTBias" data-prop-type="VarConfig.Initializer" data-prop="_type" data-id="linearTransform.biasConfig.initializer" data-default="Constant">
-                                        <optgroup class="lt" data-lt="initializer" label="Initializer" data-lt-type='["label"]'>
-                                            <option class="lt" data-lt="viConstant" data-val="Constant">Constant</option>
-                                            <option class="lt" data-lt="viZeros" data-val="Zeros">Zeros</option>
-                                            <option class="lt" data-lt="viOnes" data-val="Ones">Ones</option>
-                                            <option class="lt" data-lt="viRandNorm" data-val="RandomNormal">Random Normal</option>
-                                            <option class="lt" data-lt="viTrunNorm" data-val="TruncatedNormal">Truncated Normal</option>
-                                            <option class="lt" data-lt="viRandUni" data-val="RandomUniform">Random Uniform</option>
-                                            <option class="lt" data-lt="viOtgl" data-val="Orthogonal">Orthogonal</option>
-                                            <option class="lt" data-lt="viIdty" data-val="Identity">Identity</option>
-                                            <option class="lt" data-val="GlorotNormal">Glorot Normal</option>
-                                            <option class="lt" data-val="GlorotUniform">Glorot Uniform</option>
-                                            <option class="lt" data-val="HeNormal">He Normal</option>
-                                            <option class="lt" data-val="HeUniform">He Uniform</option>
-                                            <option class="lt" data-val="LecunNormal">Lecun Normal</option>
-                                            <option class="lt" data-val="LecunUniform">Lecun Uniform</option>
-                                        </optgroup>
-                                </select>
-                                <button class="btn1 varConfigBtn moreConfig lt" data-row-initializer="propLTBias" data-id="linearTransform.biasConfig" data-lt="moreSettings" data-lt-type='["title"]'><div class="iconSVG"><img src="img/settings.svg"/></div></button>
-                            </div>
-                            <div class="propRow"><label class="lt" data-lt="propWeightLogging" for="propWeightLogging">Train Observing:</label>
-                                <div class="checkbox propVal" data-prop-type="Layer" data-prop="weightLogging" data-default="" id="propWeightLogging" data-val="" data-val-type="checkbox"><div class="checkboxTick"><div class="iconSVG"><img src="img/ok.svg"/></div></div><div class="lt yes" data-lt="log">Log</div><div class="lt no" data-lt="propDisable">Disabled</div></div>
-                            </div>
+                            </select>
+                            <button class="btn1 varConfigBtn moreConfig lt" data-row-initializer="propLTBias" data-id="linearTransform.biasConfig" data-lt="moreSettings" data-lt-type='["title"]'><div class="iconSVG"><img src="img/settings.svg"/></div></button>
                         </div>
-                        <div class="propGroup" data-sub-class='["Layer"]'>
-                            <div class="propGroupName lt" data-lt="layerProceedings">Layer Proceedings</div>
-                            <div class="propRow"><label class="lt" data-lt="propBatchNorm" for="propBatchNorm">Batch Normalization:</label>
-                                <div class="checkbox propVal" data-prop-type="Layer" data-prop="batchNorm" data-default="" id="propBatchNorm" data-val="" data-val-type="checkbox"><div class="checkboxTick"><div class="iconSVG"><img src="img/ok.svg"/></div></div><div class="lt yes" data-lt="yes">Yes</div><div class="lt no" data-lt="no">No</div></div>
-                            </div>
-                            <div class="propRow"><label class="lt" data-lt="propActv" for="propActv">Activation Function:</label>
-                                <select id="propActv" data-default="relu" class="propVal" data-prop-type="Layer" data-prop="activation">
-                                    <option data-val="relu">relu</option>
-                                    <option data-val="sigmoid">sigmoid</option>
-                                    <option data-val="tanh">tanh</option>
-                                    <option data-val="hard_sigmoid">hard sigmoid</option>
-                                    <option data-val="linear">linear</option>
-                                    <option data-val="relu6">relu6</option>
-                                    <option data-val="selu">selu</option>
-                                    <option data-val="crelu">crelu</option>
-                                    <option data-val="elu">elu</option>
-                                    <option data-val="softplus">softplus</option>
-                                    <option data-val="softsign">softsign</option>
-                                </select>
-                            </div>
-                            <div class="propRow" data-sub-class='["Layer-BasicLayer","Layer-Collector"]'><label class="lt" data-lt="propDropKeep" for="propDropKeep">Dropout Keeping:</label><input id="propDropKeep" type="text" class="val propVal" data-prop-type="Layer" data-prop="dropout" data-default="" data-val-type="number" data-min="0" data-max="100" placeholder="100" /><div class="propUnit">%</div></div>
-                        </div>
-                        <div class="propGroup" id="propOutputConfigGroup">
-                            <div class="propGroupName lt" data-lt="outputManipulations">Output Manipulations</div>
-                            <div class="propRow"><label class="lt" data-lt="method" for="propOCMethod">Method:</label>
-                                <select class="val propVal" id="propOCMethod" data-prop-type="OutputConfig" data-prop="method" data-default="Default">
-                                    <option class="lt" data-lt="OCDefault" data-val="Default">No Changes</option>
-                                    <option class="lt" data-lt="OCFlatten" data-val="Flatten">Flatten</option>
-                                    <option class="lt" data-lt="OCReshape" data-val="Reshape">Reshape</option>
-                                </select>
-                            </div>
-                            <div id="propOCFlattenRow" class="propRow"><label class="lt" data-lt="propFlatten" for="propOCFlatten">On Axis:</label><input id="propOCFlatten" type="text" class="val propVal" placeholder="1" data-prop-type="OutputConfig" data-prop="axis" data-val-type="number" data-min="1" data-step="1" /></div>
-                            <div id="propOCReshapeRow" class="propRow"><label class="lt" data-lt="propReshape" for="propOCReshape">New Shape:</label><input id="propOCReshape" type="text" class="val propVal" placeholder="[None, -1]" data-prop-type="OutputConfig" data-prop="shape" data-val-type="shape"/></div>
+                        <div class="propRow"><label class="lt" data-lt="propWeightLogging" for="propWeightLogging">Train Observing:</label>
+                            <div class="checkbox propVal" data-prop-type="Layer" data-prop="weightLogging" data-default="" id="propWeightLogging" data-val="" data-val-type="checkbox"><div class="checkboxTick"><div class="iconSVG"><img src="img/ok.svg"/></div></div><div class="lt yes" data-lt="log">Log</div><div class="lt no" data-lt="propDisable">Disabled</div></div>
                         </div>
                     </div>
-                    <div id="propWinFinalLayer" class="propWin">
-                        <div class="propWinName lt" data-lt=""></div>
+                    <div class="propGroup" data-sub-class='["Layer"]'>
+                        <div class="propGroupName lt" data-lt="layerProceedings">Layer Proceedings</div>
+                        <div class="propRow"><label class="lt" data-lt="propBatchNorm" for="propBatchNorm">Batch Normalization:</label>
+                            <div class="checkbox propVal" data-prop-type="Layer" data-prop="batchNorm" data-default="" id="propBatchNorm" data-val="" data-val-type="checkbox"><div class="checkboxTick"><div class="iconSVG"><img src="img/ok.svg"/></div></div><div class="lt yes" data-lt="yes">Yes</div><div class="lt no" data-lt="no">No</div></div>
+                        </div>
+                        <div class="propRow"><label class="lt" data-lt="propActv" for="propActv">Activation Function:</label>
+                            <select id="propActv" data-default="relu" class="propVal" data-prop-type="Layer" data-prop="activation">
+                                <option data-val="relu">relu</option>
+                                <option data-val="sigmoid">sigmoid</option>
+                                <option data-val="tanh">tanh</option>
+                                <option data-val="hard_sigmoid">hard sigmoid</option>
+                                <option data-val="linear">linear</option>
+                                <option data-val="relu6">relu6</option>
+                                <option data-val="selu">selu</option>
+                                <option data-val="crelu">crelu</option>
+                                <option data-val="elu">elu</option>
+                                <option data-val="softplus">softplus</option>
+                                <option data-val="softsign">softsign</option>
+                            </select>
+                        </div>
+                        <div class="propRow" data-sub-class='["Layer-FullyConnected","Layer-Collector"]'><label class="lt" data-lt="propDropKeep" for="propDropKeep">Dropout Keeping:</label><input id="propDropKeep" type="text" class="val propVal" data-prop-type="Layer" data-prop="dropout" data-default="" data-val-type="number" data-min="0" data-max="100" placeholder="100" /><div class="propUnit">%</div></div>
                     </div>
-
-                    
+                    <div class="propGroup" id="propOutputConfigGroup">
+                        <div class="propGroupName lt" data-lt="outputManipulations">Output Manipulations</div>
+                        <div class="propRow"><label class="lt" data-lt="method" for="propOCMethod">Method:</label>
+                            <select class="val propVal" id="propOCMethod" data-prop-type="OutputConfig" data-prop="method" data-default="Default">
+                                <option class="lt" data-lt="OCDefault" data-val="Default">No Changes</option>
+                                <option class="lt" data-lt="OCFlatten" data-val="Flatten">Flatten</option>
+                                <option class="lt" data-lt="OCReshape" data-val="Reshape">Reshape</option>
+                            </select>
+                        </div>
+                        <div id="propOCFlattenRow" class="propRow"><label class="lt" data-lt="propFlatten" for="propOCFlatten">On Axis:</label><input id="propOCFlatten" type="text" class="val propVal" placeholder="1" data-prop-type="OutputConfig" data-prop="axis" data-val-type="number" data-min="1" data-step="1" /></div>
+                        <div id="propOCReshapeRow" class="propRow"><label class="lt" data-lt="propReshape" for="propOCReshape">New Shape:</label><input id="propOCReshape" type="text" class="val propVal" placeholder="[None, -1]" data-prop-type="OutputConfig" data-prop="shape" data-val-type="shape"/></div>
+                    </div>
                 </div>
+                <div id="propWinFinalLayer" class="propWin">
+                    <div class="propWinName lt" data-lt=""></div>
+                </div>
+
+                
             </div>
         </div>
 
@@ -1076,9 +1097,11 @@
                         <div class="actionMsg lt"></div>
                         <div class="propRow"><label class="lt" data-lt="propLayerType" for="appLayerType">Layer Type:</label>
                             <select id="appLayerType">
-                                <option class="lt" id="appLayFCL" data-val="BasicLayer" data-lt="BasicLayer">Fully Connected Layer</option>
-                                <option class="lt" id="appLayCNN" data-val="CNNLayer" data-lt="CNNLayer">CNN Layer</option>
-                                <option class="lt" id="appLayDCNN" data-val="DCNNLayer" data-lt="DCNNLayer">DCNN Layer</option>
+                                <option class="lt" id="appLayFCL" data-val="FullyConnected" data-lt="BasicLayer">Fully Connected Layer</option>
+                                <option class="lt" id="appLayConv" data-val="Convolution" data-lt="Convolution">Convolutional Layer</option>
+                                <option class="lt" id="appLayDeconv" data-val="Deconvolution" data-lt="Deconvolution">Deconvolutional Layer</option>
+                                <option class="lt" disabled id="appLayConv1D" data-val="Convolution1D" data-lt="Convolution1D">1D Convolutional Layer</option>
+                                <option class="lt" disabled id="appLayDeconv1D" data-val="Deconvolution1D" data-lt="Deconvolution1D">1D Deconvolutional Layer</option>
                                 <option class="lt" id="appLayCnt" data-val="Collector" data-lt="Collector">Collector</option>
                             </select>
                         </div>
@@ -1094,11 +1117,12 @@
                         </div>
                         <div class="cmSeperator" id="newLayerConfigSep"></div>
                         <div class="propRow" id="newHiddenSizeRow"><label class="lt" data-lt="propHiddenSize" for="appLayerCount">Hidden Size:</label><input id="appLayerCount" type="text" class="val" data-default="150" data-val-type="number" data-min="0" data-step="1" required placeholder="150" /></div>
-                        <div class="propGroup" id="newCNNLayer">
+                        <div class="propGroup" id="newConvLayer">
                             <div class="propRow"><label class="lt" data-lt="propFilterWidth" for="appFilterWidth">Filter Width:</label><input id="appFilterWidth" type="text" class="val" data-prop-type="Layer" data-prop="convFilterWidth" data-default="3" data-val-type="number" data-min="1" data-step="1" placeholder="3" required /><div class="propUnit">px</div></div>
-                            <div class="propRow"><label class="lt" data-lt="propStrideX" for="appStrideX">Stride-x:</label><input id="appStrideX" type="text" class="val propVal" data-prop-type="Layer" data-prop="_convStrideX" data-default="1" data-val-type="number" data-min="1" data-step="1" placeholder="0" required/><div class="propUnit">px</div></div>
-                            <div class="propRow"><label class="lt" data-lt="propStrideY" for="appStrideY">Stride-y:</label><input id="appStrideY" type="text" class="val propVal" data-prop-type="Layer" data-prop="_convStrideY" data-default="1" data-val-type="number" data-min="1" data-step="1" placeholder="0" required/><div class="propUnit">px</div></div>
-                            <div class="propRow" id="appDilationRow"><label class="lt" data-lt="propDilation" for="appDilation">Dilation:</label><input id="appDilation" type="text" class="val" data-prop-type="Layer" data-prop="convDilation" data-default="0" data-val-type="number" data-min="0" data-step="1" placeholder="0" required /><div class="propUnit">px</div></div>
+                            <div id="propAppStrideXRow" class="propRow"><label class="lt" data-lt="propStrideX" for="appStrideX">Stride-x:</label><input id="appStrideX" type="text" class="val propVal" data-prop-type="Layer" data-prop="_convStrideX" data-default="1" data-val-type="number" data-min="1" data-step="1" placeholder="0" required/><div class="propUnit">px</div></div>
+                            <div id="propAppStrideYRow" class="propRow"><label class="lt" data-lt="propStrideY" for="appStrideY">Stride-y:</label><input id="appStrideY" type="text" class="val propVal" data-prop-type="Layer" data-prop="_convStrideY" data-default="1" data-val-type="number" data-min="1" data-step="1" placeholder="0" required/><div class="propUnit">px</div></div>
+                            <div id="propAppStrideRow" class="propRow noDisplay"><label class="lt" data-lt="propStride" for="appStride">Stride:</label><input id="appStride" type="text" class="val propVal" data-prop-type="Layer" data-prop="convStride" data-default="1" data-val-type="number" data-min="1" data-step="1" placeholder="0" required/><div class="propUnit">px</div></div>
+                            <div class="propRow" id="appDilationRow"><label class="lt" data-lt="propDilation" for="appDilation">Dilation:</label><input id="appDilation" type="text" class="val" data-prop-type="Layer" data-prop="convDilation" data-default="1" data-val-type="number" data-min="1" data-step="1" placeholder="1" required /><div class="propUnit">px</div></div>
                             <div class="propRow"><label class="lt" data-lt="propPadding" for="appPadding">Padding:</label>
                                 <div class="checkbox propVal" data-prop-type="Layer" data-prop="convPadding" data-default="1" id="appPadding" data-val="" data-val-type="checkbox"><div class="checkboxTick"><div class="iconSVG"><img src="img/ok.svg"/></div></div><div class="lt yes" data-lt="yes">Yes</div><div class="lt no" data-lt="no">No</div></div>
                             </div>

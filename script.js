@@ -19,7 +19,7 @@
 
         Version 版本:
 
-            1903.04
+            1903.05
 
         Website & Docs 網站及文件庫:
         
@@ -175,16 +175,6 @@ function* getCombinations(array) {
         yield combIdx[yIdx].map(idx=>array[idx]);
         yIdx++;
     }
-}
-
-/**
- * Compare whether two shapes are equal.   --- UPDATED (Dexter) 20180822
- * @param {Array<(Number|String)>} shape1 - One shape array, either `Number` or `"None"`.
- * @param {Array<(Number|String)>} shape1 - Another shape array, either `Number` or `"None"`.
- * @returns {Boolean} - Whether the 2 sahpes are equal.
- */
-function shapeEquals(shape1, shape2) {
-    return shape1.every((s,idx)=>shape2[idx] == s);
 }
 
 /**
@@ -367,6 +357,16 @@ class Matrix {
                 else a[i] = ftn(v);
             });
         }
+    }
+
+    /**
+     * Compare whether two shapes are equal.   --- UPDATED (Dexter) 20180822
+     * @param {Array<(Number|String)>} shape1 - One shape array, either `Number` or `"None"`.
+     * @param {Array<(Number|String)>} shape1 - Another shape array, either `Number` or `"None"`.
+     * @returns {Boolean} - Whether the 2 sahpes are equal.
+     */
+    static shapeEquals(shape1, shape2) {
+        return shape1.every((s,idx)=>shape2[idx] == s);
     }
 }
 
@@ -603,6 +603,12 @@ class App {
     static get uid() { return this._uid; } static set uid(v) { this._uid = v; }
 
     /**
+     * Get the current navigation page.   --- UPDATED (Dexter) 20190718
+     * @returns {String} - The current navigation page.
+     */
+    static get currentPage() {return this._currentPage; } static set currentPage(pageID) { this._currentPage = pageID; }
+    
+    /**
      * Get accessible modules by a string.  --- UPDATED (Dexter) 20190406
      * @param {String} moduleName - The module name.
      * @param {Class} - The requested module.
@@ -614,11 +620,11 @@ class App {
     }
 
     /**
-     * App preparation during the parsing of this script before DOM is loaded.   --- UPDATED (Dexter) 20190317
+     * App preparation during the parsing of this script before DOM is loaded.   --- UPDATED (Dexter) 20190718
      */
     static prepare() {
         // Initialize necessary global app varialbles
-        App.all = new Map(); App.uid = 0; App.dict = new Map();
+        App.all = new Map(); App.uid = 0; App.dict = new Map(); App.currentPage = "startScreen";
 
         // Update the theme of the webpage from the loaclStorage.theme , to start before DOM is loaded because the styling rendering need to start asap.
         Theme.update(localStorage.theme);
@@ -1031,7 +1037,7 @@ class App {
 
     /**
      * Reset and unstyle the element's drop zone status.   --- UPDATED (Dexter) 20181221
-     * @param {DragEvent|DropEvent} e - A `drag`/`drop` event on an element.
+     * @param {DragEvent} e - A `drag`/`drop` event on an element.
      */
     static dragResetEle(e) {
         // Remove the dragCounter.
@@ -1071,24 +1077,33 @@ class App {
     }
 
     /**
-     * Switch the app page using a page id.   --- UPDATED (Dexter) 20181221
+     * Switch the app page using a page id.   --- UPDATED (Dexter) 20190718
      * @param {String} pageID - An app page ID.
      */
-    static gotoPage(pageID) {
+    static switchToPage(pageID) {
+        // Remove the current page.
+        var currentPage = $(App.currentPage);
+        currentPage.classList.add("hide", "out", "inactive");
+        currentPage.addEventListener("transitionend", ContextMenu.endClose, false);
+
+        // Show the current page.
+        var newPage = $(pageID);
+        newPage.classList.remove("noDisplay");
+        ContextMenu.untilShown(newPage).then(()=>{
+            newPage.classList.remove("hide", "out");
+            // Add a event that when it's fully appeared, any "pointerdown" effect from other areas will trigger the close all action.
+            newPage.addEventListener("transitionend", ()=>{
+                newPage.classList.remove("inactive");
+                App.currentPage = pageID;
+            }, {once: true, capture: false});
+        });
+        
         if (pageID == "startScreen") {
             // If it's going to the startScreen, show the startScreen and hide the home button.
-            $("startScreen").classList.remove("noDisplay");
             $("appNav").classList.add("start");
-
-            // Hide other pages that are not the startScreen.
-            [...document.getElementsByClassName("page")].filter(ele=>ele.id != "startScreen").forEach(ele=>ele.classList.add("noDisplay"));
         } else {
             // If it's other pages, show the home button and that page.
             $("appNav").classList.remove("start");
-            $(pageID).classList.remove("noDisplay");
-
-            // Hide other pages.
-            [...document.getElementsByClassName("page")].filter(ele=>ele.id != pageID).forEach(ele=>ele.classList.add("noDisplay"));
 
             // If it's the project folder page, resize the graphs.
             if (pageID == "projectFolder") {
@@ -1105,11 +1120,11 @@ class App {
     }
 
     /**
-     * Go back to the start screen.   --- UPDATED (Dexter) 20180523
+     * Go back to the start screen.   --- UPDATED (Dexter) 20190718
      * @param {Event} e - A `click` event.
      */
     static backToStart(e) {
-        App.gotoPage("startScreen");
+        App.switchToPage("startScreen");
     }
 
     /**
@@ -1230,7 +1245,7 @@ class App {
 
     
     /**
-     * For each single HTML element, apply the value onto the UI. This is typically used during the option showing of sidebar.   --- UPDATED (Dexter) 2019507
+     * For each single HTML element, apply the value onto the UI. This is typically used during the option showing of sidebar.   --- UPDATED (Dexter) 20190507
      * @param {Element} ele - An HTML element of showing the value of a property.
      * @param {(Number|String|Boolean)} toValue - The value to be set.
      */
@@ -1825,7 +1840,7 @@ class DataPreprocessingNode {
 
         /** @type {Array<(Number|String)>} - The receiving data shape from previous node. */
         this._dataShape = null;
-        /** @type {TrainSource} - The @Source.Config where this @DataPreprocessing.ColumnsNode object is attached to. */
+        /** @type {_SourceConfig} - The @Source.Config where this @DataPreprocessing.ColumnsNode object is attached to. */
         this._trainSource = null;
         /** @type {String} - The column config key of this @DataPreprocessing.ColumnsNode object. */
         this._key = null;
@@ -1882,7 +1897,7 @@ class DataPreprocessingNode {
 
     /**
      * The @Source.Config where this @DataPreprocessing.Node object is attached to.   --- UPDATED (Dexter) 20190124
-     * @returns {TrainSource} 
+     * @returns {_SourceConfig} 
      */
     get trainSource() {
         return this._trainSource;
@@ -1922,7 +1937,7 @@ class DataPreprocessingNode {
 
     /**
      * Attach this @DataPreprocessing.Node object to a @Source.Config object.   --- UPDATED (Dexter) 20190130
-     * @param {TrainSource} trainSource - The @Source.Config object to attach to.
+     * @param {_SourceConfig} trainSource - The @Source.Config object to attach to.
      * @param {String} key - The node key to identify this @DataPreprocessing.Node object.
      */
     attachToSource(trainSource, key) {
@@ -2042,7 +2057,7 @@ class DataPreprocessingNode {
     /**
      * Get a list of connectable nodes.   --- UPDATED (Dexter) 20181217
      * @param {String} mode   - Connection mode name: "connect"
-     * @returns {(ModelNode.Layer.Config|DataPreprocessing.Node)[]} - A list of connectable nodes.
+     * @returns {Array<(ModelNode.Layer.Config|DataPreprocessing.Node)>} - A list of connectable nodes.
      */
     getConnectableNodes() {
         return [...this.trainSource.train.layerProfiles.values()];
@@ -2494,14 +2509,14 @@ class Source {
         });
     }
 
-    static get Config() { return TrainSource; }
+    static get Config() { return _SourceConfig; }
     static get Table() { return TableSource; }
     static get CSV() { return CSVSource; }
     static get Image() { return ImageSource; }
 }
 
 /** Class representing a training data source.   --- UPDATED (Dexter) 20180818*/
-class TrainSource {
+class _SourceConfig {
     /**
      * Create a training data source.   --- UPDATED (Dexter) 20190221
      * @param {Number} instanceClass - The instnace class, as defined in @Source.Types .
@@ -2521,7 +2536,7 @@ class TrainSource {
         this.epochSize = oriShape.length ? oriShape[0] : null;
         /** @type {Number} - Batch size when using batched training. */
         this.batchSize = batchSize;
-        /** @type {TrainSource} - The validation subset of this @Source.Config object. */
+        /** @type {_SourceConfig} - The validation subset of this @Source.Config object. */
         this.validation = null;
         /** @type {Train} - The @Train object where this @Source.Config belongs to. If this source is just constructed, it is not belonged to any training instance. */
         this.train = null;
@@ -2568,7 +2583,7 @@ class TrainSource {
      * @returns {Object} JSON-stringifiable object
      */
     exportAsJSON() {
-        // For each of the key of this TrainSource, put them into a new blank object.
+        // For each of the key of this @Source.Config, put them into a new blank object.
         var obj = {};
         [...Object.keys(this)].forEach(k=>{
             if (k == "colConfigs") {
@@ -2586,7 +2601,7 @@ class TrainSource {
      * @param {Object} obj - JSON object from Project file
      */
     parseJSON(obj) {
-        // Iterate the object keys and take actions on mapping back to the TrainSource Class.
+        // Iterate the object keys and take actions on mapping back to the @Source.Config Class.
         [...Object.keys(obj)].forEach(k=>{
             if (k != "colConfigs") {
                 // For other properties, just directly assign the values.
@@ -2704,7 +2719,7 @@ class TrainSource {
     /**
      * Parse a JSON object to a valid @Source.Config object.   --- UPDATED (Dexter) 20190207
      * @param {Object} obj - A JSON-object.
-     * @returns {TrainSource} - The parsed @Source.Config object.
+     * @returns {_SourceConfig} - The parsed @Source.Config object.
      */
     static parseJSON(obj) {
         var source;
@@ -2727,7 +2742,7 @@ class IndexRange {
      * @param {Number} selectionLength - The total seleection length.
      * @param {String} rangeStr - A range string, validated before submission.
      * @param {Boolean} repeatable - Whether selection can be repeatably selected.
-     * @returns {Number[]} - A list of indices to be selected.
+     * @returns {Array<Number>} - A list of indices to be selected.
      */
     static parse(selectionLength, rangeStr, repeatable = false) {
         if (rangeStr.trim().length == 0) {
@@ -3775,10 +3790,16 @@ class TrainingProfile {
 /** Class representing a Tensorflow training.   --- UPDATED (Dexter) 20180701 */
 class Train {
     /**
-     * Creates a Tensorflow training.   --- UPDATED (Dexter) 20190128
+     * Get the NOM definition version.   --- UPDATED (Dexter) 20190717
+     * @returns {Number} - 6 digit number indicate the versioning (MMDDvv).
+     */
+    static get version() { return 190305; }
+
+    /**
+     * Creates a Tensorflow training.   --- UPDATED (Dexter) 20190717
      * @param {Project} project - The frontend project the user is working on while this training is attached to
      * @param {String} trainName - The name of this training.
-     * @param {(TrainSource[]|TrainSource)} source - A training source or a list of training source that this training is using
+     * @param {(Array<_SourceConfig>|_SourceConfig)} source - A training source or a list of training source that this training is using
      * @param {String} folder - The folder that this training results folder will save to.
      * @param {String} restorePath - A directory that referencing Tensorflow checkpoint files that this training will recover from.   --- BETA
      * @param {String} device - The device like CPU or GPU this training will rely on.
@@ -3819,13 +3840,13 @@ class Train {
         this.traceRecord = traceRecord;
         /** @type {Array<Array<*>>} - An array of all the items to be traced. */
         this.traceItems = [];
-        /** @type {Array<TrainSource>} - A list of all @Source.Config training source objects attached to this @Train object. */
+        /** @type {Array<_SourceConfig>} - A list of all @Source.Config training source objects attached to this @Train object. */
         this.sources = [];
         if (source != null) {
             if (source instanceof Array) this.setDataSources(...source);
             else this.addDataSource(source);
         }
-        /** @type {Array<TrainSource>} - A list of all @Source.Config test source objects attached to this @Train object. */
+        /** @type {Array<_SourceConfig>} - A list of all @Source.Config test source objects attached to this @Train object. */
         this.testSources = [];
         /** @type {String} - A directory that referencing Tensorflow checkpoint files that this training will recover from.   --- BETA */
         this.restorePath = restorePath;
@@ -3837,12 +3858,16 @@ class Train {
         this._editingColConfig = null;
         /** @type {Number} - The source id for specifying the editing @Source.Config object. */
         this._editingSource = 0;
-        /** @type {String} - The layer name for specifying the editing @LayerProject object, also as the key in @Train.layerProfiles `Map` object. */
+        /** @type {String} - The layer name for specifying the editing @ModelNode.Layer.Config object, also as the key in @Train.layerProfiles `Map` object. */
         this._editingLayer = "";
         /** @type {Project} - A reference to the project where this training belongs to. */
         this._project = project;
         /** @type {Number} - An auto-increment ID for naming of @ModelNode.Config objects injecting to this @Train object. */
         this._layerIDInc = 1;
+        /** @type {Number} - 6 digit number indicating the versioning (MMDDvv). */
+        this._version = Train.version;
+        /** @type {Number} - 6 digit number indicating the old version if this is an opened NOM (MMDDvv). */
+        this._oldVersion = 0;
     }
 
     /**
@@ -3857,7 +3882,7 @@ class Train {
                 // Noted the sources and training profiles are other classes of objects that they will handle themselves.
                 obj[k] = this[k].map(v=>v.exportAsJSON());
             } else if (k == "layerProfiles") {
-                // Noted the .layerProfiles property is a Map() object, and now converting to a 2D array, while each LayerProfile will handle themselves.
+                // Noted the .layerProfiles property is a Map() object, and now converting to a 2D array, while each @ModelNode.Layer.Config will handle themselves.
                 obj[k] = [...this[k].entries()].map(v=>[v[0],v[1].exportAsJSON()]);
             } else if (!["_project", "testSources", "_editingProfile", "_editingSource", "_editingColConfig"].includes(k)) {
                 obj[k] = this[k];
@@ -3867,16 +3892,18 @@ class Train {
     }
 
     /**
-     * Parse a previously saved object into this class of Train.   --- UPDATED (Dexter) 20190221
+     * Parse a previously saved object into this class of Train.   --- UPDATED (Dexter) 20190717
      * @param {Object} obj - JSON object from Project file
      */
     parseJSON(obj) {
         // Iterate the object keys and take actions on mapping back to the Train Class.
-        [...Object.keys(obj)].forEach(k=>{
+        for (let k of Train.getPrioritizedKeys(obj, ["_version", "buildConfigs", "trainingProfiles", "sources", "dppNodes", "layerProfiles"])) {
             if (k == "sources") {
                 // If it is a source, it will need to create their class and parse themselves.
                 this.setDataSources(...obj[k].map(v=>{
-                    var source = TrainSource.parseJSON(v);
+                    var source = Source.Config.parseJSON(v);
+                    
+                    // Create the table preview info
                     new SpreadSheet("dataSourcePreview", 10, 3, source.hasHeading, false, true, true, null, false);
                     new SpreadSheet("colDataPreview", 10, 3, source.hasHeading, false, true, true, null, false);
                     return source;
@@ -3889,12 +3916,8 @@ class Train {
                     return tp;
                 })
             } else if (k == "layerProfiles") {
-                // If it is a layer profile, it will need to create its class and parse itself.
-                this.layerProfiles = new Map(obj[k].map(v=>{
-                    var lp = ModelNode.parseJSON(v[1]);
-                    lp.train = this;
-                    return [v[0], lp];
-                }))
+                // Create each layer from JSON.
+                obj[k].forEach(([k,v])=>ModelNode.createFromJSON(k, v, this));
 
                 // Noted the layer profile will have cross referencing, so it is done now after all layer profiles are created.
                 this.layerProfiles.forEach(l=>{
@@ -3917,15 +3940,40 @@ class Train {
                         l.incomingConfig.transformGate = this.train.layerProfiles.get(l.incomingConfig.transformGate);
                     }
                 })
-            } else if (!["_project", "testSources", "_editingProfile", "_editingSource", "_editingColConfig"].includes(k)) {
+            } else if (k == "_version") {
+                // Declare the opening version.
+                this._oldVersion = obj[k];
+            } else if (!["_project", "_version", "testSources", "_editingProfile", "_editingSource", "_editingColConfig"].includes(k)) {
+                if (!(k in this)) console.dir(e);
                 this[k] = obj[k];
             }  
-        })
+        }
+    }
+
+    /** Get the 6 digit number indicating the versioning (MMDDvv).   --- UPDATED (Dexter) 20190717
+     * @returns {Number} - 6 digit number indicating the versioning (MMDDvv).
+     */
+    get version() {
+        return this._version;
+    }
+
+    /** Get the 6 digit number indicating the old version if this is an opened NOM (MMDDvv).   --- UPDATED (Dexter) 20190725
+     * @returns {Number} - 6 digit number indicating the old version if this is an opened NOM (MMDDvv).
+     */
+    get oldVersion() {
+        return this._oldVersion;
+    }
+
+    /** The current editing build number.   --- UPDATED (Dexter) 20190719
+     * @returns {Number} - The current editing build number.
+     */
+    get editingBuild() {
+        return this._editingBuild;
     }
 
     /**
      * Add a training data source to this training.   --- UPDATED (Dexter) 20180625
-     * @param {TrainSource} source - A TrainSource data source
+     * @param {_SourceConfig} source - A @_SourceConfig data source
      */
     addDataSource(source) {
         this.sources.push(source);
@@ -3934,7 +3982,7 @@ class Train {
 
     /**
      * Set multiple training data sources to this training, while previous sources will be disposed.   --- UPDATED (Dexter) 20180625
-     * @param {...TrainSource} sources - Multiple TrainSource data source objects
+     * @param {..._SourceConfig} sources - Multiple @_SourceConfig data source objects
      */
     setDataSources(...sources) {
         this.sources = sources;
@@ -3955,22 +4003,11 @@ class Train {
      * Get a list of layers directly using a particular data source.   --- UPDATED (Dexter) 20181217
      * @param {Number} sourceID - The source id.
      * @param {String} dppKey - The column config name.
-     * @returns {ModelNode.Layer.Config[]} - A list of layer profile objects.
+     * @returns {Array<_ModelNodeLayerConfig>} - A list of layer profile objects.
      */
     getLayersUsingSource(sourceID, dppKey) {
-        const buildNo = this._editingBuild;
+        const buildNo = this.editingBuild;
         return [...this.layerProfiles.values()].filter(lp=>lp.fromSource[buildNo].some(s=>s[0] == sourceID && s[1] == dppKey));
-    }
-
-    /**
-     * Get a list of layers relayting a particular data source, including task layer comparisons or sequence processing.   --- UPDATED (Dexter) 20190130
-     * @param {Number} sourceID - The source id.
-     * @param {String} dppKey - The column config name.
-     * @returns {ModelNode.Layer.Config[]} - A list of layer profile objects.
-     */
-    getLayersRelatingSource(sourceID, dppKey) {
-        const buildNo = this._editingBuild;
-        return [...this.layerProfiles.values()].filter(lp=>lp.relatedSources[buildNo].some(s=>s[0] == sourceID && s[1] == dppKey));
     }
 
     /**
@@ -3982,7 +4019,7 @@ class Train {
     }
 
     /**
-     * Set the property of this Train or one of its objects like layers, sources, etc.   --- UPDATED (Dexter) 20190712
+     * Set the property of this Train or one of its objects like layers, sources, etc.   --- UPDATED (Dexter) 20190726
      * @param {Element} ele - An HTML element of the user-interacting properties changes
      * @param {String} propType - The property type, like a train, training source, layer, etc.
      * @param {String} prop - The property name
@@ -3994,7 +4031,7 @@ class Train {
         if (propType == "Train") {
             if (prop == "device") {
                 // CNN dilation is not supported in CPU calculation.
-                if (toValue.startsWith("/cpu") && [...this.layerProfiles.values()].some(lp=>("convDilation" in lp) && lp.convDilation != 0)) InputBox.showError(ele, "dilationDeviceErr", true);
+                if (toValue.startsWith("/cpu") && [...this.layerProfiles.values()].some(lp=>(("convDilation" in lp) && lp.convDilation > 1))) InputBox.showError(ele, "dilationDeviceErr", true);
                 else this[prop] = toValue;
             } else {
                 // If it's referring to "Train", the property is updating on this Train object.
@@ -4068,18 +4105,30 @@ class Train {
 
         } else if (propType == "Layer") {
 
-            // Get the layer profile.
+            /** @type {_ModelNodeLayerConfig} - Get the layer profile. */
             var layer = this.layerProfiles.get(this._editingLayer);
 
-            if (["layerUnits", "convFilterWidth", "convDilation", "convPadding", "_convStrideX", "_convStrideY"].includes(prop)) {
+            if (["layerUnits", "dconvAlgorithm", "activation", "convFilterWidth", "convDilation", "convPadding", "convStride", "_convStrideX", "_convStrideY"].includes(prop)) {
                 // If it's changing shape-related property, this would need model tracing.
                 var configChanges = {};
                 if (prop == "_convStrideY") configChanges["convStride"] = [toValue, layer["convStride"][1]];
-                if (prop == "_convStrideX") configChanges["convStride"] = [layer["convStride"][0], toValue];
+                else if (prop == "_convStrideX") configChanges["convStride"] = [layer["convStride"][0], toValue];
+                else if (prop == "dconvAlgorithm") {
+                    // Optionally show more deconvolution settings.
+                    if (toValue == ModelNode.Layer.Deconvolution.AlgorithmTypes.Conv2DTranspose) $("deconvOptions").classList.add("noDisplay");
+                    else $("deconvOptions").classList.remove("noDisplay");
+                }
                 configChanges[prop] = toValue;
+
+                // Apply the changes.
                 var applyApplicable = layer.applyShapeChanges(undefined, configChanges);
-                if (applyApplicable.result) this._project.drawTrain();
-                else InputBox.showError(ele, applyApplicable.error || "shapeAffected", true);
+                if (!applyApplicable.result) InputBox.showError(ele, applyApplicable.error || "shapeAffected", true);
+                else {
+                    // Redraw the train.
+                    this._project.drawTrain();
+                    // Updates the output config UI interactions
+                    Project.updateOutputConfigProps(layer);
+                }
             } else if (prop == "refLayerName") {
                 if (toValue == null) {
                     // Activate other configuration and hide the reference layer transpose option.
@@ -4098,13 +4147,12 @@ class Train {
                     var thisInputShapes = layer.getPreprocessedIncomingShape();
                     var lInputShape = refLayer.getPreprocessedIncomingShape();
                     var lOutputShape = refLayer.getOutputShape();
-                    var refLayerTranspose = shapeEquals(lInputShape, thisInputShapes) ? false : shapeEquals(lOutputShape, thisInputShapes) ? true : null;
+                    var refLayerTranspose = Matrix.shapeEquals(lInputShape, thisInputShapes) ? false : Matrix.shapeEquals(lOutputShape, thisInputShapes) ? true : null;
                     
                     // If no matched shape, this is not a referenceable layer.
-                    if (refLayerTranspose === null) InputBox.showError(ele, applyApplicable.error || "notreferenceable", true);
+                    if (refLayerTranspose === null) InputBox.showError(ele, "notreferenceable", true);
                     else {
                         // Check if it is changeable.
-                        var newOutputShape = refLayerTranspose ? lInputShape : lOutputShape;
                         var configChanges = {type: "layer", id1: this.name, refLayerName: toValue};
                         var applyApplicable = layer.applyShapeChanges(null, configChanges, undefined, true);
                         if (!applyApplicable.result) InputBox.showError(ele, applyApplicable.error || "notreferenceable", true);
@@ -4114,14 +4162,6 @@ class Train {
                         }
                     }
                 }
-            } else if (prop == "predictOn") {
-                // Update the Final Layer prediction columns.
-                var configChanges = {};
-                configChanges["compareSourceID"] = ele.selectedOptions[0].dataset.sourceID;
-                configChanges["compareTensorIdx"] = ele.selectedOptions[0].dataset.cfKey;
-                var applyApplicable = layer.applyShapeChanges(undefined, configChanges);
-                if (applyApplicable.result) this._project.drawTrain();
-                else InputBox.showError(ele, applyApplicable.error || "shapeAffected", true);
             } else {
                 // Some non-shape affecting properties that may inherit through referencing layers.
                 if (["weightAvg", "weightL1Loss", "weightL2Loss", "weightStdDev", "weightDecayRate"].includes(prop)) {
@@ -4206,12 +4246,6 @@ class Train {
             
             // Update the value of the var config object.
             varConfig[prop] = toValue;
-        } else if (propType == "DCNNLayer.PaddingTypes") {
-            // Get the layer profile.
-            var layer = this.layerProfiles.get(this._editingLayer);
-            
-            // Update the value of the padding method.
-            layer[prop] = DCNNLayer.PaddingTypes[toValue];
         } else if (propType == "ColConfig") {
             if (prop == "sourceCol") {
                 if (toValue.trim().length) {
@@ -4279,7 +4313,7 @@ class Train {
     }
 
     /**
-     * Get the value of a requested property.   --- UPDATED (Dexter) 20190213
+     * Get the value of a requested property.   --- UPDATED (Dexter) 20190719
      * @param {String} propType - The property type, like a train, training source, layer, etc.
      * @param {String} prop - The property name
      * @param {String} id - A sub-id referencing, typically referring the id of a TrainingProfile
@@ -4290,7 +4324,7 @@ class Train {
             // If it's referring to "Train", the property is directly on this Train object.
             return this[prop];
         } else if (propType == "TrainSource") {
-            // Access the values on the TrainSource using the property string.
+            // Access the values on the @_SourceConfig using the property string.
             return this.sources[this._editingSource][prop];
         } else if (propType == "Layer") {
             if (prop == "predictOn") {
@@ -4319,7 +4353,7 @@ class Train {
             // For specific methods, get the values from the corresponding enumeration list.
             if (prop == "method" || prop == "_instanceClass") return OutputConfig.Types.getName(outputConfig[prop]);
             else if (prop == "shape") {
-                return `[${(this.getDataSource(...this._editingColConfig)[prop].join(", "))}]`;
+                return `[${(outputConfig[prop].join(", "))}]`;
             } else return outputConfig[prop];
         } else if (propType == "VarConfig.Initializer") {
             // Get the initializer.
@@ -4328,12 +4362,12 @@ class Train {
 
             // For specific methods, get the values from the corresponding enumeration list.
             return varConfigInit[prop];
-        } else if (propType == "DCNNLayer.PaddingTypes") {
+        } else if (propType == "ModelNode.Layer.Deconvolution.PaddingTypes") {
             // Get the value.
             const value = this.layerProfiles.get(this._editingLayer)[prop];
 
             // For specific methods, get the values from the corresponding enumeration list.
-            return DCNNLayer.PaddingTypes.getName(value);
+            return ModelNode.Layer.Deconvolution.PaddingTypes.getName(value);
         } else if (propType == "ColConfig") {
             // If it's a column config, using the property string.
             return this.getDataSource(...this._editingColConfig)[prop];
@@ -4375,7 +4409,7 @@ class Train {
      * @param {Number|String|DataPreprocessing.Node|ModelNode.Layer.Config|null} appendAt - The source ID appending on, or the layer name appending on.
      * @returns {Boolean} - Whether it has been successful to append the layer.
      */
-    appendLayer(layerProfile = new BasicLayer(), appendAt = null) {
+    appendLayer(layerProfile = new ModelNode.Layer.FullyConnected(), appendAt = null) {
         // If no layer name is given, get a new name automatically.
         if (!layerProfile.name) this.getNewLayerName(layerProfile);
 
@@ -4403,7 +4437,7 @@ class Train {
                 } else if (classof(appendAt) == "String") {
                     // If it's specifically appending on a layer, get that layer and append on it.
                     success = this.layerProfiles.get(appendAt).appendNode(layerProfile);
-                } else if (appendAt instanceof LayerProfile) {
+                } else if (appendAt instanceof ModelNode.Layer.Config) {
                     // Append the new layer to the previous layer.
                     success = appendAt.appendNode(layerProfile);
                 } else if (classof(appendAt) == "Number" || (appendAt instanceof DataPreprocessing.Node)) {
@@ -4432,17 +4466,17 @@ class Train {
      */
     attachLayer(layerProfile, ...layerOrSources) {
         //   1-1.  If only a string is given, find the layer from all layer profiles.
-        if (!(layerProfile instanceof LayerProfile)) layerProfile = this.layerProfiles.get(layerProfile);
+        if (!(layerProfile instanceof ModelNode.Layer.Config)) layerProfile = this.layerProfiles.get(layerProfile);
         
         //   1-2.  If there has not been name given, assign a unique layer name to it.
         if (!layerProfile.name) this.getNewLayerName(layerProfile);
 
-        //   2. Assign the LayerProfile to this Train.
+        //   2. Assign the @ModelNode.Layer.Config to this Train.
         layerProfile.train = this;
 
         //   3.  Loop all attaching layer or sources.
         var success = layerOrSources.every(ls=>{
-            if (classof(ls) == "String" || ls instanceof LayerProfile) {
+            if (classof(ls) == "String" || ls instanceof ModelNode.Layer.Config) {
                 //   3A. If this is a layer.
                 //   Get the previous layer and append on it.
                 const previousLayer = (classof(ls) == "String") ? this.layerProfiles.get(ls) : ls;
@@ -4468,7 +4502,7 @@ class Train {
             //  4B. Revert to previous state.
             //  4B-1.   Remove this layer from previous layers.
             layerOrSources.forEach(ls=>{
-                if (classof(ls) == "String" || ls instanceof LayerProfile) {
+                if (classof(ls) == "String" || ls instanceof ModelNode.Layer.Config) {
                     const previousLayer = (classof(ls) == "String") ? this.layerProfiles.get(ls) : ls;
                     previousLayer.removeConnectionTo(layerProfile);
                 } else {
@@ -4492,7 +4526,7 @@ class Train {
         // 1. Define where it will assign source, and the actual previous node parameter to be passed.
         var assignSource = false, previousNode;
 
-        if (classof(fromLayerOrSource) == "String" || fromLayerOrSource instanceof LayerProfile) {
+        if (classof(fromLayerOrSource) == "String" || fromLayerOrSource instanceof ModelNode.Layer.Config) {
             //  2A. If this is a layer, get the layer profile object.
             previousNode = (classof(fromLayerOrSource) == "String") ? this.layerProfiles.get(fromLayerOrSource) : fromLayerOrSource;
         } else {
@@ -4503,13 +4537,13 @@ class Train {
 
         //  3. If it's fine to attach, redraw the model.
         //  3-1. If only a string is given, find the layer from all layer profiles.
-        layerProfiles = layerProfiles.map(lp => (lp instanceof LayerProfile) ? lp : this.layerProfiles.get(lp));
+        layerProfiles = layerProfiles.map(lp => (lp instanceof ModelNode.Layer.Config) ? lp : this.layerProfiles.get(lp));
 
         var success = layerProfiles.every(lp=>{
             //  3-2.  If there has not been name given, assign a unique layer name to it.
             if (!lp.name) this.getNewLayerName(lp);
 
-            //  3-3. Assign the LayerProfile to this Train.
+            //  3-3. Assign the @ModelNode.Layer.Config to this Train.
             lp.train = this;
 
             //  3-4. Try add the source / node and return the results.
@@ -4547,16 +4581,16 @@ class Train {
      */
     removeConnections(fromLayerOrSource, ...toLayerOrSources) {
         // Get the model editing build no.
-        const buildNo = this._editingBuild;
+        const buildNo = this.editingBuild;
 
-        if (classof(fromLayerOrSource) == "String" || fromLayerOrSource instanceof LayerProfile) {
+        if (classof(fromLayerOrSource) == "String" || fromLayerOrSource instanceof ModelNode.Layer.Config) {
             //  1A-1.  If this is a layer, get the layer profile object.
             const fromLayer = (classof(fromLayerOrSource) == "String") ? this.layerProfiles.get(fromLayerOrSource) : fromLayerOrSource;
 
             //  1A-2.  Check if it's fine to remove all the requested connections.
             var tempLinks = [];
             var success = toLayerOrSources.every(ls=>{
-                if (classof(ls) == "String" || ls instanceof LayerProfile) {
+                if (classof(ls) == "String" || ls instanceof ModelNode.Layer.Config) {
                     const toLayer = (classof(ls) == "String") ? this.layerProfiles.get(ls) : ls;
                     if (fromLayer.toNode[buildNo].includes(toLayer)) {
                         tempLinks.push(["layer", fromLayer, toLayer]);
@@ -4655,11 +4689,11 @@ class Train {
 
     /**
      * Get the current model ending layer profiles (leaf nodes).   --- UPDATED (Dexter) 20181028
-     * @returns {ModelNode.Layer.Config[]} An array of ending layer of this model
+     * @returns {Array<_ModelNodeLayerConfig>} An array of ending layer of this model
      */
     getEndingLayerProfiles() {
         // Get the model editing build no.
-        const buildNo = this._editingBuild;
+        const buildNo = this.editingBuild;
 
         // Get all the layer and filter those with no output linking node.
         return [...this.layerProfiles.values()].filter(l=>l.toNode[buildNo].length ==  0);
@@ -4667,11 +4701,11 @@ class Train {
 
     /**
      * Get the final layer profiles (layers).   --- UPDATED (Dexter) 20181220
-     * @returns {ModelNode.Layer.Config[]} An array of ending layer of this model
+     * @returns {Array<_ModelNodeLayerConfig>} An array of ending layer of this model
      */
     getFinalLayers() {
         // Get the model editing build no.
-        const buildNo = this._editingBuild;
+        const buildNo = this.editingBuild;
 
         // Get all the layer and filter those with no output linking node.
         return [...this.layerProfiles.values()].filter(l=>l._final);
@@ -4688,14 +4722,18 @@ class Train {
     }
 
     /**
-     * An async function to get the Python code based on this training model.   --- UPDATED (Dexter) 20190225
+     * An async function to get the Python code based on this training model.   --- UPDATED (Dexter) 20190725
      * @returns {Promise} Finishes once all Python codes has been prepared, and resolves with the Python code or reject with an Error.
      */
     async getPython() {
         // Get the NeuralSimplycode embedding or import statement first. In case embedding is needed, this will wait until the NeuralSimplycode.py is fetched and parsed.
         return App.getNeuralSimplycode().then(heading=>{
+            // Get the CPU/GPU device.
+            var gpuHeading = "import os\n";
+            if (this.device.startsWith("/cpu")) gpuHeading += "os.environ[\"CUDA_VISIBLE_DEVICES\"]=\"-1\"\n";
+
             // Now we have the heading and add some line breaks to seperate the core model codes.
-            var heading = heading + "\nimport os\nimport sys\nnowPath = sys.argv[0]\nnowPathLength = len(nowPath)\nactualPath = nowPath[0:(max(nowPath.rfind('/'),0) or nowPathLength)][0:(max(nowPath.rfind('\\\\'),0) or 0)]\nif (len(actualPath)): os.chdir(actualPath)\n\n";
+            var heading = gpuHeading + heading + "\nimport sys, json\nnowPath = sys.argv[0]\nnowPathLength = len(nowPath)\nactualPath = nowPath[0:(max(nowPath.rfind('/'),0) or nowPathLength)][0:(max(nowPath.rfind('\\\\'),0) or 0)]\nif (len(actualPath)): os.chdir(actualPath)\n\n";
 
             // Define the import library prefix in case of embedding NeuralSimplycode
             var importNeuralSimplycode = App.all.get("embedNeuralSimplycode") == 0;
@@ -4768,7 +4806,7 @@ class Train {
 
                             // Set Data Type.
                             if (v.dtype != null) {
-                                allStr.push(`source${idx}["${k}"].asType(${libPrefix}TrainSource.getDataType("${v.dtype}"))\n`);
+                                allStr.push(`source${idx}["${k}"].asType(${libPrefix}Source.Config.getDataType("${v.dtype}"))\n`);
                             }
                         } else if (v instanceof DataPreprocessing.ImageNode) {
                             // Set Transformation.
@@ -4778,7 +4816,7 @@ class Train {
 
                             // Set Data Type.
                             if (v.dtype != null) {
-                                allStr.push(`source${idx}["${k}"].asType(${libPrefix}TrainSource.getDataType("${v.dtype}"))\n`);
+                                allStr.push(`source${idx}["${k}"].asType(${libPrefix}Source.Config.getDataType("${v.dtype}"))\n`);
                             }
                         }
                     })
@@ -4860,7 +4898,7 @@ class Train {
                         } else if (lp._type == "CNNLayer") {
                             lParams = Train.getPyParams(...[["incomingConfig", "incomingConfig"+prevIncomingConfigIdx, "var"], ["linearTransform", lp.linearTransform.getPythonConstructor(libPrefix, varConfigs, allStr), "var"], ["outputConfig", "outputConfig"+prevOutputConfigIdx, "var"], ["refLayerName",lp.refLayerName?lp.refLayerName.replace(/\s/g,""):lp.refLayerName], ["convStride", lp.convStride, "list"], ...["layerUnits", "convFilterWidth","convPadding","convDilation","reshape","activation","batchNorm","refLayerTranspose"].map(p=>[p,lp[p]])]);
                         } else if (lp._type == "DCNNLayer") {
-                            lParams = Train.getPyParams(...[["incomingConfig", "incomingConfig"+prevIncomingConfigIdx, "var"], ["linearTransform", lp.linearTransform.getPythonConstructor(libPrefix, varConfigs, allStr), "var"], ["outputConfig", "outputConfig"+prevOutputConfigIdx, "var"], ["refLayerName",lp.refLayerName?lp.refLayerName.replace(/\s/g,""):lp.refLayerName], ["convStride", lp.convStride, "list"], ["dconvPadding", `${libPrefix}DCNNLayer.PaddingTypes.${DCNNLayer.PaddingTypes.getName(lp.dconvPadding)}`, "var"], ...["layerUnits", "convFilterWidth","convPadding","convDilation","refLayerTranspose","activation","batchNorm"].map(p=>[p,lp[p]])]);
+                            lParams = Train.getPyParams(...[["incomingConfig", "incomingConfig"+prevIncomingConfigIdx, "var"], ["linearTransform", lp.linearTransform.getPythonConstructor(libPrefix, varConfigs, allStr), "var"], ["outputConfig", "outputConfig"+prevOutputConfigIdx, "var"], ["refLayerName",lp.refLayerName?lp.refLayerName.replace(/\s/g,""):lp.refLayerName], ["convStride", lp.convStride, "list"], ["dconvPadding", `${libPrefix}ModelNode.Layer.Deconvolution.PaddingTypes.${ModelNode.Layer.Deconvolution.PaddingTypes.getName(lp.dconvPadding)}`, "var"], ["dconvAlgorithm", `${libPrefix}ModelNode.Layer.Deconvolution.AlgorithmTypes.${ModelNode.Layer.Deconvolution.AlgorithmTypes.getName(lp.dconvAlgorithm)}`, "var"], ["dconvUpscale", `${libPrefix}ModelNode.Layer.Deconvolution.UpscaleTypes.${ModelNode.Layer.Deconvolution.UpscaleTypes.getName(lp.dconvUpscale)}`, "var"], ...["layerUnits", "convFilterWidth","convPadding","convDilation","refLayerTranspose","activation","batchNorm"].map(p=>[p,lp[p]])]);
                         } else if (lp._type == "Classifier") {
                             lParams = Train.getPyParams(["incomingConfig", "incomingConfig"+prevIncomingConfigIdx, "var"], ["linearTransform", lp.linearTransform.getPythonConstructor(libPrefix, varConfigs, allStr), "var"], ...["classCount","compareSourceID","compareTensorIdx","measurement","activation"].map(p=>[p,lp[p]]));
                         } else if (lp._type == "Regressor") {
@@ -4940,6 +4978,29 @@ class Train {
         }
         return dimShape;
     }
+
+    /**
+     * Get a list of keys in a object with specified key orders that may optionally appeared in the object.   --- UPDATED (Dexter) 20190404
+     * @param {Object} obj - An object.
+     * @param {Array<String>} prioritizedKeys - A sorted array of keys that may optionally appeared in the object.
+     * @returns {Array<String>} - The prioritized array of keys.
+     */
+    static getPrioritizedKeys(obj, prioritizedKeys) {
+        // Get a set of the appeared keys.
+        var jsonKeys = new Set(Object.keys(obj));
+
+        // For every given prioritized keys, push into the new list and remove from the appearing set.
+        var returnList = [];
+        for (let pKey of prioritizedKeys) {
+            if (jsonKeys.has(pKey)) {
+                returnList.push(pKey);
+                jsonKeys.delete(pKey);
+            }
+        }
+        
+        // Return the prioritized key list.
+        return [...returnList, ...jsonKeys];
+    }
 }
 
 /**
@@ -5003,13 +5064,13 @@ class IncomingConfigConfig {
      * Create an incoming configuration object.  --- UPDATED (Dexter) 20180921
      * @param {Number} method - A numerical representation for the incoming option method type.
      * @param {Number} axis - The operation axis.
-     * @param {ModelNode.Layer.Config} coreNode - The reference index of the LayerProfile.fromNode list. If `null`, an automated selection will be used.
+     * @param {ModelNode.Layer.Config} coreNode - The reference index of the @ModelNode.Layer.Config.fromNode list. If `null`, an automated selection will be used.
      * @param {Number} mergeDim - The type of dimension-merging methods if needed.
      */
     constructor(method, axis = -1, coreNode = null, mergeDim = IncomingConfig.MergeDimTypes.SubSample) {
         /** @type {Number} - The instnace class, as defined in @ModelNode.Layer.Incoming.Types .  */
         this._instanceClass = method;
-        /** @type {String} - The layer in the LayerProfile.fromNode list to act as the core code for incoming combination. If `null`, an automated selection will be used. When implemented in prgoramming runtime, it should be a @ModelNode.Config object. */
+        /** @type {String} - The layer in the @ModelNode.Layer.Config.fromNode list to act as the core code for incoming combination. If `null`, an automated selection will be used. When implemented in prgoramming runtime, it should be a @ModelNode.Config object. */
         this.coreNode = coreNode;
         /** @type {Number} - The merge dimension method, as defined in @ModelNode.Layer.Incoming.MergeDimMethods . */
         this.mergeDim = mergeDim;
@@ -5084,8 +5145,8 @@ class IncomingConfigConfig {
     /**
      * Get the python code constructor.   --- UPDATED (Deexter) 20181227
      * @param {String} libPrefix - Python library prefix.
-     * @param {VarConfig[]} varConfigsCache - Cached list of var config.
-     * @param {String[]} allStr - Python writing lines.
+     * @param {Array<VarConfig>} varConfigsCache - Cached list of var config.
+     * @param {Array<String>} allStr - Python writing lines.
      * @returns {String} - A Python coded constructor.
      */
     getPythonConstructor(libPrefix, varConfigsCache, allStr) {
@@ -5101,12 +5162,12 @@ class IncomingConfigConfig {
  */
 class IncomingConfigConcat extends IncomingConfig.Config {
     /**
-     * Create an incoming concatenation option.   --- UPDATED (Dexter) 20181125
-     * @param {ModelNode.Layer.Config} coreNode - The reference index of the LayerProfile.fromNode list. If null, a selection on nearest and smallest dimensioned node will be used.
+     * Create an incoming concatenation option.   --- UPDATED (Dexter) 20190719
+     * @param {ModelNode.Layer.Config} coreNode - The reference index of the @ModelNode.Layer.Config.fromNode list. If null, a selection on nearest and smallest dimensioned node will be used.
      * @param {Number} axis - Incoming node will be flattened to this axis for concatenation.
      * @param {Number} mergeDim - The type of dimension-merging methods if needed.
      */
-    constructor(coreNode = null, axis = 1, mergeDim = IncomingConfig.MergeDimTypes.SubSample) {
+    constructor(coreNode = null, axis = -1, mergeDim = IncomingConfig.MergeDimTypes.SubSample) {
         super(IncomingConfig.Types.Concat, axis, coreNode, mergeDim);
     }
 }
@@ -5200,10 +5261,10 @@ class IncomingConfigElementWiseConfig extends IncomingConfig.Config {
 class IncomingConfigSum extends IncomingConfig.ElementWiseConfig {
     /**
      * Create an incoming summation option object.   --- UPDATED (Dexter) 20181125
-     * @param {ModelNode.Layer.Config} coreNode - The reference index of the LayerProfile.fromNode list. If null  a selection on the node with smallest dimensioned and longest path from the root source will be used.
+     * @param {ModelNode.Layer.Config} coreNode - The reference index of the @ModelNode.Layer.Config.fromNode list. If null  a selection on the node with smallest dimensioned and longest path from the root source will be used.
      * @param {Number} axis - The operation axis.
      * @param {Number} mergeDim - The type of dimension-merging methods if needed.
-     * @param {Number} transformGate - The reference index of the LayerProfile.fromNode list of the node on which a transform gate will apply with distributed total proportion of nodes as 1. If -1, a sellection on the node with shortest path from the root source will be used. If null no transform gate will be used. Implemenetation of Highway Network may need this option.
+     * @param {Number} transformGate - The reference index of the @ModelNode.Layer.Config.fromNode list of the node on which a transform gate will apply with distributed total proportion of nodes as 1. If -1, a sellection on the node with shortest path from the root source will be used. If null no transform gate will be used. Implemenetation of Highway Network may need this option.
      * @param {LinearTransformConfig} transformConfig - The linear transform configuration of the transform gate.
      * @param {LinearTransformConfig} dimensionMappingConfig - The linear transform configuration of any mismatched dimensioned data with the coreNode. If null the dimensions stated in `self.axis` should be the same across all incoming nodes.
      */
@@ -5220,10 +5281,10 @@ class IncomingConfigSum extends IncomingConfig.ElementWiseConfig {
 class IncomingConfigMultiply extends IncomingConfig.ElementWiseConfig {
     /**
      * Create an incoming multiplication option object.   --- UPDATED (Dexter) 20181125
-     * @param {LayerPModelNode.Layer.Configrofile} coreNode - The reference index of the LayerProfile.fromNode list. If null  a selection on the node with smallest dimensioned and longest path from the root source will be used.
+     * @param {LayerPModelNode.Layer.Configrofile} coreNode - The reference index of the @ModelNode.Layer.Config.fromNode list. If null  a selection on the node with smallest dimensioned and longest path from the root source will be used.
      * @param {Number} axis - The operation axis.
      * @param {Number} mergeDim - The type of dimension-merging methods if needed.
-     * @param {Number} transformGate - The reference index of the LayerProfile.fromNode list of the node on which a transform gate will apply with distributed total proportion of nodes as 1. If -1, a sellection on the node with shortest path from the root source will be used. If null no transform gate will be used. Implemenetation of Highway Network may need this option.
+     * @param {Number} transformGate - The reference index of the @ModelNode.Layer.Config.fromNode list of the node on which a transform gate will apply with distributed total proportion of nodes as 1. If -1, a sellection on the node with shortest path from the root source will be used. If null no transform gate will be used. Implemenetation of Highway Network may need this option.
      * @param {LinearTransformConfig} transformConfig - The linear transform configuration of the transform gate.
      * @param {LinearTransformConfig} dimensionMappingConfig - The linear transform configuration of any mismatched dimensioned data with the coreNode. If null the dimensions stated in `self.axis` should be the same across all incoming nodes.
      */
@@ -5240,10 +5301,10 @@ class IncomingConfigMultiply extends IncomingConfig.ElementWiseConfig {
 class IncomingConfigBlend extends IncomingConfig.ElementWiseConfig {
     /**
      * Create an incoming blending option object with x1 + x2 + ... + xN - N * (x1 * x2 * x3 * ... * xN).   --- UPDATED (Dexter) 20181125
-     * @param {ModelNode.Layer.Config} coreNode - The reference index of the LayerProfile.fromNode list. If null a selection on the node with smallest dimensioned and longest path from the root source will be used.
+     * @param {ModelNode.Layer.Config} coreNode - The reference index of the @ModelNode.Layer.Config.fromNode list. If null a selection on the node with smallest dimensioned and longest path from the root source will be used.
      * @param {Number} axis - The operation axis.
      * @param {Number} mergeDim - The type of dimension-merging methods if needed.
-     * @param {Number} transformGate - The reference index of the LayerProfile.fromNode list of the node on which a transform gate will apply with distributed total proportion of nodes as 1. If -1, a sellection on the node with shortest path from the root source will be used. If null no transform gate will be used. Implemenetation of Highway Network may need this option.
+     * @param {Number} transformGate - The reference index of the @ModelNode.Layer.Config.fromNode list of the node on which a transform gate will apply with distributed total proportion of nodes as 1. If -1, a sellection on the node with shortest path from the root source will be used. If null no transform gate will be used. Implemenetation of Highway Network may need this option.
      * @param {LinearTransformConfig} transformConfig - The linear transform configuration of the transform gate.
      * @param {LinearTransformConfig} dimensionMappingConfig - The linear transform configuration of any mismatched dimensioned data with the coreNode. If null the dimensions stated in `self.axis` should be the same across all incoming nodes.
      * @param {Boolean} learnableBlend - If `true`, instead of originally blending, it will follow a1 * x1 + a2 * x2 + ... + aN * xN + b * (x1 * x2 * x3 * ... * xN) where a1 = a2 = ... = aN = 1 and b = N are learnable initialized constant values.
@@ -5400,7 +5461,7 @@ class OutputConfigFlatten extends OutputConfigConfig {
 class OutputConfigReshape extends OutputConfigConfig {
     /**
      * Create a reshaping output config.   --- UPDATED (Dexter) 20181125
-     * @param {Number[]} shape - The shape of the available dimensions of each item.
+     * @param {Array<Number>} shape - The shape of the available dimensions of each item.
      */
     constructor(shape = ["None", -1]) {
         super(OutputConfig.Types.Reshape);
@@ -5409,12 +5470,11 @@ class OutputConfigReshape extends OutputConfigConfig {
     }
 
     /**
-     * Get the python code constructor.   --- UPDATED (Deexter) 20190210
+     * Get the python code constructor.   --- UPDATED (Deexter) 20190725
      * @param {String} libPrefix - Python library prefix.
      * @returns {String} - A Python coded constructor.
      */
     getPythonConstructor(libPrefix) {
-        var allKeys = [...Object.keys(this)].filter(k=>!["method","_instanceClass"].includes(k));
         return `${libPrefix}OutputConfig.${OutputConfig.Types.getName(this.method)}(shape = [${this.shape.join(", ")}])`;
     }
 }
@@ -5430,7 +5490,9 @@ class OutputConfigSelectChannel extends OutputConfigConfig {
      */
     constructor(axis = 1, channel = 0) {
         super(OutputConfig.Types.SelectChannel);
+        /** @type {Number} - The selection axis of the output node. */
         this.axis = axis;
+        /** @type {Number} - The selection channel of the output node. */
         this.channel = channel;
     }
 }
@@ -5438,34 +5500,41 @@ class OutputConfigSelectChannel extends OutputConfigConfig {
 /** Class including different types of graph model nodes in a data model node.   --- RESERVED --- UPDATED (Dexter) 20190201 */
 class ModelNode {
     /**
-     * Enumeration managing the types of model nodes.   --- RESERVED --- UPDATED (Dexter) 20190201
+     * Enumeration managing the types of model nodes.   --- RESERVED --- UPDATED (Dexter) 20190725
      */
     static get Types() {
         return new Enum({
-            /** @type {Number} - Abstract class representing a model node configuration. */
+            /** @type {Number} - Abstract class representing a model node configuration. (Ref: @ModelNode.Config ) */
             Config: 0,
-
-            /** @type {Number} - Class including different types of high-level Ladder model layer. */
-            Layer: 1
+            /** @type {Number} - Class including different types of high-level Ladder model layer. (Ref: @ModelNode.Layer ) */
+            Layer: 1,
+            /** @type {Number} - Class including different types of high-level computational unit.    --- RESERVED */
+            ComputationalUnit: 2
         });
     }
 
     /**
-     * Parse a previously saved object into a new @ModelNode.Config object. This will auto-determine the sub-class of the object, and pass the JSON object to the inner method to continue to parse.   --- UPDATED (Dexter) 20190210
-     * @param {*} obj - JSON object from Project file.
-     * @returns {ModelNode.Config} - A @ModelNode.Config object.
+     * Parse a previously saved object into a new @ModelNode.Config object. This will auto-determine the sub-class of the object, and pass the JSON object to the inner method to continue to parse. The layers should be sorted in topological before.   --- UPDATED (Dexter) 20190412
+     * @param {String} key - Key for this model node object.
+     * @param {Object} obj - JSON representation of the model node object.
+     * @param {Train} train - The train of that the layers attach to.
+     * @returns {_ModelNodeConfig} - A @ModelNode.Config object.
      */
-    static parseJSON(obj) {
-        // Currently, only Ladder layer is allowed.
-        return ModelNode.Layer.parseJSON(obj);
+    static createFromJSON(key, obj, train) {
+        /** @type {_ModelNodeConfig} Parse the model node object. */
+        var layer = ModelNode[obj._nodeType ? ModelNode.Types.getName(obj._nodeType) : "Layer"].createFromJSON(obj, train);
+
+        // Set the model node to the train object; and return the model node object.
+        train.layerProfiles.set(key, layer);
+        return layer;
     }
     
-    static get Config() { return ModelNodeConfig; }
-    static get Layer() { return ModelNodeLayer; }
+    static get Config() { return _ModelNodeConfig; }
+    static get Layer() { return _ModelNodeLayer; }
 }
 
 /** Abstract class representing a model node configuration.   --- RESERVED --- UPDATED (Dexter) 20190201 */
-class ModelNodeConfig {
+class _ModelNodeConfig {
     /**
      * Create a graph model node.   --- RESERVED --- UPDATED (Dexter) 20190201
      * @param {Number} nodeType - The node type of this object, as defined in @ModelNode.Types .
@@ -5497,80 +5566,129 @@ class ModelNodeConfig {
     get nodeType() {
         return this._nodeType;
     }
+
+    /**
+     * A list of shapes in the order of each build. Each shape should be a list of number or `"None"`.    --- UPDATED (Dexter) 20190409
+     * @returns {Array<Array<Number|String>>} - A list of shapes in the order of each build. Each shape should be a list of number or `"None"`.
+     */
+    get shape() {
+        return this._shape;
+    }
+
+    /**
+     * A list of topological orders in the graph of each build.    --- UPDATED (Dexter) 20190410
+     * @returns {Array<Array<Number|String>>} - A list of topological orders in the graph of each build.
+     */
+    get order() {
+        return [...this._order];
+    }
 }
 
 /** Class including different types of high-level Ladder model layer.   --- RESERVED --- UPDATED (Dexter) 20190201 */
-class ModelNodeLayer {
+class _ModelNodeLayer {
     /**
      * Enumeration managing the types of high-level Ladder model layer.   --- RESERVED --- UPDATED (Dexter) 20190201
      */
     static get Types() {
         return new Enum({
-            /** @type {Number} - Abstract class representing a high level Ladder model layer. */
+            /** @type {Number} - Abstract class representing a high level Ladder model layer. (Ref: @ModelNode.Layer.Config ) */
             Config: 0,
-            /** @type {Number} - A collector layer, without any dimensional transformation from all the input layers. */
+            /** @type {Number} - A collector layer, without any dimensional transformation from all the input layers. (Ref: @ModelNode.Layer.Collector ) */
             Collector: 1,
-            /** @type {Number} - A fully connected layer, aka dense layer, etc. */
+            /** @type {Number} - A fully connected layer, aka dense layer, etc. (Ref: @ModelNode.Layer.FullyConnected ) */
             FullyConnected: 2,
-            /** @type {Number} - A 2D convolutional layer, providing auto reshaping of data which are not 2D images. */
+            /** @type {Number} - A 2D convolutional layer, providing auto reshaping of data which are not 2D images. (Ref: @ModelNode.Layer.Convolution ) */
             Convolution: 3,
-            /** @type {Number} - A 2D de-convolutional layer. */
+            /** @type {Number} - A 2D de-convolutional layer. (Ref: @ModelNode.Layer.Deconvolution ) */
             Deconvolution: 4,
-            /** @type {Number} - Class including different types of task layers. */
+            /** @type {Number} - A 1D convolutional layer, providing auto reshaping of data which are not 2D images. --- RESERVED */
+            Convolution1D: 6,
+            /** @type {Number} - A 1D deconvolutional layer, providing auto reshaping of data which are not 2D images. --- RESERVED */
+            Deconvolution1D: 7,
+            /** @type {Number} - Class including different types of task layers. (Ref: @ModelNode.Layer.Task ) */
             Task: 5,
         });
     }
 
     /**
-     * Parse a previously saved object into a new @ModelNode.Layer.Config object. This will auto-determine the sub-class of the object, and pass the JSON object to the inner method to continue to parse.   --- UPDATED (Dexter) 20190210
-     * @param {*} obj - JSON object from Project file.
-     * @returns {ModelNode.Layer.Config} - A @ModelNode.Layer.Config object.
+     * Parse a previously saved object into a new @ModelNode.Layer.Config object. This will auto-determine the sub-class of the object, and pass the JSON object to the inner method to continue to parse.   --- UPDATED (Dexter) 20190725
+     * @param {Object} obj - JSON object from Project file.
+     * @param {Train} train - The train of that the layers attach to.
+     * @returns {_ModelNodeLayerConfig} - A @ModelNode.Layer.Config object.
      */
-    static parseJSON(obj) {
-        var layerUnits = obj.layerUnits;
-        var lp =  obj._type == "Collector" ? new Collector() :
-        obj._type == "BasicLayer" ? new BasicLayer(undefined, layerUnits) :
-        obj._type == "CNNLayer" ? new CNNLayer(undefined, layerUnits) :
-        obj._type == "DCNNLayer" ? new DCNNLayer(undefined, layerUnits): 
-        obj._type == "Classifier"? new Classifier() : 
-        obj._type == "Regressor" ? new Regressor() : null;
-        lp.parseJSON(obj, this);
+    static createFromJSON(obj, train) {
+        /** @type {_ModelNodeLayerConfig} - The layer object to be created. */
+        var lp;
+        if (obj._layerType) {
+            // If it's using the latest definition, it can create layers using the ModelNode structure.
+            if (obj._layerType == ModelNode.Layer.Types.Task) {
+                lp = new ModelNode.Layer.Task[ModelNode.Layer.Task.Types.getName(obj._taskType)]();
+            } else {
+                lp = new ModelNode.Layer[ModelNode.Layer.Types.getName(obj._layerType)]();
+            }
+        } else {
+            // Otherwise, use if logics to determine which type of layers to be created.
+            var layerUnits = obj.layerUnits;
+            lp =  obj._type == "Collector" ? new ModelNode.Layer.Collector() :
+            obj._type == "BasicLayer" ? new ModelNode.Layer.FullyConnected(undefined, layerUnits) :
+            obj._type == "CNNLayer" ? new ModelNode.Layer.Convolution(undefined, layerUnits) :
+            obj._type == "DCNNLayer" ? new ModelNode.Layer.Deconvolution(undefined, layerUnits): 
+            obj._type == "Classifier"? new Classifier() : 
+            obj._type == "Regressor" ? new Regressor() : null;
+        }
+
+        // Parse the layer profile.
+        lp.parseJSON(obj, train);
         return lp;
+    }
+
+    /**
+     * Test the default nodes collection and preprocessing shape.   --- UPDATED (Dexter) 20190717
+     * @param {Array} incomingShapes - Preceding layer shape
+     * @param {Function} LayerClass - The node class
+     * @returns {Array} The reshaped shape
+     */
+    static testDefaultNodesCollection(incomingShapes, LayerClass) {
+        var testLayer = new LayerClass();
+        testLayer.train = Project.now.train;
+        return testLayer.getPreprocessedIncomingShape({type: "dynamic", info: incomingShapes.map(s=>({shape: s}))});
     }
 
     static get Incoming() {return IncomingConfig;}
     static get Output() {return OutputConfig;}
-    static get Config() { return LayerProfile; }
-    static get FullyConnected() { return BasicLayer; }
-    static get Convolution() { return CNNLayer;}
-    static get Deconvolution() { return DCNNLayer; }
-    static get Collector()  {return Collector; }
-    static get Task()  {return ModelNodeLayerTask; }
+    static get Config() { return _ModelNodeLayerConfig; }
+    static get FullyConnected() { return _ModelNodeLayerFullyConnected; }
+    static get Convolution() { return _ModelNodeLayerConvolution;}
+    static get Deconvolution() { return _ModelNodeLayerDeconvolution; }
+    static get Convolution1D() { return _ModelNodeLayerConvolution1D;}
+    static get Deconvolution1D() { return _ModelNodeLayerDeconvolution1D; }
+    static get Collector()  {return _ModelNodeLayerCollector; }
+    static get Task()  {return _ModelNodeLayerTask; }
 }
 
 /** Class including different types of high-level Ladder task layers.   --- RESERVED --- UPDATED (Dexter) 20190201 */
-class ModelNodeLayerTask {
+class _ModelNodeLayerTask {
     /**
      * Enumeration managing the types of high-level Ladder task layer.   --- RESERVED --- UPDATED (Dexter) 20190201
      */
     static get Types() {
         return new Enum({
-            /** @type {Number} - Abstract class representing a high level Ladder task layer. */
+            /** @type {Number} - Abstract class representing a high level Ladder task layer. (Ref: @ModelNode.Layer.Config) */
             Config: 0,
-            /** @type {Number} - Abstract class representing a task of classifier, to compare model predictions with discrete classes. */
+            /** @type {Number} - Abstract class representing a task of classifier (Ref: @ModelNode.Layer.Task.Classifier), to compare model predictions with discrete classes. */
             Classifier: 1,
-            /** @type {Number} - Abstract class representing a task of regressor, to compare model predictions with continous variables. */
+            /** @type {Number} - Abstract class representing a task of regressor (Ref: @ModelNode.Layer.Task.Regressor), to compare model predictions with continous variables. */
             Regressor: 2
         });
     }
 
-    static get Config() { return FinalLayer; }
+    static get Config() { return _ModelNodeLayerTaskConfig; }
     static get Classifier() { return Classifier; }
     static get Regressor() { return Regressor; }
 }
 
 /** Class representing a high level NOM model layer.   --- UPDATED (Dexter) 20180524 */
-class LayerProfile extends ModelNode.Config {
+class _ModelNodeLayerConfig extends ModelNode.Config {
     /**
      * Create a high level NOM model layer.   --- UPDATED (Dexter) 20190221
      * @param {Number} layerType - The type of the NOM layer, as defined in @ModelNode.Layer.Types .
@@ -5584,7 +5702,7 @@ class LayerProfile extends ModelNode.Config {
      * @param {Boolean} batchNorm - Whether to use batch normalization before activation function.
      * @param {Object} batchNormParams - Batch normalization parameters as defined in Tensorflow.
      * @param {Number} dropout - The keep probability of dropout during training.
-     * @param {OutputConfig.Config} outputConfig - - Output configurations.
+     * @param {OutputConfig.Config} outputConfig - Output configurations.
      */
     constructor(layerType = ModelNode.Layer.Types.Config, name=null, layerUnits = 150, final = false, 
         incomingConfig = new IncomingConfig.Concat(),
@@ -5637,19 +5755,11 @@ class LayerProfile extends ModelNode.Config {
     }
 
     /**
-     * Get the related sources on this layer profile.   --- UPDATED (Dexter) 20190130
-     * @returns {Array<Array<Number|String>>} - A list of related source identification pairs in every builds.
-     */
-    get relatedSources() {
-        return this.fromSource;
-    }
-
-    /**
-     * Export this LayerProfile into a represtable object for project saving.   --- UPDATED (Dexter) 20181126
+     * Export this @ModelNode.Layer.Config into a represtable object for project saving.   --- UPDATED (Dexter) 20181126
      * @returns {Object} - JSON-stringifiable object
      */
     exportAsJSON() {
-        // For each of the key of this LayerProfile, put them into a new blank object.
+        // For each of the key of this @ModelNode.Layer.Config, put them into a new blank object.
         var obj = {};
         [...Object.keys(this)].forEach(k=>{
             // train won't be stringified because of recussive references, while toNode and fromNode are restructured to be stringifiable.
@@ -5665,40 +5775,68 @@ class LayerProfile extends ModelNode.Config {
     }
     
     /**
-     * Parse a previously saved object into this class of LayerProfile.   --- UPDATED (Dexter) 20190210
+     * Parse a previously saved object into this class of @ModelNode.Layer.Config.   --- UPDATED (Dexter) 20190725
      * @param {Object} obj - JSON object from Project file
+     * @param {Train} train - The train of that the layers attach to.
      */
-    parseJSON(obj) {
-        // Iterate the object keys and take actions on mapping back to the LayerProfile Class.
-        [...Object.keys(obj)].forEach(k=>{
-            if (!["train","_shape","_order","incomingConfig", "outputConfig", "linearTransform"].includes(k)) {
-                this[k] = obj[k];
-            } else if (["_shape","_order"].includes(k)) {
-                // Backward compatibility for one-dimension shape or order.
-                if (obj[k].length && (obj[k][0] instanceof Array)) {
-                    this[k] = obj[k];
+    parseJSON(obj, train) {
+        // Iterate the object keys and take actions on mapping back to the @ModelNode.Layer.Config Class.
+        for (let [k,v] of Object.entries(obj)) {
+            if (k=="shape") {
+                // Backward compatibility for one-dimension shape or order.   --- MAXVER 1906
+                if (v.length && (v instanceof Array)) {
+                    this[k] = v;
                 } else {
-                    this[k] = [obj[k]];
+                    this[k] = [v];
+                }
+            } else if (k=="_order") {
+                // Backward compatibility for one-dimension shape or order.   --- MAXVER 1906
+                if (v.length && (v instanceof Array)) {
+                    if (Matrix.getShape(v).length == 2) {
+                        this[k] = v.map(s=>s[0]);
+                    } else {
+                        this[k] = v;
+                    }
+                } else {
+                    this[k] = [v];
                 }
             } else if (k == "linearTransform") {
-                if (obj[k] != null) {
+                if (v != null) {
                     this[k] = new LinearTransformConfig();
-                    this[k].parseJSON(obj[k]);
-                } else obj[k] = null;
+                    this[k].parseJSON(v);
+                } else v = null;
             } else if (k == "incomingConfig") {
-                this[k] = new IncomingConfig[IncomingConfig.Types.getName(obj[k]._instanceClass)]();
-                this[k].parseJSON(obj[k]);
+                this[k] = new IncomingConfig[IncomingConfig.Types.getName(v._instanceClass)]();
+                this[k].parseJSON(v);
             } else if (k == "outputConfig") {
-                if (obj[k] != null) {
-                    this[k] = new OutputConfig[OutputConfig.Types.getName(obj[k]._instanceClass)]();
-                    this[k].parseJSON(obj[k]);
-                } else obj[k] = null;
-            } 
-        });
+                if (v != null) {
+                    this[k] = new OutputConfig[OutputConfig.Types.getName(v._instanceClass)]();
+                    this[k].parseJSON(v);
+                } else v = null;
+            } else if (k == "convDilation") {
+                // Old definition of convolutional dilation starts with 0.
+                if (!train.oldVersion || train.oldVersion < 190305) {
+                    this[k] = v + 1;
+                } else this[k] = v;
+            } else if (!["train", "_layerType"].includes(k)) {
+                this[k] = v;
+            }
+        }
+
+        // Assign this layer to the train object.
+        this.train = train;
     }
 
     /**
-     * Check if this layer is a final layer.   --- UPDATED (Dexter) 20181121
+     * The type of the NOM layer, as defined in @ModelNode.Layer.Types . --- UPDATED (Dexter) 20190223
+     * @returns {Number} - The type of the NOM layer, as defined in @ModelNode.Layer.Types .
+     */
+    get layerType() {
+        return this._layerType;
+    }
+
+    /**
+     * Check if this layer is a final layer.   --- UPDATED (Dexter) 20190508
      * @returns {Boolean} - Whether this layer is a final layer.
      */
     isFinal() {
@@ -5713,7 +5851,7 @@ class LayerProfile extends ModelNode.Config {
      */
     appendNode(layerProfile) {
         // Get the model editing build no.
-        const buildNo = this.train._editingBuild;
+        const buildNo = this.train.editingBuild;
 
         // If the layer is already appended on it, returns true.
         if (layerProfile.fromNode[buildNo].includes(this)) return true;
@@ -5745,7 +5883,7 @@ class LayerProfile extends ModelNode.Config {
      */
     removeConnectionTo(layerProfile) {
         // Get the model editing build no.
-        const buildNo = this.train._editingBuild;
+        const buildNo = this.train.editingBuild;
 
         // The next layer clear this layer from the .fromNode , and return true if it is already not there.
         const oriIdx = layerProfile.fromNode[buildNo].indexOf(this);
@@ -5777,7 +5915,7 @@ class LayerProfile extends ModelNode.Config {
      */
     addSources(clear, ...sources) {
         // Get the model editing build no.
-        const buildNo = this.train._editingBuild;
+        const buildNo = this.train.editingBuild;
 
         // Clear all previously defined source linkages if needed.
         if (clear) this.fromSource[buildNo] = [];
@@ -5812,7 +5950,7 @@ class LayerProfile extends ModelNode.Config {
      */
     removeSources(...sources) {
         // Get the model editing build no.
-        const buildNo = this.train._editingBuild;
+        const buildNo = this.train.editingBuild;
 
         sources.forEach(source=>{
             // Get the source tuple id.
@@ -5848,7 +5986,7 @@ class LayerProfile extends ModelNode.Config {
      */
     appendOn(layerOrSource) {
         var success = false;
-        if (layerOrSource instanceof LayerProfile) {
+        if (layerOrSource instanceof ModelNode.Layer.Config) {
             // Ensure the previous layer is attached to a training model.
             success = layerOrSource.train.appendLayer(this, appendAt = layerOrSource);
         } else if (layerOrSource instanceof DataPreprocessing.Node) {
@@ -5865,7 +6003,7 @@ class LayerProfile extends ModelNode.Config {
      */
     attachTo(...layerOrSources) {
         // Get all previous layers.
-        var allPreviousTrains = layerOrSources.map(ls=>(ls instanceof LayerProfile) ? ls.train : (ls.trainSource == null) ?  null : ls.trainSource.train);
+        var allPreviousTrains = layerOrSources.map(ls=>(ls instanceof ModelNode.Layer.Config) ? ls.train : (ls.trainSource == null) ?  null : ls.trainSource.train);
         
         // Ensure all previous layers and sources are under the same training model.
         if (allPreviousTrains[0] == null || allPreviousTrains.some(t => t!=allPreviousTrains[0])) {
@@ -5880,7 +6018,7 @@ class LayerProfile extends ModelNode.Config {
     /**
      * Get a list of connectable nodes.   --- UPDATED (Dexter) 20181028
      * @param {String} mode   - Connection mode name: "connect" | "attach"
-     * @returns {(ModelNode.Layer.Config|DataPreprocessing.Node)[]} - A list of connectable nodes.
+     * @returns {Array<(ModelNode.Layer.Config|DataPreprocessing.Node)>} - A list of connectable nodes.
      */
     getConnectableNodes(mode) {
         var layers = [...this.train.layerProfiles.values()].filter(mode == "connect" ? (lp=>lp!=this && !lp.hasPathTo(this)) : (lp=>lp!=this && !this.hasPathTo(lp)));
@@ -5894,7 +6032,7 @@ class LayerProfile extends ModelNode.Config {
      */
     updateShape() {
         // Get the model editing build no.
-        const buildNo = this.train._editingBuild;
+        const buildNo = this.train.editingBuild;
 
         // Assign the ._shape by getting the shape through immitating the graph building.
         var newShape = this.getOutputShape();
@@ -5907,27 +6045,27 @@ class LayerProfile extends ModelNode.Config {
      */
     updateOrder() {
         // Get the model editing build no.
-        const buildNo = this.train._editingBuild;
+        const buildNo = this.train.editingBuild;
 
         this._order[buildNo] = Math.max(...this.fromNode[buildNo].map(lp=>lp._order[buildNo]), 0) + 1;
         this.toNode[buildNo].forEach(lp=>lp.updateOrder());
     }
 
     /**
-     * Apply any shape changes based on preceding layer changes or changes made in the layer properties.   --- UPDATED (Dexter) 20181130
-     * @param {Object[]} fromShapeChanges - See definition on LayerProfile.getInputShape() method.
+     * Apply any shape changes based on preceding layer changes or changes made in the layer properties.   --- UPDATED (Dexter) 20190726
+     * @param {Array<Object>} fromShapeChanges - See definition on ModelNode.Layer.Config.getInputShape() method.
      * @param {Object} configChanges - Key-value pair object of any shape-related layer properties
      * @param {Boolean} applyImmediately - Whether effect will be taken immediately on any changes once confirm proceeding layers have no conflicts.
      * @param {Map} centralizedMap - The affected layers info in the current change.
-     * @returns {Object} - Return a result information: {result: Boolean - Whether the change can be applied (and updated) successfully, error: Object - Translatable information of error message} .
+     * @returns {TrialResult} - Return a result information: {result: Boolean - Whether the change can be applied (and updated) successfully, error: Object - Translatable information of error message} .
      */
     applyShapeChanges(fromShapeChanges, configChanges = {}, centralizedMap = new Map(), applyImmediately = true) {
         // Get the model editing build no.
-        const buildNo = this.train._editingBuild;
+        const buildNo = this.train.editingBuild;
 
         // Have previous check on centralized map.
         var chainCheck = this.applyShapeChainChecks(fromShapeChanges, configChanges, centralizedMap), itself;
-        if (chainCheck.error) return {result: true};
+        if (chainCheck.error) return new TrialResult(true);
         else [fromShapeChanges, configChanges, itself] = [chainCheck.fromShapeChanges, chainCheck.configChanges, chainCheck.itself];
 
         // Try building this layer with the new shape.
@@ -5936,7 +6074,9 @@ class LayerProfile extends ModelNode.Config {
         // If shape can't be built, reject the change.
         if (!newShape) {
             var cuzLTMsg = App.createCuzLT(lang=>this._ltTemp.replace("$$$", App.getTxtFromLang(this._lt,lang)) + ": " + App.getTxtFromLang("notCompWithPrev",lang));
-            return {result: false, error: cuzLTMsg};
+            return new TrialResult(false, cuzLTMsg);
+        } else if (newShape instanceof TrialResult && !newShape.result) {
+            return newShape;
         }
 
         // If it's fine, set up the change information and prepare to apply this change to proceding layers.
@@ -5972,13 +6112,13 @@ class LayerProfile extends ModelNode.Config {
             this.commitChanges(thisInfo);
         }
 
-        return error ? {result: false, error: error} : {result: true};
+        return error ? new TrialResult(false, error) : new TrialResult(true);
 
     }
 
     /**
      * Apply any shape changes based on preceding layer changes or changes made in the layer properties. The function is defined in the subclasses.   --- UPDATED (Dexter) 20180824
-     * @param {Object[]} fromShapeChanges - See definition on LayerProfile.getInputShape() method.
+     * @param {Array<Object>} fromShapeChanges - See definition on ModelNode.Layer.Config.getInputShape() method.
      * @param {Object} configChanges - Key-value pair object of any shape-related layer properties
      * @param {Boolean} applyImmediately - Whether effect will be taken immediately on any changes once confirm proceeding layers have no conflicts.
      * @param {Map} centralizedMap - The affected layers info in the current change.
@@ -6011,11 +6151,11 @@ class LayerProfile extends ModelNode.Config {
      * Commit the changes, typically after all validation tests.   --- UPDATED (Dexter) 20181130
      * @param {Object} changeInfo - The change info.
      * @param {Object} changeInfo.configChanges - The layer onfiguration changes.
-     * @param {Number[]} changeInfo.outputShape - The output shape of this layer.
+     * @param {Array<Number>} changeInfo.outputShape - The output shape of this layer.
      */
     commitChanges(changeInfo) {
         // Get the model editing build no.
-        const buildNo = this.train._editingBuild;
+        const buildNo = this.train.editingBuild;
 
         if (changeInfo.configChanges) [...Object.keys(changeInfo.configChanges)].forEach(k => this[k] = changeInfo.configChanges[k]);
         this._shape[buildNo] = changeInfo.outputShape;
@@ -6023,9 +6163,9 @@ class LayerProfile extends ModelNode.Config {
 
     /**
      * Merge fromShapeChanges where there may be previous changes as stated in centralizedMap but new changes from chained changes.   --- UPDATED (Dexter) 20180830
-     * @param {Object[]} fromShapeChanges - See definition on LayerProfile.getInputShape() method.
+     * @param {Array<Object>} fromShapeChanges - See definition on ModelNode.Layer.Config.getInputShape() method.
      * @param {Map} centralizedMap - The affected layers info in the current change.
-     * @return {Object[]} - A merged version of fromShapeChanges.
+     * @return {Array<Object>} - A merged version of fromShapeChanges.
      */
     mergeShapeChanges(fromShapeChanges = null, centralizedMap = new Map()) {
         var thisPrevConfigInfo = centralizedMap.get(this.name);
@@ -6041,13 +6181,13 @@ class LayerProfile extends ModelNode.Config {
     }
 
     /**
-     * Get the shape of collected input of this layer by immitating the nodes collection.   --- UPDATED (Dexter) 20181126
-     * @param {(Number|String)[][]} incomingShapes - A list of shape arrays of incoming tensors.
+     * Get the shape of collected input of this layer by immitating the nodes collection.   --- UPDATED (Dexter) 20190719
+     * @param {Array<Array<(Number|String)>>} incomingShapes - A list of shape arrays of incoming tensors.
      * @returns {Array} - Return the shape of the combined incoming shape.
      */
     combineIncomingShapes(incomingShapes, configChanges = {}) {
         // Get the model editing build no.
-        const buildNo = this.train._editingBuild;
+        const buildNo = this.train.editingBuild;
 
         // There should be at least one incoming shape.
         if (incomingShapes.length == 0) return null;
@@ -6082,17 +6222,16 @@ class LayerProfile extends ModelNode.Config {
         }
 
         // Locate the core index.
-        var coreIdx = incomingShapes.findIndex(s=>shapeEquals(s, coreShape));
+        var coreIdx = incomingShapes.findIndex(s=>Matrix.shapeEquals(s, coreShape));
         if (coreIdx == -1) return null;
 
         // Determine the concatenation axis.
         var axis = incomingConfig.axis == -1 ? coreShape.length - 1 : incomingConfig.axis;
 
-        // Failes for illogical connections.
+        // Fails for illogical connections.
         if (axis >= coreShape.length) return null;
-        else if (!incomingShapes.map(s=>s.slice(0,axis)).every(s=>(shapeEquals(s, coreShape.slice(0,axis)) || s.every((si, idx)=>(si == coreShape[idx] || (si == "None" && coreShape[idx] == "None") || (si % coreShape[idx] == 0)))))) {
-            return null;
-        }
+        else if (incomingShapes.some(s => s.slice(1).includes("None"))) return null;
+        else if (!incomingShapes.map(s=>s.slice(1,axis)).every(s=>(Matrix.shapeEquals(s, coreShape.slice(1,axis)) || s.every((si, idx)=>(si % coreShape[idx+1] == 0))))) return null;
 
         // Align the dimensions of all tensors through reshaping.
         incomingShapes.forEach((s,idx, ary)=>{
@@ -6108,7 +6247,7 @@ class LayerProfile extends ModelNode.Config {
                 ary[idx] = newShape;
             }
 
-            if (!shapeEquals(ary[idx].slice(0,axis), coreShape.slice(0,axis))) {
+            if (!Matrix.shapeEquals(ary[idx].slice(0,axis), coreShape.slice(0,axis))) {
                 // Handle dimension reduction on dimensions before operation axis. --- BETA
                 // Understand how dimensions are to be split.
                 var compareSplit = ary[idx].slice(0,axis).map((dim,dimIdx)=>(dim == "None" || coreShape[dimIdx] == "None") ? "None" : Math.round(dim/coreShape[dimIdx]));
@@ -6135,7 +6274,7 @@ class LayerProfile extends ModelNode.Config {
             return [...firstShape.slice(0,axis), incomingShapes.map(s=>s[axis]).reduce((a,b)=>a+b,0), ...firstShape.slice(axis+1)];
 
         } else if (isElementWiseOp) {
-            // If they are having element-wise operations: --- BETA
+            // If they are having element-wise operations. No further operations are needed, as they are coverted to the shape of core shape.
 
             // Convert the dimensions if the core axis dimension are not the same with another node.
             return incomingShapes[coreIdx];
@@ -6144,7 +6283,7 @@ class LayerProfile extends ModelNode.Config {
 
     /**
      * Get the shape of preprocessed incoming nodes of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20181126
-     * @param {(Number|String)[]} combinedIncomingShape - A shape array of combined incoming shape.
+     * @param {Array<(Number|String)>} combinedIncomingShape - A shape array of combined incoming shape.
      * @param {Object} configChanges - Key-value pair object of any shape-related layer properties
      * @param {Map} centralizedMap - The affected layers info in the current change.
      * @returns {Array} - Return the shape of the pre-proccessed incoming shape.
@@ -6155,7 +6294,7 @@ class LayerProfile extends ModelNode.Config {
 
     /**
      * Get the shape of layer-specific-processed tensor of this layer by immitating layer-specific operations.   --- UPDATED (Dexter) 20181126
-     * @param {(Number|String)[]} preprocessedIncomingShape - A shape array of pre-proccessed incoming shape.
+     * @param {Array<(Number|String)>} preprocessedIncomingShape - A shape array of pre-proccessed incoming shape.
      * @returns {Array} - Return the shape of the tensor after layer-specific operation.
      */
     processOperationShape(preprocessedIncomingShape, configChanges = {}) {
@@ -6163,11 +6302,15 @@ class LayerProfile extends ModelNode.Config {
     }
 
     /**
-     * Get the shape of output of this layer by immitating the output processing.   --- UPDATED (Dexter) 20190210
-     * @param {(Number|String)[]} operatedShape - A shape array of layer-specific operations.
+     * Get the shape of output of this layer by immitating the output processing.   --- UPDATED (Dexter) 20190725
+     * @param {Array<(Number|String)>} operatedShape - A shape array of layer-specific operations.
      * @returns {Array} - Return the shape of the output tensor.
      */
     processOperatedShape(operatedShape, configChanges = {}) {
+        // Check the shape of the activataion function if it is updated.
+        var activation = configChanges.activation || this.activation;
+        if (activation == "crelu") operatedShape = [...operatedShape.slice(0,-1), operatedShape.slice(-1)[0]*2]
+
         // Prepare necessary information.
         var outputConfig = configChanges.outputConfig || this.outputConfig;
 
@@ -6191,38 +6334,37 @@ class LayerProfile extends ModelNode.Config {
             var totalShape = Math.round(operatedShape.filter(s=>s != "None").reduce((a,b) => a*b, 1));
 
             // Confirm if the remaining axis (with value -1) is an integer.
-            if (totalShape % confirmShape == 0) {
-                // Replace the remaining axis (with value -1) with the reshaped dimension.
-                const idx = newShape.indexOf(-1);
-                if (idx == -1) {
-                    return (totalShape/confirmShape == 0) ? newShape : null;
-                } else {
-                    newShape[idx] = Math.round(totalShape/confirmShape);
-                    return newShape;
-                }
+            if (totalShape % confirmShape != 0) return null;
+
+            // Replace the remaining axis (with value -1) with the reshaped dimension.
+            const idx = newShape.indexOf(-1);
+            if (idx == -1) {
+                return (totalShape == confirmShape) ? newShape : null;
             } else {
-                return null;
+                newShape[idx] = Math.round(totalShape/confirmShape);
+                return newShape;
             }
+
         } else return operatedShape;
     }
 
     /**
      * Try to get the shapes of the incoming layer nodes.   --- UPDATED (Dexter) 20190320
-     * @param {Object[]} fromShapeChanges - An array of shape information of the preceding layers.
+     * @param {Array<Object>} fromShapeChanges - An array of shape information of the preceding layers.
      * @param {String} fromShapeChanges[].type - The type of the preceding layer, "source", "layer" or "dynamic".
      * @param {Number|String} fromShapeChanges[].id1 - The source ID if the preceding layer is a "source"; the layer name if it's a "layer".
      * @param {String} fromShapeChanges[].id2 - The column config name if the preceding layer is a "source".
-     * @param {Number[]} fromShapeChanges[].shape - A shape array specifying the new shape of the preceding layer.
-     * @param {Object[]} fromShapeChanges[].info - An array of listed from source or node info.
+     * @param {Array<Number>} fromShapeChanges[].shape - A shape array specifying the new shape of the preceding layer.
+     * @param {Array<Object>} fromShapeChanges[].info - An array of listed from source or node info.
      * @param {String} fromShapeChanges[].info[].type - The type of the preceding layer, "source" or "layer".
      * @param {Number|String} fromShapeChanges[].info[].id1 - The source ID if the preceding layer is a "source"; the layer name if it's a "layer".
      * @param {String} fromShapeChanges[].info[].id2 - The column config name if the preceding layer is a "source".
-     * @param {Number[]} fromShapeChanges[].info[].shape - A shape array specifying the new shape of the preceding layer.
-     * @returns {Number[][]} An array of shapes of preceding layers.
+     * @param {Array<Number>} fromShapeChanges[].info[].shape - A shape array specifying the new shape of the preceding layer.
+     * @returns {Array<Array<Number>>} An array of shapes of preceding layers.
      */
     getIncomingShapes(fromShapeChanges=null) {
         // Get the model editing build no. if it has been pushed into a train.
-        const buildNo = this.train ? this.train._editingBuild : undefined;
+        const buildNo = this.train ? this.train.editingBuild : undefined;
 
         // Enusre the data sources are numbers.
         if (this.fromSource[buildNo].length && this.fromSource[buildNo].some(s=>!this.train.getDataSource(...s).isNumber())) return null;
@@ -6271,7 +6413,7 @@ class LayerProfile extends ModelNode.Config {
 
     /**
      * Get the combined and pre-proccessed incoming shapes (before any layer-specific processing).   --- UPDATED (Dexter) 20181217
-     * @param {Object[]} fromShapeChanges - See definition on LayerProfile.getInputShape() method.
+     * @param {Array<Object>} fromShapeChanges - See definition on ModelNode.Layer.Config.getInputShape() method.
      * @param {Object} configChanges - Key-value pair object of any shape-related layer properties
      * @param {Map} centralizedMap - The affected layers info in the current change.
      * @returns {Array} Return the shape of the preprocessed incoming shape of this layer; null if conflicts occurs and it can't be built logically.
@@ -6288,7 +6430,7 @@ class LayerProfile extends ModelNode.Config {
 
     /**
      * Get the shape of processed operations of this layer by immitating the graph building.   --- UPDATED (Dexter) 20190210
-     * @param {Object[]} fromShapeChanges - See definition on LayerProfile.getInputShape() method.
+     * @param {Array<Object>} fromShapeChanges - See definition on ModelNode.Layer.Config.getInputShape() method.
      * @param {Object} configChanges - Key-value pair object of any shape-related layer properties
      * @param {Map} centralizedMap - The affected layers info in the current change.
      * @returns {Array} Return the shape of the output of this layer; null if conflicts occurs and it can't be built logically.
@@ -6310,11 +6452,11 @@ class LayerProfile extends ModelNode.Config {
     }
     
     /**
-     * Get the shape of output of this layer by immitating the graph building.   --- UPDATED (Dexter) 20181126
-     * @param {Object[]} fromShapeChanges - See definition on LayerProfile.getInputShape() method.
+     * Get the shape of output of this layer by immitating the graph building.   --- UPDATED (Dexter) 20190726
+     * @param {Array<Object>} fromShapeChanges - See definition on ModelNode.Layer.Config.getInputShape() method.
      * @param {Object} configChanges - Key-value pair object of any shape-related layer properties
      * @param {Map} centralizedMap - The affected layers info in the current change.
-     * @returns {Array} Return the shape of the output of this layer; null if conflicts occurs and it can't be built logically.
+     * @returns {(Array|TrialError)} Return the shape of the output of this layer; null if conflicts occurs and it can't be built logically.
      */
     getOutputShape(fromShapeChanges = null, configChanges = {}, centralizedMap = new Map()) {
         // Check if there is previously set centralizedMap, and replace with current fromShapeChanges if needed.
@@ -6324,6 +6466,7 @@ class LayerProfile extends ModelNode.Config {
         // Get the list of shapes of preceding layers.
         var preprocessedIncomingShape = this.getPreprocessedIncomingShape(fromShapeChanges, configChanges, centralizedMap);
         if (preprocessedIncomingShape == null) return null;
+        else if (preprocessedIncomingShape instanceof TrialResult) return preprocessedIncomingShape;
 
         // Update the inputShape if needed.
         if (thisPrevConfigInfo) thisPrevConfigInfo.preprocessedIncomingShape = preprocessedIncomingShape;
@@ -6331,6 +6474,7 @@ class LayerProfile extends ModelNode.Config {
         // Get layer-specific tensor processing shape.
         var operatedShape = this.processOperationShape(preprocessedIncomingShape, configChanges);
         if (operatedShape == null) return null;
+        else if (operatedShape instanceof TrialResult) return operatedShape;
 
         return this.processOperatedShape(operatedShape, configChanges);
     }
@@ -6342,7 +6486,7 @@ class LayerProfile extends ModelNode.Config {
      */
     hasPathTo(layerProfile) {
         // Get the model editing build no.
-        const buildNo = this.train._editingBuild;
+        const buildNo = this.train.editingBuild;
 
         // If the specific layer profile has a lower order, it must not have been connected after this layer.
         if (layerProfile._order[buildNo] <= this._order[buildNo]) return false;
@@ -6360,7 +6504,7 @@ class LayerProfile extends ModelNode.Config {
      */
     remove(removalType = 0) {
         // Get the model editing build no.
-        const buildNo = this.train._editingBuild;
+        const buildNo = this.train.editingBuild;
 
         // Try to observe the changes after the removal of this node.
         var thisFromNodes = this.fromNode[buildNo];
@@ -6435,7 +6579,7 @@ class LayerProfile extends ModelNode.Config {
      */
     removeThisAndAllProceedings(startFromThis = true) {
         // Get the model editing build no.
-        const buildNo = this.train._editingBuild;
+        const buildNo = this.train.editingBuild;
 
         // If some of the layers are using this layer as reference layer and they are not the direct path, reject the removal.
         if ([...this.train.layerProfiles.values()].some(lp=>lp.refLayerName == this.name && !this.hasPathTo(lp))) {
@@ -6492,7 +6636,7 @@ class LayerProfile extends ModelNode.Config {
 /**
  * Class representing a collector layer, without any dimensional transformation from all the input layers.   --- UPDATED (Dexter) 20181126
  */
-class Collector extends ModelNode.Layer.Config {
+class _ModelNodeLayerCollector extends ModelNode.Layer.Config {
     /**
      * Create a collector layer, without any dimensional transformation from all the input layers.   --- UPDATED (Dexter) 20190221
      * @param {String} name - The name of this layer.
@@ -6516,7 +6660,7 @@ class Collector extends ModelNode.Layer.Config {
 
     /**
      * Get the shape of preprocessed incoming nodes of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20181126
-     * @param {(Number|String)[]} combinedIncomingShape - A shape array of combined incoming shape.
+     * @param {Array<(Number|String)>} combinedIncomingShape - A shape array of combined incoming shape.
      * @param {Object} configChanges - Key-value pair object of any shape-related layer properties
      * @param {Map} centralizedMap - The affected layers info in the current change.
      * @returns {Array} - Return the shape of the pre-proccessed incoming shape.
@@ -6527,7 +6671,7 @@ class Collector extends ModelNode.Layer.Config {
 
     /**
      * Get the shape of layer-specific-processed tensor of this layer by immitating layer-specific operations.   --- UPDATED (Dexter) 20181126
-     * @param {(Number|String)[]} preprocessedIncomingShape - A shape array of pre-proccessed incoming shape.
+     * @param {Array<(Number|String)>} preprocessedIncomingShape - A shape array of pre-proccessed incoming shape.
      * @returns {Array} - Return the shape of the tensor after layer-specific operation.
      */
     processOperationShape(preprocessedIncomingShape, configChanges = {}) {
@@ -6537,9 +6681,9 @@ class Collector extends ModelNode.Layer.Config {
 }
 
 /** Class representing a basic layer, aka fully connected layer, dense layer, etc.   --- UPDATED (Dexter) 20180524 */
-class BasicLayer extends ModelNode.Layer.Config {
+class _ModelNodeLayerFullyConnected extends ModelNode.Layer.Config {
     /**
-     * Create a basic layer, aka fully connected layer, dense layer, etc.   --- UPDATED (Dexter) 20190221
+     * Create a basic layer, aka fully connected layer, dense layer, etc.   --- UPDATED (Dexter) 20190725
      * @param {String} name - The name of this layer.
      * @param {Number} layerUnits - The number of hidden units in this layer.
      * @param {Number} flattenToAxis - The flattening axis after consolidating all preceding layers.
@@ -6560,7 +6704,7 @@ class BasicLayer extends ModelNode.Layer.Config {
         activation = "relu", activationParams = {}, 
         batchNorm = true,  batchNormParams = {}, dropout = 100, 
         outputConfig = new OutputConfig.Default()) {
-        super(ModelNode.Layer.Task.FullyConnected, name, layerUnits, false, 
+        super(ModelNode.Layer.Types.FullyConnected, name, layerUnits, false, 
             incomingConfig, linearTransform,
             activation, activationParams, 
             batchNorm, batchNormParams, 
@@ -6575,8 +6719,8 @@ class BasicLayer extends ModelNode.Layer.Config {
     }
 
     /**
-     * Get the shape of preprocessed incoming nodes of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20181126
-     * @param {(Number|String)[]} combinedIncomingShape - A shape array of combined incoming shape.
+     * Get the shape of preprocessed incoming nodes of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20190718
+     * @param {Array<(Number|String)>} combinedIncomingShape - A shape array of combined incoming shape.
      * @param {Object} configChanges - Key-value pair object of any shape-related layer properties
      * @param {Map} centralizedMap - The affected layers info in the current change.
      * @returns {Array} - Return the shape of the pre-proccessed incoming shape.
@@ -6606,13 +6750,13 @@ class BasicLayer extends ModelNode.Layer.Config {
             // Determine whether transpose is needed. If neither transpose can be operated, this cannot be referenced, and the changes can't be applied.
             var refInputShape = (hasRefLayerInfo && "preprocessedIncomingShape" in refLayerInfo) ? refLayerInfo.preprocessedIncomingShape : refLayer.getPreprocessedIncomingShape();
             var refOutputShape = (hasRefLayerInfo && "outputShape" in refLayerInfo) ? refLayerInfo.outputShape : refLayer.getOutputShape();
-            var refLayerTranspose = shapeEquals(refInputShape, preprocessedIncomingShape) ? false : shapeEquals(refOutputShape, preprocessedIncomingShape) ? true : null;
+            var refLayerTranspose = Matrix.shapeEquals(refInputShape, preprocessedIncomingShape) ? false : Matrix.shapeEquals(refOutputShape, preprocessedIncomingShape) ? true : null;
             if (refLayerTranspose === null) return null;
             
             // Apply other reference layer configurations.
             configChanges.refLayerTranspose = refLayerTranspose;
             configChanges.layerUnits = refLayerTranspose ? refInputShape.slice(-1)[0] : refOutputShape.slice(-1)[0];
-            configChanges.linearTransform = (hasRefLayerInfo && "linearTransform" in refLayerInfo) ? refLayerInfo.linearTransform : refLayer.linearTransform;
+            configChanges.linearTransform = (hasRefLayerInfo && "linearTransform" in refLayerInfo.configChanges) ? refLayerInfo.configChanges.linearTransform : refLayer.linearTransform;
         }
 
         return preprocessedIncomingShape;
@@ -6620,7 +6764,7 @@ class BasicLayer extends ModelNode.Layer.Config {
 
     /**
      * Get the shape of layer-specific-processed tensor of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20181126
-     * @param {(Number|String)[]} preprocessedIncomingShape - A shape array of pre-proccessed incoming shape.
+     * @param {Array<(Number|String)>} preprocessedIncomingShape - A shape array of pre-proccessed incoming shape.
      * @returns {Array} - Return the shape of the tensor after layer-specific operation.
      */
     processOperationShape(preprocessedIncomingShape, configChanges = {}) {
@@ -6631,28 +6775,17 @@ class BasicLayer extends ModelNode.Layer.Config {
         // Return the transformed operation.
         return LinearTransformConfig.processOperationShape(preprocessedIncomingShape, layerUnits, flattenToAxis);
     }
-
-    /**
-     * Test the default nodes collection and preprocessing shape.   --- UPDATED (Dexter) 20181127
-     * @param {Array} previousShapes - Preceding layer shape
-     * @returns {Array} The reshaped shape
-     */
-    static testDefaultNodesCollection(incomingShapes) {
-        var basicLayer = new BasicLayer();
-        basicLayer.train = Project.now.train;
-        return basicLayer.getPreprocessedIncomingShape({type: "dynamic", info: incomingShapes.map(s=>({shape: s}))});
-    }
 }
 
 /** Class representing a convolutional layer.   --- UPDATED (Dexter) 20180524 */
-class CNNLayer extends ModelNode.Layer.Config {
+class _ModelNodeLayerConvolution extends ModelNode.Layer.Config {
     /**
-     * Create a convolutional layer.   --- UPDATED (Dexter) 20190708
+     * Create a convolutional layer.   --- UPDATED (Dexter) 20190717
      * @param {String} name - The name of this layer.
      * @param {Number} layerUnits - The number of hidden units in this layer.
      * @param {Number} convFilterWidth - The convolutional layer filter width.
      * @param {Boolean} convPadding - Whether to use padding on this convolutional layer, i.e. the output image size will be the same as the previous one.
-     * @param {Number[]} convStride - The stride of the convolutional layer filter.   --- BETA
+     * @param {Array<Number>} convStride - The stride of the convolutional layer filter.   --- BETA
      * @param {Number} convDilation - The convolution dilation of the convolutional layer filter.
      * @param {Array} reshape - The shape of reshaping previous layers. If not specified, it will automatically reshaped if the previous layer can't interpret as an image.
      * @param {String} refLayerName - Any referenced weight that this layer mirrors for.
@@ -6665,7 +6798,7 @@ class CNNLayer extends ModelNode.Layer.Config {
      * @param {Object} batchNormParams - Batch normalization parameters as defined in Tensorflow.
      * @param {OutputConfig} outputConfig - - Output configurations.
      */
-    constructor(name=null, layerUnits = 30, convFilterWidth=3, convPadding=true, convStride=[1,1], convDilation=0, reshape=null, refLayerName = null, refLayerTranspose = false, 
+    constructor(name=null, layerUnits = 30, convFilterWidth=3, convPadding=true, convStride=[1,1], convDilation=1, reshape=null, refLayerName = null, refLayerTranspose = false, 
                 incomingConfig = new IncomingConfig.Concat(),
                 linearTransform = LinearTransformConfig.createBasicConfig(0, 0.05, false, true, undefined, 0, 0.001),
                 activation = "relu", activationParams = {}, 
@@ -6693,8 +6826,8 @@ class CNNLayer extends ModelNode.Layer.Config {
     }
 
     /**
-     * Get the shape of preprocessed incoming nodes of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20181205
-     * @param {(Number|String)[]} combinedIncomingShape - A shape array of combined incoming shape.
+     * Get the shape of preprocessed incoming nodes of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20190718
+     * @param {Array<(Number|String)>} combinedIncomingShape - A shape array of combined incoming shape.
      * @param {Object} configChanges - Key-value pair object of any shape-related layer properties
      * @param {Map} centralizedMap - The affected layers info in the current change.
      * @returns {Array} - Return the shape of the pre-proccessed incoming shape.
@@ -6705,13 +6838,13 @@ class CNNLayer extends ModelNode.Layer.Config {
         if (refLayerName) {
             // Get the layer properties from the changed or original reference layer configs.
             refLayerInfo = centralizedMap.get(refLayerName);
-            hasRefLayerInfo = new Boolean(refLayerInfo);
+            hasRefLayerInfo = !!refLayerInfo;
             refLayer = this.train.layerProfiles.get(refLayerName);
             
             // No reference for non-matched type of layer.
             if (!["CNNLayer", "DCNNLayer"].includes(refLayer._type)) return null;
             
-            // Update flattenToAxis.
+            // Update auto reshape.
             configChanges.reshape = (hasRefLayerInfo && reshape in refLayerInfo.configChanges) ? refLayerInfo.configChanges.reshape : refLayer.reshape;
         }
 
@@ -6758,12 +6891,15 @@ class CNNLayer extends ModelNode.Layer.Config {
             // Determine whether transpose is needed. If neither transpose can be operated, this cannot be referenced, and the changes can't be applied.
             var refInputShape = (hasRefLayerInfo && "preprocessedIncomingShape" in refLayerInfo) ? refLayerInfo.preprocessedIncomingShape : refLayer.getPreprocessedIncomingShape();
             var refOutputShape = (hasRefLayerInfo && "outputShape" in refLayerInfo) ? refLayerInfo.outputShape : refLayer.getOutputShape();
+            const refLayerTranspose = configChanges.refLayerTranspose = refLayer instanceof ModelNode.Layer.Deconvolution;
+
+            // Raise error if either referenced input and output shape can not match with the currently preprocessed incoming shape.
+            if ((refLayerTranspose && !Matrix.shapeEquals(refOutputShape, preprocessedIncomingShape)) || (!refLayerTranspose && !Matrix.shapeEquals(refInputShape, preprocessedIncomingShape))) return null;
             
             // Apply other reference layer configurations.
-            configChanges.refLayerTranspose = refLayer._type == "DCNNLayer";
             configChanges.layerUnits = refLayerTranspose ? refInputShape.slice(-1)[0] : refOutputShape.slice(-1)[0];
             ["convFilterWidth", "convPadding", "convStride", "convDilation", "linearTransform"].forEach(prop=>{
-                configChanges[prop] = (hasRefLayerInfo && prop in refLayerInfo) ? refLayerInfo[prop] : refLayer[prop];
+                configChanges[prop] = (hasRefLayerInfo && prop in refLayerInfo.configChanges) ? refLayerInfo.configChanges[prop] : refLayer[prop];
             });
         }
 
@@ -6771,8 +6907,8 @@ class CNNLayer extends ModelNode.Layer.Config {
     }
 
     /**
-     * Get the shape of layer-specific-processed tensor of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20190708
-     * @param {(Number|String)[]} preprocessedIncomingShape - A shape array of pre-proccessed incoming shape.
+     * Get the shape of layer-specific-processed tensor of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20190717
+     * @param {Array<(Number|String)>} preprocessedIncomingShape - A shape array of pre-proccessed incoming shape.
      * @returns {Array} - Return the shape of the tensor after layer-specific operation.
      */
     processOperationShape(preprocessedIncomingShape, configChanges = {}) {
@@ -6783,6 +6919,12 @@ class CNNLayer extends ModelNode.Layer.Config {
         var convDilation = "convDilation" in configChanges? configChanges.convDilation : this.convDilation;
         var layerUnits = "layerUnits" in configChanges ? configChanges.layerUnits : this.layerUnits;
 
+        // Return error for incompatible settings.
+        if (convDilation > 1 && this.train.device.startsWith("/cpu")) {
+            // Convolutional layer dilation cannot be used with CPU computation.
+            return new TrialResult(false, "dilationDeviceErr");
+        } 
+        
         // Determine whether CNN padding is used.
         if (convPadding) {
             return [preprocessedIncomingShape[0], Math.ceil(preprocessedIncomingShape[1] / convStride[0]), Math.ceil(preprocessedIncomingShape[2] / convStride[1]), layerUnits];
@@ -6790,8 +6932,8 @@ class CNNLayer extends ModelNode.Layer.Config {
             // If no padding is used, the shape will be changed according to the CNN filter and dilation configurations.
             var height = preprocessedIncomingShape[1];
             var width = preprocessedIncomingShape[2];
-            var stridesH = height - (convFilterWidth + convDilation * (convFilterWidth-1)) + 1;
-            var stridesW = width - (convFilterWidth + convDilation * (convFilterWidth-1)) + 1;
+            var stridesH = height - (convFilterWidth + (convDilation-1) * (convFilterWidth-1)) + 1;
+            var stridesW = width - (convFilterWidth + (convDilation-1) * (convFilterWidth-1)) + 1;
             var newHeight = Math.ceil(stridesH / convStride[0]);
             var newWidth = Math.ceil(stridesW / convStride[1]);
 
@@ -6801,30 +6943,21 @@ class CNNLayer extends ModelNode.Layer.Config {
             } else return null;
         }
     }
-
-    /**
-     * Test the default nodes collection and preprocessing shape.   --- UPDATED (Dexter) 20181127
-     * @param {Array} previousShapes - Preceding layer shape
-     * @returns {Array} The reshaped shape
-     */
-    static testDefaultNodesCollection(incomingShapes) {
-        var convLayer = new CNNLayer();
-        convLayer.train = Project.now.train;
-        return convLayer.getPreprocessedIncomingShape({type: "dynamic", info: incomingShapes.map(s=>({shape: s}))});
-    }
 }
 
 /** Class representing a DCNN Layer.   --- UPDATED (Dexter) 20180819 */
-class DCNNLayer extends ModelNode.Layer.Config {
+class _ModelNodeLayerDeconvolution extends ModelNode.Layer.Config {
     /**
-     * Create a DCNN layer.   --- UPDATED (Dexter) 20190708
+     * Create a deconvolutional layer.   --- UPDATED (Dexter) 20190723
      * @param {String} name - The name of this layer.
      * @param {Number} layerUnits - The number of hidden units in this layer.
      * @param {Number} convFilterWidth - The deconvolution filter width.
      * @param {Boolean} convPadding - Whether to use padding on this deconvolution layer, i.e. the output image size will be the same as the previous one.
-     * @param {Number[]} convStride - The stride of this deconvolution filter.   --- BETA
+     * @param {Array<Number>} convStride - The stride of this deconvolution filter.   --- BETA
      * @param {Number} convDilation - The convolution dilation of this deconvolution filter.
-     * @param {Number} dconvPadding - The deconvolution padding method, as defined in DCNNLayer.PaddingTypes .   --- BETA
+     * @param {Number} dconvPadding - The deconvolution padding method, as defined in @ModelNode.Layer.Deconvolution.PaddingTypes .   --- BETA
+     * @param {Number} dconvUpscale - The deconvolution upscale methods due to striding or stretched padding, as defined in @ModelNode.Layer.Deconvolution.UpscaleTypes .   --- BETA
+     * @param {Number} dconvAlgorithm - A value defined in @ModelNode.Layer.Deconvolution.AlgorithmTypes .
      * @param {String} refLayerName - Any referenced kernal that this layer mirrors for.
      * @param {Boolean} refLayerTranspose - Whether transpose is required for the referenced weight.
      * @param {IncomingConfig} incomingConfig - Input configurations.
@@ -6834,7 +6967,8 @@ class DCNNLayer extends ModelNode.Layer.Config {
      * @param {Boolean} batchNorm - Whether to use batch normalization before activation function.
      * @param {Object} batchNormParams - Batch normalization parameters as defined in Tensorflow.
      */
-    constructor(name=null, layerUnits=30, convFilterWidth=3, convPadding=true, convStride=[1,1], convDilation=0, dconvPadding=0, refLayerName=null, refLayerTranspose = false, 
+    constructor(name=null, layerUnits=30, convFilterWidth=3, convPadding=true, convStride=[1,1], convDilation=1, 
+                dconvPadding=1, dconvUpscale=0, dconvAlgorithm = 0, refLayerName=null, refLayerTranspose = false, 
                 incomingConfig = new IncomingConfig.Concat(),
                 linearTransform = LinearTransformConfig.createBasicConfig(0, 0.05, false, true, undefined, 0, 0.001),
                 activation = "relu", activationParams = {}, 
@@ -6851,8 +6985,12 @@ class DCNNLayer extends ModelNode.Layer.Config {
         this.convStride = convStride;
         /** @type {Number} - The convolution dilation of this deconvolution filter.*/
         this.convDilation = convDilation;
-        /** @type {Number} - The deconvolution padding method, as defined in ModelNode.Layer.Deconvolution.PaddingTypes .   --- BETA */
+        /** @type {Number} - The deconvolution padding method, as defined in @ModelNode.Layer.Deconvolution.PaddingTypes .   --- BETA */
         this.dconvPadding = dconvPadding;
+        /** @type {Number} - The deconvolution upscale methods due to striding or stretched padding, as defined in @ModelNode.Layer.Deconvolution.UpscaleTypes .   --- BETA */
+        this.dconvUpscale = dconvUpscale;
+        /** @type {Number} - A value defined in @ModelNode.Layer.Deconvolution.AlgorithmTypes . */
+        this.dconvAlgorithm = dconvAlgorithm;
         /** @type {String} - Any referenced weight that this layer mirrors for. */
         this.refLayerName = refLayerName;
         /** @type {Boolean} - Whether transpose is required for the referenced weight. */
@@ -6862,8 +7000,8 @@ class DCNNLayer extends ModelNode.Layer.Config {
     }
     
     /**
-     * Get the shape of preprocessed incoming nodes of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20181205
-     * @param {(Number|String)[]} combinedIncomingShape - A shape array of combined incoming shape.
+     * Get the shape of preprocessed incoming nodes of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20190718
+     * @param {Array<(Number|String)>} combinedIncomingShape - A shape array of combined incoming shape.
      * @param {Object} configChanges - Key-value pair object of any shape-related layer properties
      * @param {Map} centralizedMap - The affected layers info in the current change.
      * @returns {Array} - Return the shape of the pre-proccessed incoming shape.
@@ -6874,7 +7012,7 @@ class DCNNLayer extends ModelNode.Layer.Config {
         if (refLayerName) {
             // Get the layer properties from the changed or original reference layer configs.
             refLayerInfo = centralizedMap.get(refLayerName);
-            hasRefLayerInfo = new Boolean(refLayerInfo);
+            hasRefLayerInfo = !!refLayerInfo;
             refLayer = this.train.layerProfiles.get(refLayerName);
             
             // No reference for non-matched type of layer.
@@ -6900,13 +7038,16 @@ class DCNNLayer extends ModelNode.Layer.Config {
             // Determine whether transpose is needed. If neither transpose can be operated, this cannot be referenced, and the changes can't be applied.
             var refInputShape = (hasRefLayerInfo && "preprocessedIncomingShape" in refLayerInfo) ? refLayerInfo.preprocessedIncomingShape : refLayer.getPreprocessedIncomingShape();
             var refOutputShape = (hasRefLayerInfo && "outputShape" in refLayerInfo) ? refLayerInfo.outputShape : refLayer.getOutputShape();
+            const refLayerTranspose = configChanges.refLayerTranspose = refLayer instanceof ModelNode.Layer.Convolution;
+
+            // Raise error if either referenced input and output shape can not match with the currently preprocessed incoming shape.
+            if ((refLayerTranspose && !Matrix.shapeEquals(refOutputShape, preprocessedIncomingShape)) || (!refLayerTranspose && !Matrix.shapeEquals(refInputShape, preprocessedIncomingShape))) return null;
             
             // Apply other reference layer configurations.
-            configChanges.refLayerTranspose = refLayer._type == "CNNLayer";
             configChanges.layerUnits = refLayerTranspose ? refInputShape.slice(-1)[0] : refOutputShape.slice(-1)[0];
-            if (refLayer._type == "DCNNLayer") configChanges.dconvPadding = (hasRefLayerInfo && "dconvPadding" in refLayerInfo) ? refLayerInfo.dconvPadding : refLayer.dconvPadding;
+            if (refLayer._type == "DCNNLayer") configChanges.dconvPadding = (hasRefLayerInfo && "dconvPadding" in refLayerInfo.configChanges) ? refLayerInfo.configChanges.dconvPadding : refLayer.dconvPadding;
             ["convFilterWidth", "convPadding", "convStride", "convDilation", "linearTransform"].forEach(prop=>{
-                configChanges[prop] = (hasRefLayerInfo && prop in refLayerInfo) ? refLayerInfo[prop] : refLayer[prop];
+                configChanges[prop] = (hasRefLayerInfo && prop in refLayerInfo.configChanges) ? refLayerInfo.configChanges[prop] : refLayer[prop];
             });
         }
 
@@ -6914,8 +7055,210 @@ class DCNNLayer extends ModelNode.Layer.Config {
     }
 
     /**
-     * Get the shape of layer-specific-processed tensor of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20181127
-     * @param {(Number|String)[]} preprocessedIncomingShape - A shape array of pre-proccessed incoming shape.
+     * Get the shape of layer-specific-processed tensor of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20190726
+     * @param {Array<(Number|String)>} preprocessedIncomingShape - A shape array of pre-proccessed incoming shape.
+     * @returns {Array} - Return the shape of the tensor after layer-specific operation.
+     */
+    processOperationShape(preprocessedIncomingShape, configChanges = {}) {
+        // Get the layer properties from either config changes or original configs.
+        var convPadding = "convPadding" in configChanges? configChanges.convPadding : this.convPadding;
+        var convFilterWidth = "convFilterWidth" in configChanges? configChanges.convFilterWidth : this.convFilterWidth;
+        var convStride = "convStride" in configChanges? configChanges.convStride : this.convStride;
+        var convDilation = "convDilation" in configChanges? configChanges.convDilation : this.convDilation;
+        var layerUnits = "layerUnits" in configChanges ? configChanges.layerUnits : this.layerUnits;
+        var dconvAlgorithm = "dconvAlgorithm" in configChanges ? configChanges.dconvAlgorithm : this.dconvAlgorithm;
+
+        // Return error for incompatible settings.
+        if (convDilation > 1 && this.train.device.startsWith("/cpu")) {
+            // Convolutional layer dilation cannot be used with CPU computation.
+            return new TrialResult(false, "dilationDeviceErr");
+        } else if (dconvAlgorithm == ModelNode.Layer.Deconvolution.AlgorithmTypes.Conv2DTranspose && convDilation > 1 && convStride.some(s=>s>1)) {
+            return new TrialResult(false, "dconvDilationStrideErr")
+        }
+        
+        // Simulate the shape algorithm and determine whether convolutionalal padding is used.
+        if (convPadding) {
+            return [preprocessedIncomingShape[0], preprocessedIncomingShape[1] * convStride[0], preprocessedIncomingShape[2] * convStride[1], layerUnits];
+        } else {
+            // If no padding is used, the shape will be changed according to the CNN filter and dilation configurations.
+            // Ref: https://github.com/tensorflow/tensorflow/blob/r1.14/tensorflow/python/keras/utils/conv_utils.py (def deconv_output_length)
+            var height = preprocessedIncomingShape[1];
+            var width = preprocessedIncomingShape[2];
+            var paddingPxH = Math.max(convFilterWidth+(convDilation-1)*(convFilterWidth-1) - convStride[0], 0);
+            var paddingPxW = Math.max(convFilterWidth+(convDilation-1)*(convFilterWidth-1) - convStride[1], 0);
+            var newHeight = height*convStride[0]+paddingPxH;
+            var newWidth = width*convStride[1]+paddingPxW;
+
+            // Ensure DCNN on previous image produce an image, i.e. filter with dilation size larger than original image size.
+            if (newWidth > 0 && newHeight > 0) {
+                return [preprocessedIncomingShape[0], newHeight, newWidth, layerUnits];
+            } else return null;
+        }
+    }
+
+    /**
+     * Enumeration definining the deconvolutional padding methods.   --- BETA --- UPDATED (Dexter) 20190725
+     */
+    static get PaddingTypes() {
+        return new Enum({
+            /** @type {Number} - Pad with zeros. */
+            Zeros: 0, 
+            /** @type {Number} - Stretch and upscale the original image. */
+            Stretch: 1
+        });
+    }
+
+    /**
+     * Enumeration definining the deconvolutional upscale methods due to striding or stretched padding.   --- BETA --- UPDATED (Dexter) 20190725
+     */
+    static get UpscaleTypes() {
+        return new Enum({
+            /** @type {Number} - Enlarge the image using bicubic resize. */
+            Bicubic: 0, 
+            /** @type {Number} - Enlarge the image using bilinear resize. */
+            Bilinear: 1, 
+            /** @type {Number} - Enlarge the image using nearest neighbor resize. */
+            NearestNeighbor: 2, 
+            /** @type {Number} - Pad the image with zeros. */
+            PadZeros: 3,
+            /** @type {Number} - Add zeros between original pixels. */
+            InsertZeros: 4
+        });
+    }
+
+    /**
+     * Enumeration definining the deconvolutional layer algorithms.   --- UPDATED (Dexter) 20190725
+     */
+    static get AlgorithmTypes() {
+        return new Enum({
+            /** @type {Number} - Use TensorFlow native Convolution 2D Transpose. */
+            Conv2DTranspose: 0, 
+            /** @type {Number} - Upscale the image and follow by a convolutional 2D layer.   --- BETA */
+            ScaleThenConv2D: 1
+        });
+    }
+}
+
+/** Class representing a 1D convolutional layer.   --- UPDATED (Dexter) 20180723. */
+class _ModelNodeLayerConvolution1D extends ModelNode.Layer.Config {
+    /**
+     * Create a 1D convolutional layer.   --- UPDATED (Dexter) 20190723
+     * @param {String} name - The name of this layer.
+     * @param {Number} layerUnits - The number of hidden units in this layer.
+     * @param {Number} convFilterWidth - The convolutional layer filter width.
+     * @param {Boolean} convPadding - Whether to use padding on this convolutional layer, i.e. the output image size will be the same as the previous one.
+     * @param {Number} convStride - The stride of the convolutional layer filter.
+     * @param {Number} convDilation - The convolution dilation of the convolutional layer filter.
+     * @param {Array} reshape - The shape of reshaping previous layers. If not specified, it will automatically reshaped if the previous layer can't interpret as an image.
+     * @param {String} refLayerName - Any referenced weight that this layer mirrors for.
+     * @param {Boolean} refLayerTranspose - Whether transpose is required for the referenced weight.
+     * @param {IncomingConfig} incomingConfig - Input configurations.
+     * @param {LinearTransformConfig} linearTransform - The linear transformation configuration.
+     * @param {String} activation - The activation function of this layer.
+     * @param {Object} activationParams - Activation parameters as defined in Tensorflow.
+     * @param {Boolean} batchNorm - Whether to use batch normalization before activation function.
+     * @param {Object} batchNormParams - Batch normalization parameters as defined in Tensorflow.
+     * @param {OutputConfig} outputConfig - - Output configurations.
+     */
+    constructor(name=null, layerUnits = 30, convFilterWidth=3, convPadding=true, convStride=1, convDilation=1, reshape=null, refLayerName = null, refLayerTranspose = false, 
+                incomingConfig = new IncomingConfig.Concat(),
+                linearTransform = LinearTransformConfig.createBasicConfig(0, 0.05, false, true, undefined, 0.0001, 0.001),
+                activation = "relu", activationParams = {}, 
+                batchNorm = true,  batchNormParams = {}, 
+                outputConfig = new OutputConfig.Default()) {
+        super(ModelNode.Layer.Types.Convolution1D, name, layerUnits, false, incomingConfig, linearTransform, 
+                activation, activationParams, 
+                batchNorm, batchNormParams, 100, outputConfig);
+        /** @type {Number} - The convolutional layer filter width. */
+        this.convFilterWidth = convFilterWidth;
+        /** @type {Boolean} - Whether to use padding on this convolutional layer, i.e. the output image size will be the same as the previous one. */
+        this.convPadding = convPadding;
+        /** @type {Number} - The stride of the convolutional layer filter. */
+        this.convStride = convStride;
+        /** @type {Number} - The convolution dilation of the convolutional layer filter. */
+        this.convDilation = convDilation;
+        /** @type {Array<Number>} - The shape of reshaping previous layers. If `null`, it will automatically reshaped if the previous layer can't interpret as an image. */
+        this.reshape = reshape;
+        /** @type {String} - Any referenced weight that this layer mirrors for. */
+        this.refLayerName = refLayerName;
+        /** @type {Boolean} - Whether transpose is required for the referenced weight. */
+        this.refLayerTranspose = refLayerTranspose;
+    }
+
+    /**
+     * Get the shape of preprocessed incoming nodes of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20190727
+     * @param {Array<(Number|String)>} combinedIncomingShape - A shape array of combined incoming shape.
+     * @param {Object} configChanges - Key-value pair object of any shape-related layer properties
+     * @param {Map} centralizedMap - The affected layers info in the current change.
+     * @returns {Array} - Return the shape of the pre-proccessed incoming shape.
+     */
+    preprocessIncomingShape(combinedIncomingShape, configChanges = {}, centralizedMap = new Map()) {
+        // Apply layer configs from referencing layer.
+        var refLayerName = configChanges.refLayerName || this.refLayerName, refLayerInfo, hasRefLayerInfo = false;
+        /** @type {_ModelNodeLayerConfig} */
+        var refLayer;
+        if (refLayerName) {
+            // Get the layer properties from the changed or original reference layer configs.
+            refLayerInfo = centralizedMap.get(refLayerName);
+            hasRefLayerInfo = !!refLayerInfo;
+            refLayer = this.train.layerProfiles.get(refLayerName);
+            
+            // No reference for non-matched type of layer.
+            if (![ModelNode.Layer.Types.Convolution1D, ModelNode.Layer.Types.Convolution1D].includes(refLayer.layerType)) return null;
+            
+            // Update auto reshape.
+            configChanges.reshape = (hasRefLayerInfo && reshape in refLayerInfo.configChanges) ? refLayerInfo.configChanges.reshape : refLayer.reshape;
+        }
+
+        // Apply preprocessing reshape to support convolutional layer for other shapes of data.
+        var preprocessedIncomingShape;
+        if (combinedIncomingShape.length != 3) {
+            var reshape = "reshape" in configChanges ? configChanges.reshape : this.reshape;
+            if (reshape == null) {
+                if (combinedIncomingShape.length > 3) {
+                    // If more than 3 dimension, flatten to the 3rd dim.
+                    const flattenSize = combinedIncomingShape.slice(2).reduce((a,b) => a*b, 1);
+                    preprocessedIncomingShape = [...combinedIncomingShape.slice(0,2), flattenSize];
+                } else if (combinedIncomingShape.length == 2) {
+                    // If only 2 dimension, auto reshape to a sequence with 1 channel.
+                    preprocessedIncomingShape = [...combinedIncomingShape, 1];
+                } else if (combinedIncomingShape.length == 1) return null;
+            } else {
+                // Check whether the reshape is matched with fromShape.
+                var originalFromShapeTotal = combinedIncomingShape.slice(1).reduce((a,b)=>a*b,1);
+                var newReshape = reshape.reduce((a,b)=>a*b,1);
+                if (originalFromShapeTotal != newReshape) return null;
+                else if (reshape.length != 2) return null;
+
+                // Update the reshape.
+                preprocessedIncomingShape = [combinedIncomingShape[0], ...reshape];
+            }
+        } else {
+            preprocessedIncomingShape = combinedIncomingShape;
+        }
+
+        if (refLayerName) {
+            // Determine whether transpose is needed. If neither transpose can be operated, this cannot be referenced, and the changes can't be applied.
+            var refInputShape = (hasRefLayerInfo && "preprocessedIncomingShape" in refLayerInfo) ? refLayerInfo.preprocessedIncomingShape : refLayer.getPreprocessedIncomingShape();
+            var refOutputShape = (hasRefLayerInfo && "outputShape" in refLayerInfo) ? refLayerInfo.outputShape : refLayer.getOutputShape();
+            const refLayerTranspose = configChanges.refLayerTranspose = refLayer instanceof ModelNode.Layer.Deconvolution1D;
+
+            // Raise error if either referenced input and output shape can not match with the currently preprocessed incoming shape.
+            if ((refLayerTranspose && !Matrix.shapeEquals(refOutputShape, preprocessedIncomingShape)) || (!refLayerTranspose && !Matrix.shapeEquals(refInputShape, preprocessedIncomingShape))) return null;
+            
+            // Apply other reference layer configurations.
+            configChanges.layerUnits = refLayerTranspose ? refInputShape.slice(-1)[0] : refOutputShape.slice(-1)[0];
+            ["convFilterWidth", "convPadding", "convStride", "convDilation", "linearTransform"].forEach(prop=>{
+                configChanges[prop] = (hasRefLayerInfo && prop in refLayerInfo.configChanges) ? refLayerInfo.configChanges[prop] : refLayer[prop];
+            });
+        }
+
+        return preprocessedIncomingShape;
+    }
+
+    /**
+     * Get the shape of layer-specific-processed tensor of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20190723
+     * @param {Array<(Number|String)>} preprocessedIncomingShape - A shape array of pre-proccessed incoming shape.
      * @returns {Array} - Return the shape of the tensor after layer-specific operation.
      */
     processOperationShape(preprocessedIncomingShape, configChanges = {}) {
@@ -6926,44 +7269,155 @@ class DCNNLayer extends ModelNode.Layer.Config {
         var convDilation = "convDilation" in configChanges? configChanges.convDilation : this.convDilation;
         var layerUnits = "layerUnits" in configChanges ? configChanges.layerUnits : this.layerUnits;
 
-        // Determine whether CNN padding is used.
+        // Determine whether convolutional padding is used.
         if (convPadding) {
-            return [...preprocessedIncomingShape.slice(0,-1), layerUnits];
+            return [preprocessedIncomingShape[0], Math.ceil(preprocessedIncomingShape[1] / convStride), layerUnits];
         } else {
-            // If no padding is used, the shape will be changed according to the CNN filter and dilation configurations.
-            var height = preprocessedIncomingShape[1];
-            var width = preprocessedIncomingShape[2];
-            var paddingPxH = convFilterWidth+convDilation*(convFilterWidth-1)-1+height*(convStride[0] - 1);
-            var paddingPxW = convFilterWidth+convDilation*(convFilterWidth-1)-1+width*(convStride[1] - 1);
-            var newHeight = height+paddingPxH;
-            var newWidth = width+paddingPxW;
+            // If no padding is used, the shape will be changed according to the convolutional filter and dilation configurations.
+            var seqLength = preprocessedIncomingShape[1];
+            var stridesLength = seqLength - (convFilterWidth + (convDilation - 1) * (convFilterWidth-1)) + 1;
+            var newLength = Math.ceil(stridesLength / convStride);
 
-            // Ensure DCNN on previous image produce an image, i.e. filter with dilation size larger than original image size.
-            if (newWidth > 0 && newHeight > 0) {
-                return [preprocessedIncomingShape[0], newHeight, newWidth, layerUnits];
+            // Ensure convolutional operation on previous image produce an image, i.e. filter with dilation size larger than original image size.
+            if (newLength > 0) {
+                return [preprocessedIncomingShape[0], newLength, layerUnits];
             } else return null;
         }
     }
+}
+
+/** Class representing a 1D deconvolutional Layer.   --- UPDATED (Dexter) 20190723 */
+class _ModelNodeLayerDeconvolution1D extends ModelNode.Layer.Config {
+    /**
+     * Create a 1D deconvolutional layer.   --- UPDATED (Dexter) 20190723
+     * @param {String} name - The name of this layer.
+     * @param {Number} layerUnits - The number of hidden units in this layer.
+     * @param {Number} convFilterWidth - The deconvolution filter width.
+     * @param {Boolean} convPadding - Whether to use padding on this deconvolution layer, i.e. the output image size will be the same as the previous one.
+     * @param {Array<Number>} convStride - The stride of this deconvolution filter.   --- BETA
+     * @param {Number} convDilation - The convolution dilation of this deconvolution filter.
+     * @param {String} refLayerName - Any referenced kernal that this layer mirrors for.
+     * @param {Boolean} refLayerTranspose - Whether transpose is required for the referenced weight.
+     * @param {IncomingConfig} incomingConfig - Input configurations.
+     * @param {LinearTransformConfig} linearTransform - The linear transformation configuration.
+     * @param {String} activation - The activation function of this layer.
+     * @param {Object} activationParams - Activation parameters as defined in Tensorflow.
+     * @param {Boolean} batchNorm - Whether to use batch normalization before activation function.
+     * @param {Object} batchNormParams - Batch normalization parameters as defined in Tensorflow.
+     */
+    constructor(name=null, layerUnits=30, convFilterWidth=3, convPadding=true, convStride=[1,1], convDilation=1, refLayerName=null, refLayerTranspose = false, 
+                incomingConfig = new IncomingConfig.Concat(),
+                linearTransform = LinearTransformConfig.createBasicConfig(0, 0.05, false, true, undefined, 0, 0.001),
+                activation = "relu", activationParams = {}, 
+                batchNorm = true, batchNormParams = {}, 
+                outputConfig = new OutputConfig.Default()) {
+        super(ModelNode.Layer.Types.Deconvolution, name, layerUnits, false, incomingConfig, linearTransform,
+                activation, activationParams, 
+                batchNorm, batchNormParams, 100, outputConfig);
+        /** @type {Number} - The deconvolution layer filter width. */
+        this.convFilterWidth = convFilterWidth;
+        /** @type {Boolean} - Whether to use padding on this deconvolution layer, i.e. the output image size will be the same as the previous one. */
+        this.convPadding = convPadding;
+        /** @type {{0: Number, 1: Number}} - The stride of the deconvolution layer filter. */
+        this.convStride = convStride;
+        /** @type {Number} - The convolution dilation of this deconvolution filter.*/
+        this.convDilation = convDilation;
+        /** @type {String} - Any referenced weight that this layer mirrors for. */
+        this.refLayerName = refLayerName;
+        /** @type {Boolean} - Whether transpose is required for the referenced weight. */
+        this.refLayerTranspose = refLayerTranspose;
+        this._type = "DCNNLayer";
+        [this._convStrideY, this._convStrideX] = convStride;
+    }
+    
+    /**
+     * Get the shape of preprocessed incoming nodes of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20190723
+     * @param {Array<(Number|String)>} combinedIncomingShape - A shape array of combined incoming shape.
+     * @param {Object} configChanges - Key-value pair object of any shape-related layer properties
+     * @param {Map} centralizedMap - The affected layers info in the current change.
+     * @returns {Array} - Return the shape of the pre-proccessed incoming shape.
+     */
+    preprocessIncomingShape(combinedIncomingShape, configChanges = {}, centralizedMap = new Map()) {
+        // Apply layer configs from referencing layer.
+        var refLayerName = configChanges.refLayerName || this.refLayerName, refLayerInfo, hasRefLayerInfo = false, refLayer;
+        if (refLayerName) {
+            // Get the layer properties from the changed or original reference layer configs.
+            refLayerInfo = centralizedMap.get(refLayerName);
+            hasRefLayerInfo = !!refLayerInfo;
+            refLayer = this.train.layerProfiles.get(refLayerName);
+            
+            // No reference for non-matched type of layer.
+            if (![ModelNode.Layer.Convolution1D, ModelNode.Layer.Deconvolution1D].includes(refLayer.layerType)) return null;
+        }
+
+        // Apply preprocessing reshape to support deconvolutional layer for other shapes of data.
+        var preprocessedIncomingShape;
+        if (combinedIncomingShape.length != 3) {
+            if (combinedIncomingShape.length > 3) {
+                // If more than 3 dimension, flatten to the 3rd dim.
+                const flattenSize = combinedIncomingShape.slice(2).reduce((a,b) => a*b, 1);
+                preprocessedIncomingShape = [...combinedIncomingShape.slice(0,2), flattenSize];
+            } else if (combinedIncomingShape.length == 2) {
+                // If only 2 dimension, supplement a dimension.
+                preprocessedIncomingShape = [...combinedIncomingShape, 1];
+            } else return null; // 1 or lower dimension is not supported.
+        } else {
+            preprocessedIncomingShape = combinedIncomingShape;
+        }
+
+        if (refLayerName) {
+            // Determine whether transpose is needed. If neither transpose can be operated, this cannot be referenced, and the changes can't be applied.
+            var refInputShape = (hasRefLayerInfo && "preprocessedIncomingShape" in refLayerInfo) ? refLayerInfo.preprocessedIncomingShape : refLayer.getPreprocessedIncomingShape();
+            var refOutputShape = (hasRefLayerInfo && "outputShape" in refLayerInfo) ? refLayerInfo.outputShape : refLayer.getOutputShape();
+            const refLayerTranspose = configChanges.refLayerTranspose = refLayer instanceof ModelNode.Layer.Convolution1D;
+
+            // Raise error if either referenced input and output shape can not match with the currently preprocessed incoming shape.
+            if ((refLayerTranspose && !Matrix.shapeEquals(refOutputShape, preprocessedIncomingShape)) || (!refLayerTranspose && !Matrix.shapeEquals(refInputShape, preprocessedIncomingShape))) return null;
+            
+            // Apply other reference layer configurations.
+            configChanges.layerUnits = refLayerTranspose ? refInputShape.slice(-1)[0] : refOutputShape.slice(-1)[0];
+            if (refLayer._type == "DCNNLayer") configChanges.dconvPadding = (hasRefLayerInfo && "dconvPadding" in refLayerInfo.configChanges) ? refLayerInfo.configChanges.dconvPadding : refLayer.dconvPadding;
+            ["convFilterWidth", "convPadding", "convStride", "convDilation", "linearTransform"].forEach(prop=>{
+                configChanges[prop] = (hasRefLayerInfo && prop in refLayerInfo.configChanges) ? refLayerInfo.configChanges[prop] : refLayer[prop];
+            });
+        }
+
+        return preprocessedIncomingShape;
+    }
 
     /**
-     * Enumeration definining the methods for deconvolutional padding.   --- UPDATED (Dexter) 20181217
+     * Get the shape of layer-specific-processed tensor of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20190723
+     * @param {Array<(Number|String)>} preprocessedIncomingShape - A shape array of pre-proccessed incoming shape.
+     * @returns {Array} - Return the shape of the tensor after layer-specific operation.
      */
-    static get PaddingTypes() { 
-        return new Enum({
-            /** @type {Number} - Enlarge the image using bicubic resize. */
-            Bicubic: 0, 
-            /** @type {Number} - Enlarge the image using bilinear resize */
-            Bilinear: 1, 
-            /** @type {Number} - Enlarge the image using nearest neighbor resize. */
-            NearestNeighbor: 2, 
-            /** @type {Number} - Pad the image with zeros. */
-            Zeros: 3
-        });
+    processOperationShape(preprocessedIncomingShape, configChanges = {}) {
+        // Get the layer properties from either config changes or original configs.
+        var convPadding = "convPadding" in configChanges? configChanges.convPadding : this.convPadding;
+        var convFilterWidth = "convFilterWidth" in configChanges? configChanges.convFilterWidth : this.convFilterWidth;
+        var convStride = "convStride" in configChanges? configChanges.convStride : this.convStride;
+        var convDilation = "convDilation" in configChanges? configChanges.convDilation : this.convDilation;
+        var layerUnits = "layerUnits" in configChanges ? configChanges.layerUnits : this.layerUnits;
+
+        // Determine whether convolutional padding is used.
+        if (convPadding) {
+            return [preprocessedIncomingShape[0], preprocessedIncomingShape[1] * convStride, layerUnits];
+        } else {
+            // If no padding is used, the shape will be changed according to the convolutional filter and dilation configurations.
+            // Ref: https://github.com/tensorflow/tensorflow/blob/r1.14/tensorflow/python/keras/utils/conv_utils.py (def deconv_output_length)
+            var seqLength = preprocessedIncomingShape[1];
+            var paddingPx = Math.max(convFilterWidth+(convDilation-1)*(convFilterWidth-1) - convStride, 0);
+            var newLength = seqLength*convStride+paddingPx;
+
+            // Ensure deconvolutional operation on previous image produce an image, i.e. filter with dilation size larger than original image size.
+            if (newLength > 0) {
+                return [preprocessedIncomingShape[0], newLength, layerUnits];
+            } else return null;
+        }
     }
 }
 
 /** Class representing a final layer (training task).   --- UPDATED (Dexter) 20180524 */
-class FinalLayer extends ModelNode.Layer.Config {
+class _ModelNodeLayerTaskConfig extends ModelNode.Layer.Config {
     /**
      * Creates a final layer.   --- UPDATED (Dexter) 20190221
      * @param {Number} taskType
@@ -7011,7 +7465,7 @@ class FinalLayer extends ModelNode.Layer.Config {
 
     /**
      * Get the shape of output of this layer, with no output processing of FinalLayer.   --- UPDATED (Dexter) 20181127
-     * @param {(Number|String)[]} operatedShape - A shape array of layer-specific operations.
+     * @param {Array<(Number|String)>} operatedShape - A shape array of layer-specific operations.
      * @returns {Array} - Return the shape of the output tensor.
      */
     processOperatedShape(operatedShape, configChanges = {}) {
@@ -7020,7 +7474,7 @@ class FinalLayer extends ModelNode.Layer.Config {
 
     /**
      * Apply any shape changes based on preceding layer changes or changes made in the layer properties.   --- UPDATED (Dexter) 20180824
-     * @param {Object[]} fromShapeChanges - See definition on LayerProfile.getInputShape() method.
+     * @param {Array<Object>} fromShapeChanges - See definition on ModelNode.Layer.Config.getInputShape() method.
      * @param {Object} configChanges - Key-value pair object of any shape-related layer properties
      * @param {Boolean} applyImmediately - Whether effect will be taken immediately on any changes once confirm proceeding layers have no conflicts.
      * @param {Map} centralizedMap - The affected layers info in the current change.
@@ -7064,7 +7518,7 @@ class FinalLayer extends ModelNode.Layer.Config {
      */
     remove() {
         // Get the model editing build no.
-        const buildNo = this.train._editingBuild;
+        const buildNo = this.train.editingBuild;
 
         // Delete the layer from Train collections.
         this.train.layerProfiles.delete(this.name);
@@ -7089,7 +7543,7 @@ class FinalLayer extends ModelNode.Layer.Config {
      */
     updateOrder() {
         // Get the model editing build no.
-        const buildNo = this.train._editingBuild;
+        const buildNo = this.train.editingBuild;
 
         this._order[buildNo] = Math.max(...this.train.getEndingLayerProfiles().filter(lp=>lp!=this).map(lp=>lp._order[buildNo]), ...this.fromNode[buildNo].map(lp=>lp._order[buildNo]), 0) + 1;
     }
@@ -7124,7 +7578,7 @@ class Classifier extends ModelNode.Layer.Task.Config {
 
     /**
      * Apply any shape changes based on preceding layer changes or changes made in the layer properties.   --- UPDATED (Dexter) 20190213
-     * @param {Object[]} fromShapeChanges - See definition on LayerProfile.getInputShape() method.
+     * @param {Array<Object>} fromShapeChanges - See definition on ModelNode.Layer.Config.getInputShape() method.
      * @param {Object} configChanges - Key-value pair object of any shape-related layer properties
      * @param {Boolean} applyImmediately - Whether effect will be taken immediately on any changes once confirm proceeding layers have no conflicts.
      * @param {Map} centralizedMap - The affected layers info in the current change.
@@ -7145,8 +7599,8 @@ class Classifier extends ModelNode.Layer.Task.Config {
     }
 
     /**
-     * Get the shape of layer-specific-processed tensor of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20181126
-     * @param {(Number|String)[]} preprocessedIncomingShape - A shape array of pre-proccessed incoming shape.
+     * Get the shape of layer-specific-processed tensor of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20190717
+     * @param {Array<(Number|String)>} preprocessedIncomingShape - A shape array of pre-proccessed incoming shape.
      * @returns {Array} - Return the shape of the tensor after layer-specific operation.
      */
     processOperationShape(preprocessedIncomingShape, configChanges = {}) {
@@ -7168,7 +7622,7 @@ class Classifier extends ModelNode.Layer.Task.Config {
 
         // Check if the previous shape dimension is more or equal to the comparing shape.
         const targetDim = compareShape.length;
-        if (!shapeEquals(preprocessedIncomingShape.slice(0,targetDim), compareShape.slice(0,targetDim))) return null;
+        if (!Matrix.shapeEquals(preprocessedIncomingShape.slice(0,targetDim), compareShape.slice(0,targetDim))) return null;
 
         // Linear transform to flatten the previous layer up to the feature-realted dimensions and fully connected to the target shape.
         var midShape = LinearTransformConfig.processOperationShape(preprocessedIncomingShape, toClassCount, targetDim);
@@ -7210,7 +7664,7 @@ class Regressor extends ModelNode.Layer.Task.Config {
 
     /**
      * Apply any shape changes based on preceding layer changes or changes made in the layer properties.   --- UPDATED (Dexter) 20190213
-     * @param {Object[]} fromShapeChanges - See definition on LayerProfile.getInputShape() method.
+     * @param {Array<Object>} fromShapeChanges - See definition on ModelNode.Layer.Config.getInputShape() method.
      * @param {Object} configChanges - Key-value pair object of any shape-related layer properties
      * @param {Boolean} applyImmediately - Whether effect will be taken immediately on any changes once confirm proceeding layers have no conflicts.
      * @param {Map} centralizedMap - The affected layers info in the current change.
@@ -7231,8 +7685,8 @@ class Regressor extends ModelNode.Layer.Task.Config {
     }
 
     /**
-     * Get the shape of layer-specific-processed tensor of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20181126
-     * @param {(Number|String)[]} preprocessedIncomingShape - A shape array of pre-proccessed incoming shape.
+     * Get the shape of layer-specific-processed tensor of this layer by immitating the combined incoming shape preprocessing.   --- UPDATED (Dexter) 20190717
+     * @param {Array<(Number|String)>} preprocessedIncomingShape - A shape array of pre-proccessed incoming shape.
      * @returns {Array} - Return the shape of the tensor after layer-specific operation.
      */
     processOperationShape(preprocessedIncomingShape, configChanges = {}) {
@@ -7241,7 +7695,7 @@ class Regressor extends ModelNode.Layer.Task.Config {
         var compareTensorIdx = "compareTensorIdx" in configChanges ? configChanges.compareTensorIdx : this.compareTensorIdx;
         var compareShape = "shape" in configChanges ? configChanges.shape : this.train.getDataSource(compareSourceID, compareTensorIdx).getShape();
 
-        if (shapeEquals(preprocessedIncomingShape, compareShape)) {
+        if (Matrix.shapeEquals(preprocessedIncomingShape, compareShape)) {
             // If the shape is already matched, no conversion is needed.
             return [...compareShape];
         } else {
@@ -7315,7 +7769,7 @@ class InputRange {
 
     /**
      * Set the data values on the available points of the input range.   --- UPDATED (Dexter) 20180806
-     * @param {Number[]} - An array of numbers of valid values.
+     * @param {Array<Number>} - An array of numbers of valid values.
      */
     setDataValues(ary) {
         this.step = -1;
@@ -7468,7 +7922,7 @@ class SpreadSheet  {
      * @param {Boolean} hideMoreRow - Whether to show ... instead of full table.
      * @param {Array} table - The 2D array of original data.
      * @param {Boolean} editable - Whether this spreadsheet is editable.
-     * @param {Number[]} activeCellID - A pair of integer describing the current active cell position in [x,y] format.
+     * @param {Array<Number>} activeCellID - A pair of integer describing the current active cell position in [x,y] format.
      * @param {Boolean} makeActiveDefault - Enforce a default active cell for any click on the spreadsheet as the constructor activeCellID.
      */
     constructor(id, row=null, col=null, hasHeader=false, showGridID=false, hideMoreCol=true, hideMoreRow=true, table=[], editable=false, activeCellID=[0,0], makeActiveDefault=false) {
@@ -7825,8 +8279,8 @@ class SpreadSheet  {
 
     /**
      * Force to focus on a cell.   --- UPDATED (Dexter) 20181208
-     * @param {Number[]} selectionStart - The row and col position of the start cell of the spreadsheet.
-     * @param {Number[]} selectionEnd - The row and col position of the end cell of the spreadsheet.
+     * @param {Array<Number>} selectionStart - The row and col position of the start cell of the spreadsheet.
+     * @param {Array<Number>} selectionEnd - The row and col position of the end cell of the spreadsheet.
      * @param {Boolean} updatingColSel - Whether this selection will update the column selection, typically false when it's only a resuming selection.
      */
     setSelection(selectionStart, selectionEnd = null, updatingColSel = true) {
@@ -7871,8 +8325,8 @@ class SpreadSheet  {
 
     /**
      * Set the selected data.   --- UPDATED (Dexter) 20181221
-     * @param {Number[]} selectionStart - The row and col position of the start cell of the spreadsheet.
-     * @param {Number[]} selectionEnd - The row and col position of the end cell of the spreadsheet.
+     * @param {Array<Number>} selectionStart - The row and col position of the start cell of the spreadsheet.
+     * @param {Array<Number>} selectionEnd - The row and col position of the end cell of the spreadsheet.
      * @param {Boolean} includeHeader - Whether header is included within the selected data.
      * @param {Boolean} updatingColSel - Whether this selection will update the column selection, typically false when it's only a resuming selection.
      */
@@ -7981,8 +8435,8 @@ class SpreadSheet  {
 
     /**
      * Change the highlight status of an area of cells.   --- UPDATED (Dexter) 20181210
-     * @param {Number[]} fromCellPos - The from cell position.
-     * @param {Number[]} toCellPos - The to cell position.
+     * @param {Array<Number>} fromCellPos - The from cell position.
+     * @param {Array<Number>} toCellPos - The to cell position.
      * @param {Boolean} mode - Whether to highlight the cells.
      */
     changeHighlightArea(fromCellPos, toCellPos = null, mode = true) {
@@ -8275,8 +8729,8 @@ class SpreadSheet  {
 
     /**
      * Refresh the data on the HTML spreadsheet from a specific range.   --- UPDATED (Dexter) 20190127
-     * @param {Number[]} rangeStart - The start coordinate (inclusive)
-     * @param {Number[]} relativeEnd - The end coordinate (exclusive)
+     * @param {Array<Number>} rangeStart - The start coordinate (inclusive)
+     * @param {Array<Number>} relativeEnd - The end coordinate (exclusive)
      */
     showData(rangeStart = null, relativeEnd = null) {
         // Get the data and its shape
@@ -8430,8 +8884,8 @@ class SpreadSheet  {
     
     /**
      * Convert coordinates from the data array position to the HTML element.   --- UPDATED (Dexter) 20181210
-     * @param {Number[]} coor - Corrdinate of the data cell in the data array position in (y,x).
-     * @returns {Number[]} - Coordinates of the data cell in the HTML element.
+     * @param {Array<Number>} coor - Corrdinate of the data cell in the data array position in (y,x).
+     * @returns {Array<Number>} - Coordinates of the data cell in the HTML element.
      */
     toChildrenCellPos(coor) {
         return [Math.min(coor[0], this.rowCount)+((this.showGridID||this.hasHeader)?1:0), Math.min(coor[1], this.colCount)+(this.showGridID?1:0)];
@@ -8439,7 +8893,7 @@ class SpreadSheet  {
 
     /**
      * Get the cell element from a position.   --- UPDATED (Dexter) 20181210
-     * @param {Number[]} pos - The position of the cell.
+     * @param {Array<Number>} pos - The position of the cell.
      * @param {Element} - The cell element.
      */
     getCellFromPos(pos) {
@@ -8448,8 +8902,8 @@ class SpreadSheet  {
 
     /**
      * Convert coordinates from the HTML element to the data array position.   --- UPDATED (Dexter) 20180524
-     * @param {Number[]} coor - Coordinates of the data cell in the HTML element in (y,x).
-     * @returns {Number[]} Corrdinate of the data cell in the data array position.
+     * @param {Array<Number>} coor - Coordinates of the data cell in the HTML element in (y,x).
+     * @returns {Array<Number>} Corrdinate of the data cell in the data array position.
      */
     toActualCellPos(coor) {
         return [coor[0]-((this.showGridID||this.hasHeader)?1:0), coor[1]-(this.showGridID?1:0)];
@@ -8489,14 +8943,14 @@ class SpreadSheet  {
 class ConnectingNodeInfo {
     /**
      * Create a connecting node information.   --- UPDATED (Dexter) 20181124
-     * @param {ModelNode.Layer.|DataPreprocessing.Node} layerOrSource - The layer name to copy existing info.
+     * @param {ModelNode.Layer.Config|DataPreprocessing.Node} layerOrSource - The layer name to copy existing info.
      * @param {Train} train - The editing train object. If no train is given, Project.now.train will be used.
      */
     constructor(layerOrSource, train) {
         const thisTrain = train || Project.now.train;
-        const build = thisTrain._editingBuild;
+        const build = thisTrain.editingBuild;
         this.buildNo = build;
-        this.type = layerOrSource instanceof LayerProfile ? "Layer" : "Source";
+        this.type = layerOrSource instanceof ModelNode.Layer.Config ? "Layer" : "Source";
         var details = {};
         if (this.type == "Layer") {
             details.layerName = layerOrSource.name;
@@ -8646,7 +9100,7 @@ class Project {
 
         // TODO [Model Editing/Model Drawing]
         // Action: Remove too many source HTML elements as from previous draw state to current draw state.
-        // Remarks: Multiple TrainSource has not been implemented.
+        // Remarks: Multiple @Source.Config has not been implemented.
         
         
         // Layers won't necessarily be sorted in Train.layerProfiles.
@@ -8654,7 +9108,7 @@ class Project {
         var layerNodeCounts = [], skipNodeCounts = [];
 
         // Get the model editing build no.
-        const buildNo = this.train._editingBuild;
+        const buildNo = this.train.editingBuild;
 
         // Add each layer into the graph. For graphical logic, the layer profiles are now sorted by the ._order proerty
         var layerProfiles = [...this.train.layerProfiles.entries()];
@@ -9004,12 +9458,12 @@ class Project {
     }
 
     /**
-     * To show properties on the right panel.   --- UPDATED (Dexter) 20190213
+     * To show properties on the right panel.   --- UPDATED (Dexter) 20190725
      * @param {String} type - "Train", "TrainSource", "ColConfig", "Layer".
      */
     showProp(type) {
         // Get the model editing build no.
-        const buildNo = this.train._editingBuild;
+        const buildNo = this.train.editingBuild;
 
         // Show the requesting property panel.
         [...$("editProp").getElementsByClassName("propWin")].forEach(ele=>{
@@ -9190,7 +9644,10 @@ class Project {
             layer.showNameOnEle($("propLayerName"));
 
             // Determine if it's now final layer, and assign a new key for clarifications.
-            var fullType = (layer._final ? "FinalLayer" : "Layer") + "-" + layer._type;
+            /** @type {String} - The description string of the layer type. */
+            const layerType = ModelNode.Layer.Types.getName(layer.layerType);
+            /** @type {String} - The concatenated string of the full layer type. */
+            var fullType = (layer._final ? "FinalLayer" : "Layer") + "-" + layerType;
 
             // Query for available "propGroup" that are applicable to this Layer type
             [...$("propWinLayer").getElementsByClassName("propGroup")].forEach(g=>{
@@ -9213,25 +9670,26 @@ class Project {
             });
 
             // Determine if it's now final layer, and assign a new key for clarifications.
-            const layerType = layer._type;
             $("propLayerType").dataset.lt = layerType;
             $("propLayerType").innerText = App.getTxtFromLang(layerType);
 
             // Determine if layer reference is allowed.
             var referenceable = false, hasRefLayer = layer.refLayerName != null;
             if (layer._order[buildNo] >= 1) {
+                /** @type {Array<_ModelNodeLayerConfig>} - All layers that has not reference other layers and is before this layer. */
                 var allLayers = [...Project.now.train.layerProfiles.values()].filter(l=>!l.refLayerName && l._order[buildNo] < layer._order[buildNo]);
+                /** @type {Array<_ModelNodeLayerConfig>} - All referenceable layers. */
+                var referenceableLayers = [];
+                /** @type {Array<Number>} Get the input shapes of this editing layer. */
+                var thisInputShapes = layer.getPreprocessedIncomingShape();
                 
-                if (layerType == "BasicLayer") {
-                    // Get the input shapes of this editing layer.
-                    var thisInputShapes = layer.getPreprocessedIncomingShape();
-                    
+                if (layer instanceof ModelNode.Layer.FullyConnected) {
                     // Filter possible layers that can be referenced.
-                    var basiclayers = allLayers.filter(l=>l._type == "BasicLayer").filter(l=>{
+                    referenceableLayers = allLayers.filter(l=>l instanceof ModelNode.Layer.FullyConnected).filter(l=>{
                         // Determine the shape match with this editing layer to check if transpose if needed.
                         var lInputShape = l.getPreprocessedIncomingShape();
                         var lOutputShape = l.getOutputShape();
-                        var refLayerTranspose = shapeEquals(lInputShape, thisInputShapes) ? false : shapeEquals(lOutputShape, thisInputShapes) ? true : null;
+                        var refLayerTranspose = Matrix.shapeEquals(lInputShape, thisInputShapes) ? false : Matrix.shapeEquals(lOutputShape, thisInputShapes) ? true : null;
 
                         // If no matched shape, this is not a referenceable layer.
                         if (refLayerTranspose === null) return false;
@@ -9247,20 +9705,45 @@ class Project {
                         // If there is no later layers, it's fine with any reference layers.
                         else return true;
                     });
+                } else if ((layer instanceof ModelNode.Layer.Convolution) || (layer instanceof ModelNode.Layer.Deconvolution)) {
+                    // Filter possible layers that can be referenced.
+                    referenceableLayers = allLayers.filter(l=>(l instanceof ModelNode.Layer.Convolution || l instanceof ModelNode.Layer.Deconvolution)).filter(l=>{
+                        // Determine the shape match with this editing layer to check if transpose if needed.
+                        var lInputShape = l.getPreprocessedIncomingShape();
+                        var lOutputShape = l.getOutputShape();
+                        const refLayerTranspose = (layer instanceof ModelNode.Layer.Convolution) ? l instanceof ModelNode.Layer.Deconvolution : l instanceof ModelNode.Layer.Convolution;
 
-                    if (basiclayers.length > 0) {
-                        // If it is a BasicLayer, find if there is any previous layer with the same input/output shape as current input shape.
-                        referenceable = true;
-    
-                        // Show the basic layer as options for parameters sharing.
-                        App.controlChildrenCount($("propLayerRef"), basiclayers.length+1, document.createElement("option"), undefined, undefined, (ele,idx)=>{
-                            if (idx >= 1) {
-                                ele.dataset.val = basiclayers[idx-1].name;
-                                basiclayers[idx-1].showNameOnEle(ele);
-                            }
-                        });
-                    }
-                } else if (["CNNLayer", "DCNNLayer"].includes(layerType)) {
+                        // Disable if either referenced input and output shape can not match with the currently preprocessed incoming shape.
+                        if ((refLayerTranspose && !Matrix.shapeEquals(lOutputShape, thisInputShapes)) || (!refLayerTranspose && !Matrix.shapeEquals(lInputShape, thisInputShapes))) return null;
+            
+                        // Otherwise, check the new output shape and see if it's possible with later layers.
+                        else if (layer.toNode[buildNo].length) {
+                            var newOutputShape = refLayerTranspose ? lInputShape : lOutputShape;
+                            var configChanges = {type: "layer", id1: this.name, shape: newOutputShape};
+                            var nextLayerResults = layer.applyShapeChanges(null, configChanges, undefined, false);
+                            return nextLayerResults.result;
+                        } 
+
+                        // If there is no later layers, it's fine with any reference layers.
+                        else return true;
+                    });
+                } 
+                
+                if (referenceableLayers.length > 0) {
+                    // If it is a BasicLayer, find if there is any previous layer with the same input/output shape as current input shape.
+                    referenceable = true;
+                    $("propLayerRef").classList.remove("inactive");
+
+                    // Show the basic layer as options for parameters sharing.
+                    App.controlChildrenCount($("propLayerRef"), referenceableLayers.length+1, document.createElement("option"), undefined, ele => ele.classList.add("lt"), (ele,idx)=>{
+                        if (idx >= 1) {
+                            ele.dataset.val = referenceableLayers[idx-1].name;
+                            referenceableLayers[idx-1].showNameOnEle(ele);
+                        }
+                    });
+                }
+
+                if ([ModelNode.Layer.Types.Convolution, ModelNode.Layer.Types.Deconvolution].includes(layer.layerType)) {
                     // CPU processing disables CNN dilations.
                     if (this.train.device.startsWith("/cpu")) {
                         $("propDilationRow").classList.add("noDisplay");
@@ -9290,29 +9773,9 @@ class Project {
 
             // Determine whether to show output configurations.
             if (layer.isFinal()) {
+                // Disable the appearance for output config.
                 $("propOutputConfigGroup").classList.add("noDisplay");
-            } else {
-                $("propOutputConfigGroup").classList.remove("noDisplay");
 
-                if (layer.outputConfig instanceof OutputConfig.Flatten) {
-                    $("propOCFlattenRow").classList.remove("noDisplay");
-                    $("propOCReshapeRow").classList.add("noDisplay");
-                } else if (layer.outputConfig instanceof OutputConfig.Reshape) {
-                    $("propOCFlattenRow").classList.add("noDisplay");
-                    $("propOCReshapeRow").classList.remove("noDisplay");
-                } else {
-                    $("propOCFlattenRow", "propOCReshapeRow").forEach(ele=>ele.classList.add("noDisplay"));
-                }
-                
-                // Assign validations on output manipulations.
-                var shape = layer.getPreprocessedOperationShape();
-                $("propOCFlatten").dataset.max = shape.length - 1;
-                $("propOCReshape").dataset.shapeTotal = shape.filter(n=>n!="None" && n!= -1).reduce((a,b)=>a*b, 1);
-                $("propOCReshape").dataset.restrictedShape = "None"
-            }
-
-            // If it's FinalLayer, show with the measurement that is using with.
-            if (fullType.startsWith("FinalLayer")) {
                 // TODO [Model Editing/Task Measurement]
                 // Action: Switch to the measurement that this FinalLayer is undertaking.
                 // Reasons: Currently only one measurement is implemented.
@@ -9336,6 +9799,19 @@ class Project {
 
                 // Set the selection value.
                 $("propPred").selectedIndex = [...$("propPred").children].findIndex(ele=>Number(ele.dataset.sourceID) == layer.compareSourceID && ele.dataset.cfKey == layer.compareTensorIdx);
+            
+            } else {
+                // If it's a task layer, show the output config.
+                $("propOutputConfigGroup").classList.remove("noDisplay");
+
+                // Update the output configurations settings.
+                Project.updateOutputConfigProps(layer);
+
+                // Display further options.
+                if (layer instanceof ModelNode.Layer.Deconvolution) {
+                    if (layer.dconvAlgorithm == ModelNode.Layer.Deconvolution.AlgorithmTypes.Conv2DTranspose) $("deconvOptions").classList.add("noDisplay");
+                    else $("deconvOptions").classList.remove("noDisplay");
+                }
             }
 
             // Apply all prop values
@@ -9344,17 +9820,17 @@ class Project {
     }
 
     /**
-     * Activate layer configuration properties.   --- UPDATED (Dexter) 20180825
+     * Activate layer configuration properties.   --- UPDATED (Dexter) 20190717
      */
     static activateLayerConfigs() {
-        $("propTransRefWeight", "propHiddenSize", "propFilterWidth", "propDilation", "propPadding").forEach(ele=>ele.classList.remove("inactive"));
+        $("propTransRefWeight", "propHiddenSize", "propFilterWidth", "propDilation", "propPadding", "propStrideX", "propStrideY").forEach(ele=>ele.classList.remove("inactive"));
     }
 
     /**
-     * Inactivate layer configuration properties.   --- UPDATED (Dexter) 20180825
+     * Inactivate layer configuration properties.   --- UPDATED (Dexter) 20190717
      */
     static inactivateLayerConfigs() {
-        $("propTransRefWeight", "propHiddenSize", "propFilterWidth", "propDilation", "propPadding").forEach(ele=>ele.classList.add("inactive"));
+        $("propTransRefWeight", "propHiddenSize", "propFilterWidth", "propDilation", "propPadding", "propStrideX", "propStrideY").forEach(ele=>ele.classList.add("inactive"));
     }
     
     /**
@@ -9409,10 +9885,10 @@ class Project {
     }
 
     /**
-     * To change update the training parameters according to the user updates from the HTML elements.   --- UPDATED (Dexter) 20190210
+     * To get the training parameter value according to the user updates from the HTML elements.   --- UPDATED (Dexter) 20190417
      * @param {Element} ele - HTML element of a property is being edited
      */
-    setPropVal(ele) {
+    getPropVal(ele) {
         // Get the value of the user input, while the input has also made a copy into ele.dataset.val .
         var toValue = null;
 
@@ -9420,6 +9896,8 @@ class Project {
         if (ele.localName == "select") toValue = ele.selectedOptions[0].dataset.val || null;
         else if (ele.classList.contains("checkbox")) toValue = (ele.dataset.val == "1");
         else if (ele.dataset.valType == "number") toValue = ele.value.trim() != "" ? Number(ele.value) : null;
+        else if (ele.dataset.valType == "percentage") toValue = ele.value.trim() != "" ? Number(ele.value)/100 : null;
+        else if (ele.dataset.valType == "numberOrE") toValue = ele.value.trim() == "e" ? Math.E : ele.value.trim() != "" ? Number(ele.value) : null;
         else if (ele.dataset.valType == "text") toValue = ele.value.trim();
         else if (ele.dataset.valType == "indexRange") toValue = ele.value.trim();
         else if (ele.dataset.valType == "shape") toValue = ele.value.trim().slice(1,-1).split(",").map(n=>{
@@ -9427,14 +9905,34 @@ class Project {
                                                                 return nT == "None" ? nT : Number(nT);
                                                             });
         else toValue = ele.value || ele.dataset.val;
-        
+
         // If it's not checkbox, the dataset value will be updated to the new value. (Checkbox already updated.)
-        if (!ele.classList.contains("checkbox"))
+        if (!ele.classList.contains("checkbox")) {
             if (ele.localName == "input") {
                 if (ele.dataset.valType == "shape") {
                     ele.dataset.val = `[${toValue.join(", ")}]`;
                 } else ele.dataset.val = (toValue == null || toValue == undefined)? "" : toValue;
             } else ele.dataset.val = toValue;
+        }
+
+        // If it's an enumeration, return the actual enumeration value instead of the set value.
+        if (ele.dataset.enum && ele.dataset.enumModule) {
+            var enumVal = App.Modules(ele.dataset.enumModule)
+            var enumPos = ele.dataset.enum.split(".");
+            for (let subClass of enumPos) {
+                enumVal = enumVal[subClass];
+            }
+            return enumVal[toValue];
+        } else return toValue;
+    }
+
+    /**
+     * To change update the training parameters according to the user updates from the HTML elements.   --- UPDATED (Dexter) 20190406
+     * @param {Element} ele - HTML element of a property is being edited
+     */
+    setPropVal(ele) {
+        // Get the value of the user input, while the input has also made a copy into ele.dataset.val .
+        var toValue = this.getPropVal(ele);
         
         // Set the value into the Train object.
         this.train.setProp(ele,ele.dataset.propType, ele.dataset.prop, toValue, ele.dataset.id);
@@ -9489,7 +9987,7 @@ class Project {
         // Get the connectable nodes by first updating the connection graph view.
         var connectableNodes = this.updateConnectionMode(mode, layerEle);
         this.connectionNode = new ConnectingNodeInfo(connectableNodes[0]);
-        this.connectionAffectingNodes = connectableNodes[1].filter(lpos=>lpos instanceof LayerProfile).map(lp => new ConnectingNodeInfo(lp));
+        this.connectionAffectingNodes = connectableNodes[1].filter(lpos=>lpos instanceof ModelNode.Layer.Config).map(lp => new ConnectingNodeInfo(lp));
         
         // Inactivate other model changes.
         $("cmLayerBef", "cmLayerAtt", "cmLayerAft", "cmLayerCrt", "cmLayerCnt", "cmLayerDel", "cmLayerDelLater", "cmInputDelLater",
@@ -9501,11 +9999,11 @@ class Project {
      * To start the connection mode of this project.   --- UPDATED (Dexter) 20181217
      * @param {String} mode - Connection mode name: "connect" | "attach"
      * @param {Element} layerEle - An HTML element on displaying the layer node.
-     * @returns {(ModelNode.Layer.Config|DataPreprocessing.Node)[]} - A list of connectable nodes.
+     * @returns {Array<(ModelNode.Layer.Config|DataPreprocessing.Node)>} - A list of connectable nodes.
      */
     updateConnectionMode(mode, layerEle) {
         // Get the model editing build no.
-        const buildNo = this.train._editingBuild;
+        const buildNo = this.train.editingBuild;
 
         // Get the layer or source from the activating element.
         const layerOrSource = this.connectingLayerOrSource = (layerEle.dataset.layerName || [Number(layerEle.dataset.sourceID), layerEle.dataset.dppKey]);
@@ -9528,7 +10026,7 @@ class Project {
         if (isLayer) {
             connectableNodes.forEach(lpos=>{
                 lpos.ele.classList.remove("selectedReceive", "selectedOutput", "pendingReceive", "pendingOutput");
-                if (lpos instanceof LayerProfile) {
+                if (lpos instanceof ModelNode.Layer.Config) {
                     lpos.ele.classList.add((editingNode[mode == "connect" ? "toNode" : "fromNode"][buildNo].includes(lpos) ? "selected" : "pending") + (mode == "connect" ? "Receive": "Output"));
                 } else {
                     const sourceConfigInfo = lpos.getIDAndKey();
@@ -9619,11 +10117,11 @@ class Project {
     static get now() { return this._now; } static set now(v) { this._now = v; }
 
     /**
-     * To initiate Project-related items at the beginning after the app is loaded.   --- UPDATED (Dexter) 20190224
+     * To initiate Project-related items at the beginning after the app is loaded.   --- UPDATED (Dexter) 20190725
      */
     static initiate() {
         // Start Screen Buttons - Add "click" events for new project start up or open file picker for old project openning.
-        $("startProject").addEventListener("click", Project.toStartNewProject, false);
+        $("startProject").addEventListener("click", Project.startNewProject, false);
         $("openProject").addEventListener("click", Project.toOpenProjectClick,false);
 
         // Show Start Screen First Time Guidence.
@@ -9663,7 +10161,7 @@ class Project {
         // Dynamically update the spreadsheet for whether header is included.
         $("startHasHeader").addEventListener("change", Project.updatePasteDataIncludeHeader, false);
 
-        // Finishing the TrainSource setup.
+        // Finishing the @Source.Config setup.
         $("startEditGOBtn").addEventListener("click", Project.startFinish, false);
 
         // Image source startup parameters.
@@ -9693,6 +10191,7 @@ class Project {
         $("cmLayerCrt").addEventListener("click", Project.toCreateAfter, false);
         $("cmLayerCnt").addEventListener("click", Project.toConnectTo, false);
         $("cmFinLayBef").addEventListener("click", Project.toInsertBefore, false);
+        $("cmFinLayAtt").addEventListener("click", Project.toAttachOn, false);
         $("cmLayerDel").addEventListener("click", Project.toDelLayer, false);
         $("cmLayerDelLater").addEventListener("click", Project.toDelLaterLayers, false);
         $("cmFinLayDel").addEventListener("click", Project.toDelFinalLayer, false);
@@ -9783,20 +10282,11 @@ class Project {
     }
 
     /**
-     * Start a project after clicking the button on the startScreen.   --- UPDATED (Dexter) 20180524
-     */
-    static toStartNewProject() {
-        App.gotoPage("editModel");
-        Project.startNewProject();
-    }
-    
-    /**
-     * To start a new blank model editing project.   --- UPDATED (Dexter) 20180524
+     * To start a new blank model editing project.   --- UPDATED (Dexter) 20190718
      */
     static startNewProject() {
         // Display the input step-by-step screen instead of the model editing graph.
-        $("editStart").classList.remove("noDisplay");
-        $("editCore").classList.add("noDisplay");
+        App.switchToPage("editStart");
 
         // Clear previous connection mode if needed.
         if (Project.now && Project.now.connectionMode) { Project.now.endConnectionMode(); }
@@ -9910,13 +10400,10 @@ class Project {
     }
 
     /**
-     * Parse a JSON file and read the text to prepare it to be a Project.   --- UPDATED (Dexter) 20190222
+     * Parse a JSON file and read the text to prepare it to be a Project.   --- UPDATED (Dexter) 20190718
      * @param {File} file - A File object as sent from the File Picker
      */
     static async readJSONFile(file) {
-        // Go to the model editing page.
-        App.gotoPage("editModel");
-
         // Show the properties button.
         $("propertiesBtn").classList.remove("noDisplay");
 
@@ -9954,8 +10441,7 @@ class Project {
         Project.now.showProp("Train");
 
         // Show the model editing environment instead of step-to-step data source setup.
-        $("editStart").classList.add("noDisplay");
-        $("editCore").classList.remove("noDisplay");
+        App.switchToPage("editModel");
 
         // Display notification for finishing reading the project.
         AppNotification.update(nf, "projectSuccess", "","ok.svg");
@@ -10385,7 +10871,7 @@ class Project {
     }
 
     /**
-     * Start a model editing graph from a given type of data source.   --- UPDATED (Dexter) 20190130
+     * Start a model editing graph from a given type of data source.   --- UPDATED (Dexter) 20190718
      * @param {String} source - A source type whether it is a "TableSource" or "ImageSource"
      */
     static startGraph(source) {
@@ -10393,8 +10879,7 @@ class Project {
         $("propertiesBtn").classList.remove("noDisplay");
 
         // Display the model editing environment instead of the data source setup details.
-        $("editStart").classList.add("noDisplay");
-        $("editCore").classList.remove("noDisplay");
+        App.switchToPage("editModel");
 
         // Prepare the data source to create Train object later on.
         var dataSource;
@@ -10404,7 +10889,7 @@ class Project {
             var toCSV = $("startSourceLocation").value;
 
             // Create the data source based on the given info.
-            dataSource = toCSV ? new CSVSource(toCSV, Number($("startColCount").value), $("startEncoding").selectedOptions[0].dataset.val, hasHeading) : new TableSource(SpreadSheet.get("pasteSourceTable").table, undefined, hasHeading);
+            dataSource = toCSV ? new Source.CSV(toCSV, Number($("startColCount").value), $("startEncoding").selectedOptions[0].dataset.val, hasHeading) : new Source.Table(SpreadSheet.get("pasteSourceTable").table, undefined, hasHeading);
 
             // Create the table preview info
             new SpreadSheet("dataSourcePreview", 10, 3, hasHeading, false, true, true, null, false);
@@ -10584,21 +11069,42 @@ class Project {
     }
 
     /**
-     * Update the properties options when changing the output manipulation method.   --- UPDATED (Dexter) 20181208
+     * Update the properties options when changing the output manipulation method.   --- UPDATED (Dexter) 20190726
      * @param {Event} e - A click event typically from clicking the `$("propOCMethod")` button
      */
     static changeOutputConfig(e) {
-        const selVal = this.selectedOptions[0].dataset.val;
-        if (selVal == "Default") {
-            $("propOCFlattenRow", "propOCReshapeRow").forEach(ele=>ele.classList.add("noDisplay"));
-        } else if (selVal == "Flatten") {
+        Project.updateOutputConfigProps(Project.now.train.layerProfiles.get(Project.now.train._editingLayer));
+    }
+
+    /** 
+     * Update the output configuration settings in the properties pane.   ---- UPDATED (Dexter) 20190726
+     * @param {_ModelNodeLayerConfig} layer - The layer of which the properties are shown.
+     */
+    static updateOutputConfigProps(layer) {
+        /** @type {OutputConfigConfig} - The output configuration of the layer. */
+        var outputConfig = layer.outputConfig;
+
+        // Display options of output config depending on the class.
+        if (outputConfig instanceof OutputConfig.Flatten) {
             $("propOCFlattenRow").classList.remove("noDisplay");
             $("propOCReshapeRow").classList.add("noDisplay");
-            $("propOCFlatten").value = "1";
-        } else if (selVal == "Reshape") {
+        } else if (outputConfig instanceof OutputConfig.Reshape) {
             $("propOCFlattenRow").classList.add("noDisplay");
             $("propOCReshapeRow").classList.remove("noDisplay");
-            $("propOCReshape").value = "[None,-1]";
+        } else {
+            $("propOCFlattenRow", "propOCReshapeRow").forEach(ele=>ele.classList.add("noDisplay"));
+        }
+
+        // Get the shape of the output of shape after operation.
+        var shape = layer.getPreprocessedOperationShape();
+        if (!(shape instanceof TrialResult)) {
+            // Get the activation changes.
+            if (layer.activation == "crelu") shape = [...shape.slice(0,-1), shape.slice(-1)[0]*2];
+
+            // Assign validations on output manipulations.
+            $("propOCFlatten").dataset.max = shape.length - 1;
+            $("propOCReshape").dataset.shapeTotal = shape.slice(1).filter(n=>n!="None" && n!= -1).reduce((a,b)=>a*b, 1);
+            $("propOCReshape").dataset.restrictedShape = shape[0];
         }
     }
 
@@ -10628,7 +11134,7 @@ class Project {
                 // Validate the input boxes of the circular definition adding flyout.
                 if (!InputBox.validateAll($("defCirColSelCols"), $("defCirColMin"), $("defCirColMax"))) return false;
 
-                // Get the information, and pass to the TrainSource object to set the circular output details.
+                // Get the information, and pass to the @Source.Config object to set the circular output details.
                 var toUpdate = Project.now.train.sources[editingColConfig[0]].setCircularOutput(editingColConfig[1], $("defCirColSelCols").value, Number($("defCirColMin").value), Number($("defCirColMax").value));
 
                 // If the update isn't successful, a failure prompt will appear.
@@ -10669,7 +11175,7 @@ class Project {
                 // Check basic input validation.
                 if (!InputBox.validateAll($("defTxmSelCols"))) return false;
                 
-                // Get the information, and pass to the TrainSource object to set the transformation details
+                // Get the information, and pass to the @Source.Config object to set the transformation details
                 var toUpdate = Project.now.train.sources[editingColConfig[0]].setTransform(editingColConfig[1], $("defTxmSelCols").value, $("defTransSel").selectedOptions[0].dataset.val);
 
                 // If the update isn't successful, a failure prompt will appear
@@ -10686,8 +11192,8 @@ class Project {
 
     /**
      * Update the circular data definition list on the Properties Pane.   --- UPDATED (Dexter) 20190321
-     * @param {Number} sourceIdx - The index of the TrainSource to request
-     * @param {String} dppKey - The column key of the ColConfig in the TrainSource
+     * @param {Number} sourceIdx - The index of the @Source.Config to request
+     * @param {String} dppKey - The column key of the ColConfig in the @Source.Config
      * @param {Boolean} updateImmediately - Update the list of data preview immediately.
      */
     static updateCircularList(sourceIdx, dppKey, updateImmediately = true) {
@@ -10741,7 +11247,7 @@ class Project {
      * @param {Event} e - A click event on the deletion of a circular definition.
      */
     static toRemoveCircularItem(e) {
-        // Remove the circular item in the TrainSource
+        // Remove the circular item in the @Source.Config
         var editingColConfig = Project.now.train._editingColConfig;
         var source = Project.now.train.sources[editingColConfig[0]];
         var dppKey = editingColConfig[1];
@@ -10765,8 +11271,8 @@ class Project {
 
     /**
      * Update the transformation list on the Properties Pane.   --- UPDATED (Dexter) 20190321
-     * @param {Number} sourceIdx - The index of the TrainSource to request
-     * @param {String} dppKey - The column key of the ColConfig in the TrainSource
+     * @param {Number} sourceIdx - The index of the @Source.Config to request
+     * @param {String} dppKey - The column key of the ColConfig in the @Source.Config
      * @param {Boolean} updateImmediately - Update the list of data preview immediately.
      */
     static updateTransformList(sourceIdx, dppKey, updateImmediately = true) {
@@ -10822,7 +11328,7 @@ class Project {
      * @param {Event} e - A click event on the deletion of a transformation action.
      */
     static toRemoveTransformItem(e) {
-        // Remove the transform item in the TrainSource
+        // Remove the transform item in the @Source.Config
         var editingColConfig = Project.now.train._editingColConfig;
         var source = Project.now.train.sources[editingColConfig[0]];
         var dppKey = editingColConfig[1];
@@ -10845,7 +11351,7 @@ class Project {
     }
 
     /**
-     * Prepare insertion of a layer.   --- UPDATED (Dexter) 20181220
+     * Prepare insertion of a layer.   --- UPDATED (Dexter) 20190717
      * @param {ModelNode.Layer.Config|DataPreprocessing.Node} atNode - The editing node at which the insertion is made.
      * @param {String} method - The action of insertion: "before" or "after".
      * @param {Bool} relink - For the method of "after", relink the original toNode if needed.
@@ -10854,7 +11360,7 @@ class Project {
     static prepareInsertNode(atNode, method = "after", relink = true) {
         // Get the model editing build no.
         const train = Project.now.train;
-        const buildNo = train._editingBuild;
+        const buildNo = train.editingBuild;
 
         var atLayer, atSource, prevLayers, prevSources, nextLayers, fromNodes, toNodes;
 
@@ -10872,7 +11378,7 @@ class Project {
             prevSources = [...atSource];
             nextLayers = [];
         } else if (atNode) {
-            if (method == "before" && atNode instanceof LayerProfile) {
+            if (method == "before" && atNode instanceof ModelNode.Layer.Config) {
                 // If it's inserting before, it should be a layer profile.
                 atLayer = atNode;
 
@@ -10880,7 +11386,7 @@ class Project {
                 fromNodes = [...atNode.fromSource[buildNo], ...atNode.fromNode[buildNo].map(l=>l.name)];
                 toNodes = [atNode.name];
             } else if (["after", "add"].includes(method)) {
-                if (atNode instanceof LayerProfile) {
+                if (atNode instanceof ModelNode.Layer.Config) {
                     // If this is a layer profile, assign to atLayer.
                     atLayer = atNode;
 
@@ -10906,23 +11412,36 @@ class Project {
 
         // Understand how many previous layers exist in the model.
         if ((prevLayers.length + prevSources.length) > 1) {
-            // If there are too many latest layers, CNN Layer won't be appendable on them.
-            $("appLayCNN").disabled = true;
-            $("newCNNLayer").classList.add("noDisplay");
+            // If there are too many latest layers, convolutional Layer won't be appendable on them.
+            $("appLayConv").disabled = true;
+            $("newConvLayer").classList.add("noDisplay");
         } else {
             // Otherwise, check the shape of the latest layers or data sources.
             var prevShapes = [...prevSources.map(s=>s.getShape()), ...prevLayers.map(lp => lp._shape[buildNo])];
 
-            // Determine if CNN/DCNN are available by using default settings of testing processable incoming shapes.
-            var newShape = CNNLayer.testDefaultNodesCollection(prevShapes);
+            // Determine if conv/deconv are available by using default settings of testing processable incoming shapes.
+            var newShape = ModelNode.Layer.testDefaultNodesCollection(prevShapes, ModelNode.Layer.Convolution);
 
-            // If it's ok to auto reshape for CNN use, allow the CNN Layer to be created.
+            // If it's ok to auto reshape for convolutional layer use, allow the convolutional Layer to be created.
             if (newShape) {
-                $("appLayCNN").disabled = false;
-                $("appLayDCNN").disabled = false;
+                $("appLayConv").disabled = false;
+                $("appLayDeconv").disabled = false;
             } else {
-                $("appLayCNN").disabled = true;
-                $("appLayDCNN").disabled = true;
+                $("appLayConv").disabled = true;
+                $("appLayDeconv").disabled = true;
+            }
+
+            // Determine if conv/deconv 1D are available by using default settings of testing processable incoming shapes.
+            var newShape = ModelNode.Layer.testDefaultNodesCollection(prevShapes, ModelNode.Layer.Convolution1D);
+            newShape = false;
+
+            // If it's ok to auto reshape for convolutional layer use, allow the convolutional Layer to be created.
+            if (newShape) {
+                $("appLayConv1D").disabled = false;
+                $("appLayDeconv1D").disabled = false;
+            } else {
+                $("appLayConv1D").disabled = true;
+                $("appLayDeconv1D").disabled = true;
             }
         }
 
@@ -10958,17 +11477,18 @@ class Project {
     }
 
     /**
-     * Validate the insertion after some layers.   --- UPDATED (Dexter) 20190406
+     * Validate the insertion after some layers.   --- UPDATED (Dexter) 20190725
      * @param {Object} insertionInfo - The insertion data.
-     * @param {ModelNode.Layer.Config[]} insertionInfo.prevLayers - Previous layers.
-     * @param {DataPreprocessing.Node[]} insertionInfo.prevSources - Previous data sources.
-     * @param {Number[][]} insertionInfo.prevShapes - Previous shapes.
-     * @param {ModelNode.Layer.Config[]} insertionInfo.nextLayers - Next layers.
+     * @param {Array<_ModelNodeLayerConfig>} insertionInfo.prevLayers - Previous layers.
+     * @param {Array<DataPreprocessing.Node>} insertionInfo.prevSources - Previous data sources.
+     * @param {Array<Array<Number>>} insertionInfo.prevShapes - Previous shapes.
+     * @param {Array<_ModelNodeLayerConfig>} insertionInfo.nextLayers - Next layers.
      * @param {ModelNode.Layer.Config} insertionInfo.currentLayer - Current Layer.
+     * @return {Boolean} - Whether it can be validated for the validation.
      */
     static insertValidation(insertionInfo) {
         // Get the model editing build no.
-        const buildNo = Project.now.train._editingBuild;
+        const buildNo = Project.now.train.editingBuild;
 
         // Validate for the layer count.
         var layerCountSucc = InputBox.validate($("appLayerCount"));
@@ -10983,23 +11503,23 @@ class Project {
         // Validate for layer-specific items.
         var hiddenSize = Number($("appLayerCount").value);
         var newLayerType = $("appLayerType").selectedOptions[0].dataset.val, newLayer;
-        if (newLayerType == "CNNLayer") {
-            newLayer = new CNNLayer(undefined, hiddenSize, Number($("appFilterWidth").value), $("appPadding").dataset.val == "1", [Number($("appStrideX").value), Number($("appStrideY").value)], Number($("appDilation").value));
-        } else if (newLayerType == "DCNNLayer") {
-            newLayer = new DCNNLayer(undefined, hiddenSize, Number($("appFilterWidth").value), $("appPadding").dataset.val == "1", [Number($("appStrideX").value), Number($("appStrideY").value)], Number($("appDilation").value));
-        } else if (newLayerType == "BasicLayer") {
+        if (newLayerType == "Convolution") {
+            newLayer = new ModelNode.Layer.Convolution(undefined, hiddenSize, Number($("appFilterWidth").value), $("appPadding").dataset.val == "1", [Number($("appStrideX").value), Number($("appStrideY").value)], Number($("appDilation").value));
+        } else if (newLayerType == "Deconvolution") {
+            newLayer = new ModelNode.Layer.Deconvolution(undefined, hiddenSize, Number($("appFilterWidth").value), $("appPadding").dataset.val == "1", [Number($("appStrideX").value), Number($("appStrideY").value)], Number($("appDilation").value));
+        } else if (newLayerType == "FullyConnected") {
             if (insertionInfo.nextLayers.length == 0) return true;
-            else newLayer = new BasicLayer(undefined, hiddenSize);
+            else newLayer = new ModelNode.Layer.FullyConnected(undefined, hiddenSize);
         } else if (newLayerType == "Collector") {
             if (insertionInfo.nextLayers.length == 0) return true;
-            else newLayer = new Collector();
+            else newLayer = new ModelNode.Layer.Collector();
         } else return false;
         newLayer.train = Project.now.train;
 
         // Warn if the input cannot pass for the compatibility test.
         var shapeSucc = newLayer.getOutputShape({type: "dynamic", info: insertionInfo.prevShapes.map(s=>{return {shape:s};})});
         if (!shapeSucc) {
-            if (newLayerType == "CNNLayer" || newLayerType == "DCNNLayer") {
+            if (newLayerType == "Convolution" || newLayerType == "Deconvolution") {
                 InputBox.showError($("appLayerCtxErr"), "notCompWithPrev", false, "warning.svg");
             }
             return false;
@@ -11036,7 +11556,7 @@ class Project {
     }
     
     /**
-     * Append a layer at the end of the model.   --- UPDATED (Dexter) 20181217
+     * Append a layer at the end of the model.   --- UPDATED (Dexter) 20190725
      * @param {Event} e - A click event typically from clicking $("actionAppendLayer") append layer button
      */
     static toAppendLayer(e) {
@@ -11054,13 +11574,17 @@ class Project {
             // Create the new layer and append to the current Train object.
             var newLayer;
             if (newLayerType == "Collector") {
-                newLayer = new Collector();
-            } else if (newLayerType == "BasicLayer") {
-                newLayer = new BasicLayer(undefined, hiddenSize);
-            } else if (newLayerType == "CNNLayer") {
-                newLayer = new CNNLayer(undefined, hiddenSize, Number($("appFilterWidth").value), $("appPadding").dataset.val == "1", [Number($("appStrideX").value), Number($("appStrideY").value)], Number($("appDilation").value));
-            } else if (newLayerType == "DCNNLayer") {
-                newLayer = new DCNNLayer(undefined, hiddenSize, Number($("appFilterWidth").value), $("appPadding").dataset.val == "1", [Number($("appStrideX").value), Number($("appStrideY").value)], Number($("appDilation").value));
+                newLayer = new ModelNode.Layer.Collector();
+            } else if (newLayerType == "FullyConnected") {
+                newLayer = new ModelNode.Layer.FullyConnected(undefined, hiddenSize);
+            } else if (newLayerType == "Convolution") {
+                newLayer = new ModelNode.Layer.Convolution(undefined, hiddenSize, Number($("appFilterWidth").value), $("appPadding").dataset.val == "1", [Number($("appStrideX").value), Number($("appStrideY").value)], Number($("appDilation").value));
+            } else if (newLayerType == "Deconvolution") {
+                newLayer = new ModelNode.Layer.Deconvolution(undefined, hiddenSize, Number($("appFilterWidth").value), $("appPadding").dataset.val == "1", [Number($("appStrideX").value), Number($("appStrideY").value)], Number($("appDilation").value));
+            } else if (newLayerType == "Convolution1D") {
+                newLayer = new ModelNode.Layer.Convolution1D(undefined, hiddenSize, Number($("appFilterWidth").value), $("appPadding").dataset.val == "1", Number($("appStride").value), Number($("appDilation").value));
+            } else if (newLayerType == "Deconvolution1D") {
+                newLayer = new ModelNode.Layer.Deconvolution1D(undefined, hiddenSize, Number($("appFilterWidth").value), $("appPadding").dataset.val == "1", Number($("appStride").value), Number($("appDilation").value));
             }
             newLayer.train = Project.now.train;
 
@@ -11079,60 +11603,91 @@ class Project {
     }
     
     /**
-     * Change settings triggered from changing the layer type to be appended.   --- UPDATED (Dexter) 20180818
+     * Change settings triggered from changing the layer type to be appended.   --- UPDATED (Dexter) 20190725
      * @param {Event} e - A click event typically from changing the $("appLayerType") append layer type.
      */
     static changeAppendLayerType(e) {
         // Get the model editing build no.
-        const buildNo = Project.now.train._editingBuild;
-
+        const buildNo = Project.now.train.editingBuild;
         const layerType = this.selectedOptions[0].dataset.val;
-        
+
         // Whether the layer type has referenceable layer.
         const nowOrder = Number($("appLayerCtx").dataset.order);
         const fromNode = JSON.parse($("appLayerCtx").dataset.fromNodes);
         const toNode = JSON.parse($("appLayerCtx").dataset.toNodes);
         const inputShapes = JSON.parse($("appLayerCtx").dataset.prevShapes);
         if (nowOrder >= 1) {
+            /** @type {Array<_ModelNodeLayerConfig>} - All layers that has not reference other layers and is before this layer. */
             var allLayers = [...Project.now.train.layerProfiles.values()].filter(l=>!l.refLayerName);
+            /** @type {Array<_ModelNodeLayerConfig>} - All referenceable layers. */
+            var referenceableLayers = []
 
-            if (layerType == "BasicLayer") {
+            if (layerType == "FullyConnected") {
                 // Confirm either one side of the shape equals
-                var newInputShape = BasicLayer.testDefaultNodesCollection(inputShapes);
-                var newOutputShapes = toNode.length ? toNode.map(ln=>Project.now.train.layerProfiles.get(ln)) : null;
+                var newInputShape = ModelNode.Layer.testDefaultNodesCollection(inputShapes, ModelNode.Layer.FullyConnected);
                 
-                var basiclayers = allLayers.filter(l=>l._type == "BasicLayer" && l._order[buildNo] <= nowOrder).filter(l=>{
+                referenceableLayers = allLayers.filter(l=>l instanceof ModelNode.Layer.FullyConnected && l.order[buildNo] <= nowOrder).filter(l=>{
                     var lInputShape = l.getPreprocessedIncomingShape();
                     var lOutputShape = l.getOutputShape();
-                    return (lInputShape.every((s,idx)=>s==newInputShape[idx]) || lOutputShape.every((s,idx)=>s==newInputShape[idx]));
+                    return (Matrix.shapeEquals(lInputShape, newInputShape) || Matrix.shapeEquals(lOutputShape, newInputShape));
                 });
-
-                if (basiclayers.length > 0) {
-                    // If it is a BasicLayer, find if there is any previous layer with the same input/output shape as current input shape.
-                    $("appLayerRefRows").classList.remove("noDisplay");
-
-                    // Show the basic layer as options for parameters sharing.
-                    App.controlChildrenCount($("appLayerRef"), basiclayers.length+1, document.createElement("option"), undefined, undefined, (ele,idx)=>{
-                        if (idx >= 1) {
-                            ele.dataset.val = basiclayers[idx-1].name;
-                            basiclayers[idx-1].showNameOnEle(ele);
-                        }
-                    });
-                } else {
-                    $("appLayerRefRows").classList.add("noDisplay");
-                }
-            } else if (layerType == "CNNLayer" || layerType == "DCNNLayer" || layerType == "Collector") {
+            } else if (layerType == "Convolution" || layerType == "Deconvolution") {
+                // Confirm either one side of the shape equals.
+                var newInputShape = ModelNode.Layer.testDefaultNodesCollection(inputShapes, layerType == "Convolution" ? ModelNode.Layer.Convolution : ModelNode.Layer.Deconvolution);
+                
+                referenceableLayers = allLayers.filter(l=>(l instanceof ModelNode.Layer.Deconvolution || l instanceof ModelNode.Layer.Convolution) && l.order[buildNo] <= nowOrder).filter(l=>{
+                    var lInputShape = l.getPreprocessedIncomingShape();
+                    var lOutputShape = l.getOutputShape();
+                    if (layerType == "Convolution") return (((l instanceof ModelNode.Layer.Deconvolution) && Matrix.shapeEquals(lOutputShape, newInputShape)) || ((l instanceof ModelNode.Layer.Convolution) && Matrix.shapeEquals(lInputShape, newInputShape)));
+                    else return (((l instanceof ModelNode.Layer.Deconvolution) && Matrix.shapeEquals(lInputShape, newInputShape)) || ((l instanceof ModelNode.Layer.Convolution) && Matrix.shapeEquals(lOutputShape, newInputShape)));
+                });
+            } else if (layerType == "Convolution1D" || layerType == "Deconvolution1D") {
+                // Confirm either one side of the shape equals.
+                var newInputShape = ModelNode.Layer.testDefaultNodesCollection(inputShapes, layerType == "Convolution1D" ? ModelNode.Layer.Convolution1D : ModelNode.Layer.Deconvolution1D);
+                
+                referenceableLayers = allLayers.filter(l=>(l instanceof ModelNode.Layer.Deconvolution1D || l instanceof ModelNode.Layer.Convolution1D) && l.order[buildNo] <= nowOrder).filter(l=>{
+                    var lInputShape = l.getPreprocessedIncomingShape();
+                    var lOutputShape = l.getOutputShape();
+                    if (layerType == "Convolution1D") return (((l instanceof ModelNode.Layer.Deconvolution1D) && Matrix.shapeEquals(lOutputShape, newInputShape)) || ((l instanceof ModelNode.Layer.Convolution1D) && Matrix.shapeEquals(lInputShape, newInputShape)));
+                    else return (((l instanceof ModelNode.Layer.Deconvolution1D) && Matrix.shapeEquals(lInputShape, newInputShape)) || ((l instanceof ModelNode.Layer.Convolution1D) && Matrix.shapeEquals(lOutputShape, newInputShape)));
+                });
+            } else if (layerType == "Collector") {
                 $("appLayerRefRows").classList.add("noDisplay");
             }
+
+            if (referenceableLayers.length > 0) {
+                // If it is a referenceable layer, find if there is any previous layer with the same input/output shape as current input shape.
+                $("appLayerRefRows").classList.remove("noDisplay");
+
+                // Show the basic layer as options for parameters sharing.
+                App.controlChildrenCount($("appLayerRef"), referenceableLayers.length+1, document.createElement("option"), undefined, undefined, (ele,idx)=>{
+                    if (idx >= 1) {
+                        ele.dataset.val = referenceableLayers[idx-1].name;
+                        referenceableLayers[idx-1].showNameOnEle(ele);
+                    }
+                });
+            } else {
+                $("appLayerRefRows").classList.add("noDisplay");
+            }
+
         } else {
             $("appLayerRefRows").classList.add("noDisplay");
         }
 
         // Whether to show layer-specific rows.
-        if (["CNNLayer", "DCNNLayer"].includes(this.selectedOptions[0].dataset.val) && ($("appLayerRefRows").classList.contains("noDisplay") || $("appLayerRef").selectedOptions[0].dataset.val == "None")) {
-            $("newCNNLayer").classList.remove("noDisplay");
+        if (["Convolution", "Deconvolution", "Convolution1D", "Deconvolution1D"].includes(this.selectedOptions[0].dataset.val) && ($("appLayerRefRows").classList.contains("noDisplay") || $("appLayerRef").selectedOptions[0].dataset.val == "None")) {
+            $("newConvLayer").classList.remove("noDisplay");
+            if (this.selectedOptions[0].dataset.val.endsWith("1D")) {
+                $("propAppStrideRow").classList.remove("noDisplay");
+                $("propAppStrideXRow").classList.add("noDisplay");
+                $("propAppStrideYRow").classList.add("noDisplay");
+            } else {
+                $("propAppStrideRow").classList.add("noDisplay");
+                $("propAppStrideXRow").classList.remove("noDisplay");
+                $("propAppStrideYRow").classList.remove("noDisplay");
+            }
         } else {
-            $("newCNNLayer").classList.add("noDisplay");
+            $("newConvLayer").classList.add("noDisplay");
         }
 
         // Hide hidden units if it's a collector.
@@ -11142,7 +11697,8 @@ class Project {
             $("newLayerConfigSep", "newHiddenSizeRow").forEach(ele=>ele.classList.remove("noDisplay"));
         }
 
-        // Trigger the detail settings of layer reference.
+        // Reset the detail settings of layer reference.
+        $("appLayerRef").selectedIndex = 0;
         Project.changeAppendLayerRef.bind($("appLayerRef"))();
 
         if (!$("appLayerCtx").classList.contains("hide")) {
@@ -11152,7 +11708,7 @@ class Project {
     }
 
     /**
-     * Change settings triggered from changing the layer type to be appended.   --- UPDATED (Dexter) 20181217
+     * Change settings triggered from changing the layer type to be appended.   --- UPDATED (Dexter) 20190717
      * @param {Event} e - A click event typically from changing the $("appLayerType") append layer type.
      */
     static changeAppendLayerRef(e) {
@@ -11169,20 +11725,19 @@ class Project {
             $("appLayerCount", "appFilterWidth", "appDilation", "appStrideX", "appStrideY", "appPadding").forEach(ele=>ele.classList.add("inactive"));
             $("appTransRefWeightRow").classList.remove("noDisplay");
             
-            // Get the reference layer.
+            /** @type {ModelNode.Layer.Config} - Get the reference layer. */ 
             const refLayer = Project.now.train.layerProfiles.get(refLayerName);
             if (refLayer._type == "BasicLayer") {
                 // Get the current appending layer shape info.
-                var newInputShape = BasicLayer.testDefaultNodesCollection(inputShapes);
-                var newOutputShapes = toNode.length ? toNode.map(ln=>Project.now.train.layerProfiles.get(ln)) : null;
-
+                var newInputShape = ModelNode.Layer.testDefaultNodesCollection(inputShapes, ModelNode.Layer.FullyConnected);
+                
                 // Get the reference layer shape info.
                 var lInputShape = refLayer.getPreprocessedIncomingShape();
                 var lOutputShape = refLayer.getOutputShape();
 
                 // Check if the referenced weights are transposable.
-                if (!shapeEquals(lInputShape, lOutputShape)) $("appTransRefWeight").classList.add("inactive");
-                if (shapeEquals(newInputShape, lInputShape)) {
+                if (!Matrix.shapeEquals(lInputShape, lOutputShape)) $("appTransRefWeight").classList.add("inactive");
+                if (Matrix.shapeEquals(newInputShape, lInputShape)) {
                     App.applyPropVal($("appLayerCount"),lOutputShape.slice(-1));
                     App.applyPropVal($("appTransRefWeight"),false);
                 } else {
@@ -11191,12 +11746,27 @@ class Project {
                 }
             } else if (refLayer._type == "CNNLayer" || refLayer._type == "DCNNLayer") {
                 App.applyPropVal($("appLayerCount"),refLayer.getPreprocessedIncomingShape().slice(-1));
-                App.applyPropVal($("appTransRefWeight"),true);
                 App.applyPropVal($("appDilation"),refLayer.convDilation);
                 App.applyPropVal($("appStrideY"),refLayer.convStride[0]);
                 App.applyPropVal($("appStrideX"),refLayer.convStride[1]);
                 App.applyPropVal($("appPadding"),refLayer.convPadding);
-                $("appTransRefWeight").classList.remove("inactive");
+                
+                // Get the current appending layer shape info.
+                var newInputShape = ModelNode.Layer.testDefaultNodesCollection(inputShapes, ModelNode.Layer[ModelNode.Layer.Types.getName(refLayer.nodeType)]);
+                
+                // Get the reference layer shape info.
+                var lInputShape = refLayer.getPreprocessedIncomingShape();
+                var lOutputShape = refLayer.getOutputShape();
+                
+                // Check if the referenced weights are transposable.
+                if (!Matrix.shapeEquals(lInputShape, lOutputShape)) $("appTransRefWeight").classList.add("inactive");
+                if (Matrix.shapeEquals(newInputShape, lInputShape)) {
+                    App.applyPropVal($("appLayerCount"),lOutputShape.slice(-1));
+                    App.applyPropVal($("appTransRefWeight"), false);
+                } else {
+                    App.applyPropVal($("appLayerCount"),lInputShape.slice(-1));
+                    App.applyPropVal($("appTransRefWeight"), true);
+                }
             }
         }
 
@@ -11340,24 +11910,29 @@ class Project {
     }
 
     /**
-     * Insert a layer.   --- UPDATED (Dexter) 20181217
+     * Insert a layer.   --- UPDATED (Dexter) 20190725
      * @param {Event} e - A click event, typically from layer related insert before buttons.
      * @param {String} oriLayerDisplayName - The display name of the original layer.
      * @param {Object} insertionInfo - The insertion data.
-     * @param {ModelNode.Layer.Config[]} insertionInfo.prevLayers - Previous layers.
-     * @param {DataPreprocessing.Node[]} insertionInfo.prevSources - Previous data sources.
-     * @param {Number[][]} insertionInfo.prevShapes - Previous shapes.
-     * @param {ModelNode.Layer.Config[]} insertionInfo.nextLayers - Next layers.
+     * @param {Array<_ModelNodeLayerConfig>} insertionInfo.prevLayers - Previous layers.
+     * @param {Array<DataPreprocessing.Node.Config>} insertionInfo.prevSources - Previous data sources.
+     * @param {Array<Array<Number>>} insertionInfo.prevShapes - Previous shapes.
+     * @param {Array<_ModelNodeLayerConfig>} insertionInfo.nextLayers - Next layers.
      * @param {ModelNode.Layer.Config} insertionInfo.currentLayer - Current Layer.
      */
     static toInsert(e, oriLayerDisplayName, insertionInfo) {
         // Get the model editing build no.
-        const buildNo = Project.now.train._editingBuild;
+        const buildNo = Project.now.train.editingBuild;
 
         // Show and validate the insertion dialog.
         const insLangKey = insertionInfo.method == "before" ? "insertLayerB" : insertionInfo.method == "after" ? "insertLayerA" : "insertLayerC";
         ActionDialog.show("appLayerCtx", App.getTxtFromLang(insertionInfo.method == "add" ? "appLayerT" : "insertLayerT"), App.getTxtFromLang(insLangKey+"1T") + (oriLayerDisplayName || insertionInfo.atLayer.name) + App.getTxtFromLang(insLangKey+"2T"), {x: e.pageX, y: e.pageY, pointerType: e.pointerType},(e)=>{
-            return Project.insertValidation(insertionInfo);
+            var valResult =  Project.insertValidation(insertionInfo);
+            if (!valResult) {
+                // Show error that it may not be compatible for the later layers.
+                InputBox.showError($("appLayerConfirm"), "noInsInfo", false, undefined, true);
+            }
+            return valResult;
         }).then(e=>{
             if (e) {
                 // Get the values and assign as constructor parameters.
@@ -11367,13 +11942,13 @@ class Project {
                 // Create the new layer and append to the current Train object.
                 var newLayer;
                 if (newLayerType == "Collector") {
-                    newLayer = new Collector();
-                } else if (newLayerType == "BasicLayer") {
-                    newLayer = new BasicLayer(undefined, hiddenSize);
-                } else if (newLayerType == "CNNLayer") {
-                    newLayer = new CNNLayer(undefined, hiddenSize, Number($("appFilterWidth").value), $("appPadding").dataset.val == "1", [Number($("appStrideX").value), Number($("appStrideY").value)], Number($("appDilation").value));
-                } else if (newLayerType == "DCNNLayer") {
-                    newLayer = new DCNNLayer(undefined, hiddenSize, Number($("appFilterWidth").value), $("appPadding").dataset.val == "1", [Number($("appStrideX").value), Number($("appStrideY").value)], Number($("appDilation").value));
+                    newLayer = new ModelNode.Layer.Collector();
+                } else if (newLayerType == "FullyConnected") {
+                    newLayer = new ModelNode.Layer.FullyConnected(undefined, hiddenSize);
+                } else if (newLayerType == "Convolution") {
+                    newLayer = new ModelNode.Layer.Convolution(undefined, hiddenSize, Number($("appFilterWidth").value), $("appPadding").dataset.val == "1", [Number($("appStrideX").value), Number($("appStrideY").value)], Number($("appDilation").value));
+                } else if (newLayerType == "Deconvolution") {
+                    newLayer = new ModelNode.Layer.Deconvolution(undefined, hiddenSize, Number($("appFilterWidth").value), $("appPadding").dataset.val == "1", [Number($("appStrideX").value), Number($("appStrideY").value)], Number($("appDilation").value));
                 }
                 newLayer.train = Project.now.train;
 
@@ -11562,7 +12137,7 @@ class Project {
      * Extract errors from the error results returned.   --- UPDATED (Dexter) 20181129
      * @param {Array} nextLayerResults - Error lists of next layer results (may be stacked).
      * @param {Function} callback - A callback function if there exists errors.
-     * @returns {Object[]} - A list of errors.
+     * @returns {Array<Object>} - A list of errors.
      */
     static extractErrors(nextLayerResults, callback = null) {
         var error = null, result = true;
@@ -11937,10 +12512,10 @@ class ProjectFolder {
     }
     
     /**
-     * Feedback from the Web Worker that the folder has read completely and the dashboard UI can be prepared.   --- UPDATED (Dexter) 20180723
+     * Feedback from the Web Worker that the folder has read completely and the dashboard UI can be prepared.   --- UPDATED (Dexter) 20190718
      * @param {Date} nowDate - Current date involved in the dashboards.
-     * @param {Date[]} dateList - Array of dates the project folder contains.
-     * @param {Map()} specialLogDates - Map of special logs that may optionally appears in different trials, key of the log name with value of a set of numbers representing the dates where weightlogs exist/
+     * @param {Array<Date>} dateList - Array of dates the project folder contains.
+     * @param {Map<String,Set<Number>>} specialLogDates - Map of special logs that may optionally appears in different trials, key of the log name with value of a set of numbers representing the dates where weightlogs exist/
      */
     static startFolderUI(nowDate, dateList, specialLogDates = new Map()) {
         // Update the notification status to analysing the data.
@@ -11948,7 +12523,7 @@ class ProjectFolder {
         
         // Clear all previous graphs and go to the page "projectFolder".
         TrainLog.clearAll(); WeightGraph.clearAll(); TraceLog.clearAll();
-        App.gotoPage("projectFolder");
+        App.switchToPage("projectFolder");
         
         // Remove the inactive class of startScreen so later users can interact with the startScreen.
         $("startScreen").classList.remove("inactive");
@@ -11993,7 +12568,7 @@ class ProjectFolder {
 
     /**
      * Switch the dashboard data display to specific list of dates.   --- UPDATED (Dexter) 20180723
-     * @param {Number[]} dateAry - An array of number representation of dates
+     * @param {Array<Number>} dateAry - An array of number representation of dates
      */
     static switchToDate(dateAry = []) {
         // Closs all context menus (close the selection boxes).
@@ -12106,12 +12681,12 @@ class ProjectFolder {
     }
 
     /**
-     * Feedback from the Web Worker that the project folder notification has to be updated.   --- UPDATED (Dexter) 20180525
+     * Feedback from the Web Worker that the project folder notification has to be updated.   --- UPDATED (Dexter) 20190718
      * @param {*} nofMsgs - Parameters for calling the AppNotification.update(): title, msg, icon
      */
     static readingError(...nofMsgs) {
         AppNotification.update(ProjectFolder.nf, ...nofMsgs, true);
-        App.gotoPage("startScreen");
+        App.switchToPage("startScreen");
     }
 
     /**
@@ -12522,7 +13097,7 @@ class GraphItem extends DashboardItem {
 
     /**
      * Draw a list of elements on the SVG.   --- UPDATED (Dexter) 20180726
-     * @param {PreSVGElement[]} eleList - The list of pre-SVG elements to be drawn
+     * @param {Array<PreSVGElement>} eleList - The list of pre-SVG elements to be drawn
      * @param {Function} ftn - A follow-up function when an element is drawn
      */
     draw(eleList, ftn=null) {
@@ -12565,7 +13140,7 @@ class GraphItem extends DashboardItem {
 
     /**
      * Re-draw a list of elements on the SVG.   --- UPDATED (Dexter) 20180803
-     * @param {PreSVGElement[]} eleList - The list of pre-SVG elements to be drawn
+     * @param {Array<PreSVGElement>} eleList - The list of pre-SVG elements to be drawn
      * @param {Function} ftn - A follow-up function when an element is drawn
      */
     redraw (eleList, ftn=null) {
@@ -12621,7 +13196,7 @@ class GraphItem extends DashboardItem {
 
     /**
      * Remove a list of element using id referencing.   --- UPDATED (Dexter) 20180525
-     * @param {String[]} eleList - A list of element ids
+     * @param {Array<String>} eleList - A list of element ids
      */
     removeEle(eleList) {
         // If the count is small, just remove now.
@@ -12836,6 +13411,37 @@ class TrainLogDataOptions extends DataOptions {
     }
 }
 
+/** Class representing a data point in a train log.   --- UPDATED (Dexter) 20190721 */
+class _DashboardGraphTrainLogDataPoint {
+    /** Create a data point in a train log.   --- UPDATED (Dexter) 20190721 
+     * @param {Number} atX - The x-coordinate of the data point on the SVG element.
+     * @param {Number} atY - The y-coordinate of the data point on the SVG element.
+     * @param {Number} valX - The value of x of the data point.
+     * @param {Number} valY - The value of y of the data point.
+    */
+    constructor(atX, atY, valX, valY) {
+        /** @type {Number} - The x-coordinate of the data point on the SVG element. */
+        this.atX = atX;
+        /** @type {Number} - The y-coordinate of the data point on the SVG element. */
+        this.atY = atY;
+        /** @type {Number} - The value of x of the data point. */
+        this.valX = valX;
+        /** @type {Number} - The value of y of the data point. */
+        this.valY = valY;
+    }
+}
+
+/** Class representing a data line information in a train log.   --- UPDATED (Dexter) 20190721 */
+class _DashboardGraphTrainLogDataLineInfo {
+    /** Create a train log data line information.   --- UPDATED (Dexter) 20190721 */
+    constructor() {
+        /** @type {Array<_DashboardGraphTrainLogDataPoint>} - A list of data points in the train log data line. */
+        this.dataPoints = [];
+        /** @type {Array<Number>} - A list of x-values threshold changing the hovering value. */
+        this.hoverList = [];
+    }
+}
+
 /** Class representing a train log, a line chart representation for different measurements in trainlog or testlog.   --- UPDATED (Dexter) 20180525 */
 class TrainLog extends GraphItem {
     /**
@@ -12996,13 +13602,7 @@ class TrainLog extends GraphItem {
 
     /**
      * Set up pointer hovering information as data prepared from the "draw.js" Web Worker.   --- UPDATED (Dexter) 20180527
-     * @param {Map(String,dlInfo)} dlInfos - Data line information
-     * @param {dataPoint[]} dlInfo.dataPoints - A sorted list of data point information of one data line
-     * @param {Number} dataPoint.atX - The x-coordinate of the data point on the SVG element
-     * @param {Number} dataPoint.atY - The y-coordinate of the data point on the SVG element
-     * @param {Number} dataPoint.valX - The value of x of the data point
-     * @param {Number} dataPoint.valY - The value of y of the data point
-     * @param {Number[]} dlInfo.hoverList - The x-position of the boundaries, including leftmost and rightmost, of all x segments of one data line
+     * @param {Map<String,_DashboardGraphTrainLogDataLineInfo>} dlInfos - Data line information.
      * @param {Number} topmost - The y-coordinate of the upper boundary of the plot area on the SVG element.
      * @param {Number} bottommost - The y-coordinate of the lower boundary of the plot area on the SVG element.
      * @param {Number} leftmost - The x-coordinate of the left boundary of the plot area on the SVG element.
@@ -13016,8 +13616,8 @@ class TrainLog extends GraphItem {
 
     /**
      * Set up available runs and cross validations for properties pane selections.   --- UPDATED (Dexter) 20181121
-     * @param {Number[]} availableRuns - The available list of run numbers.
-     * @param {Number[]} availableCVs - The available list of cross validation numbers.
+     * @param {Array<Number>} availableRuns - The available list of run numbers.
+     * @param {Array<Number>} availableCVs - The available list of cross validation numbers.
      */
     setUpRunCVOptions(availableRuns, availableCVs) {
         App.controlChildrenCount($("optTrainLogRunNoMore"), availableRuns.length, document.createElement("option"), null, undefined, (ele,idx) => {
@@ -13043,6 +13643,9 @@ class TrainLog extends GraphItem {
      * Current user data option.   --- UPDATED (Dexter) 20180723
      */
     static get currentDataOptions() { return this._currentDataOptions; } static set currentDataOptions(v) { this._currentDataOptions = v; }
+
+    static get DataLineInfo() {return _DashboardGraphTrainLogDataLineInfo; }
+    static get DataPoint() {return _DashboardGraphTrainLogDataPoint; }
 
     /**
      * Initiation after the app is loaded.   --- UPDATED (Dexter) 20180723
@@ -13141,7 +13744,7 @@ class WeightGraph extends GraphItem {
 
     /**
      * Draw a list of elements on the SVG.   --- UPDATED (Dexter) 20180525
-     * @param {PreSVGElement[]} eleList - The list of pre-SVG elements to be drawn
+     * @param {Array<PreSVGElement>} eleList - The list of pre-SVG elements to be drawn
      */
     draw(eleList) {
         // Noted for weightgraphs, elements may have special events, and would need to add after the super.draw() finishes for each element.
@@ -13150,7 +13753,7 @@ class WeightGraph extends GraphItem {
 
     /**
      * Re-draw a list of elements on the SVG.   --- UPDATED (Dexter) 20180525
-     * @param {PreSVGElement[]} eleList - The list of pre-SVG elements to be drawn
+     * @param {Array<PreSVGElement>} eleList - The list of pre-SVG elements to be drawn
      */
     redraw(eleList) {
         // Noted for weightgraphs, elements may have special events, and would need to add after the super.draw() finishes for each element.
@@ -13291,8 +13894,8 @@ class WeightGraph extends GraphItem {
 
     /**
      * Set up pointer hovering information of recorded steps as data prepared from the "draw.js" Web Worker.   --- UPDATED (Dexter) 20180527
-     * @param {Number[]} hoverList - The x-position of the boundaries, including leftmost and rightmost, of all x segments of recorded steps
-     * @param {Number[]} allSteps - A sorted array of all recorded step numbers
+     * @param {Array<Number>} hoverList - The x-position of the boundaries, including leftmost and rightmost, of all x segments of recorded steps
+     * @param {Array<Number>} allSteps - A sorted array of all recorded step numbers
      * @param {Number} minY - The y-coordinate of the upper boundary of the recorded step box
      * @param {Number} maxY - The y-coordinate of the lower boundary of the recorded step box
      * @param {Number} stepNow - The current displaying recorded step
@@ -13306,7 +13909,7 @@ class WeightGraph extends GraphItem {
     /**
      * Update the weight/bias selection buttons.   --- UPDATED (Dexter) 20180527
      * POTENTIAL BUG: not supported for multi panes of weight graphs, due to conflict of sharing $("weightCols")  --- (Dexter) 20180723
-     * @param {String[]} allCols - The column names of all the recorded weights/biases
+     * @param {Array<String>} allCols - The column names of all the recorded weights/biases
      * @param {String} nowCol - The currently displaying weight/bias
      */
     updateAllCol(allCols, nowCol) {
@@ -13428,8 +14031,8 @@ class WeightGraph extends GraphItem {
 
     /**
      * Set up available runs and cross validations for properties pane selections.   --- UPDATED (Dexter) 20181121
-     * @param {Number[]} availableRuns - The available list of run numbers.
-     * @param {Number[]} availableCVs - The available list of cross validation numbers.
+     * @param {Array<Number>} availableRuns - The available list of run numbers.
+     * @param {Array<Number>} availableCVs - The available list of cross validation numbers.
      */
     setUpRunCVOptions(availableRuns, availableCVs) {
         App.controlChildrenCount($("optWeightGraphRunNoMore"), availableRuns.length, document.createElement("option"), null, undefined, (ele,idx) => {
@@ -14209,7 +14812,7 @@ class InputBox {
     }
 
     /**
-     * Validate on the user-input element.  --- UPDATED (Dexter) 20190210
+     * Validate on the user-input element.  --- UPDATED (Dexter) 20190719
      * @param {Element} obj - An HTML element regarding on a user-input, not neceessarily to be `<input>`, but may also `<select>` or `<div>` with class "checkbox"
      * @param {Boolean} multi - Whether multiple elements is being validated
      * @param {Boolean} showMsg - Whether to show the input validation flyout
@@ -14296,16 +14899,17 @@ class InputBox {
             } else if (type == "shape") {
                 if (val.startsWith("[") && val.endsWith("]")) {
                     var ary = val.slice(1,-1).split(",").map(n=>n.trim()=="None" ? "None" : Number(n));
+                    var nonBatchAry = ary.slice(1);
                     var currentTotal = ary.filter(n=>n!="None" && n!=-1).reduce((a,b)=>a*b,1);
 
                     if (ary.some(n=>n!="None" && isNaN(n))) InputBox.showError(obj, "shapeNaNErr", !multi, undefined, stack);
-                    else if (ary.filter(n=>n == -1).length > 1) InputBox.showError(obj, "shapeFlexError", !multi, undefined, stack);
+                    else if (nonBatchAry.filter(n=>n == -1 || n == "None").length > 1) InputBox.showError(obj, "shapeFlexError", !multi, undefined, stack);
                     else if (ary.filter(n=>n=="None").length > (("noneCount" in dataset) ? Number(dataset.noneCount) : 1)) InputBox.showError(obj, "shapeTooManyNoneError", !multi, undefined, stack);
                     else if (dataset.restrictedShape && dataset.restrictedShape.split(",").map(n=>n.trim()=="None" ? "None" : Number(n)).some((n,idx) => n!= ary[idx])) {
                         var cuzError = {"zh-TW": App.getTxtFromLang("shapeRestrictedError", "zh-TW") + dataset.restrictedShape, "en-US": App.getTxtFromLang("shapeRestrictedError", "zh-TW") + dataset.restrictedShape};
                         InputBox.showError(obj, cuzError, !multi, undefined, stack);
                     } else if (ary.some(n=>n !="None" && (n%1 != 0 || n < -1 || n == 0))) InputBox.showError(obj, "shapeIntError", !multi, undefined, stack);
-                    else if (!dataset.shapeTotal || (ary.some(n=>n==-1) && currentTotal > Number(dataset.shapeTotal)) || (ary.every(n=>n > 0) && currentTotal != Number(dataset.shapeTotal))) InputBox.showError(obj, "shapeTotalDimError", !multi, undefined, stack);
+                    else if (!dataset.shapeTotal || (nonBatchAry.some(n=>n==-1 || n == "None") && currentTotal > Number(dataset.shapeTotal)) || (nonBatchAry.every(n=>n > 0) && currentTotal != Number(dataset.shapeTotal))) InputBox.showError(obj, "shapeTotalDimError", !multi, undefined, stack);
                     else result = true;
                 } else {
                     InputBox.showError(obj, "shapeFormatErr", !multi, undefined, stack);
@@ -14544,7 +15148,7 @@ class CSV {
      * CSV Parsing adapted from a stackoverflow answer:
      * https://stackoverflow.com/questions/1293147/javascript-code-to-parse-csv-data
      * @param {String} str - The original string to be parsed
-     * @param {String[]} del - Characters acts as the delimiters
+     * @param {Array<String>} del - Characters acts as the delimiters
      * @returns {Array} 2-dimension array as a table
      */
     static read(str, del = [","]) {
@@ -14571,7 +15175,7 @@ class CSV {
     /**
      * Read a string asynchronously into a table (2D-array).   --- UPDATED (Dexter) 20180524
      * @param {String} str - The original string to be parsed
-     * @param {String[]} del - Characters acts as the delimiters
+     * @param {Array<String>} del - Characters acts as the delimiters
      * @param {Boolean} errorAsDefault - Whether to display default CSV error in-app notification in case of error reading
      * @returns {Promise} A Promise that is resolved after the Worker has parsed the string
      */

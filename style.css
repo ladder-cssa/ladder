@@ -286,7 +286,7 @@ option:active, option:focus, option:checked {
 
 /* #endregion */
 
-/* #region --- Top navigation bar and core content   --- UPDATED (Dexter) 20190509 */
+/* #region --- Top navigation bar and core content   --- UPDATED (Dexter) 20190718 */
 #appNav {
     position: fixed; z-index: 2;
     top: 0; left: 0;
@@ -328,8 +328,17 @@ option:active, option:focus, option:checked {
 .page {
     position: fixed; left: 0; bottom: 0;
     width: 100%; height: calc(100% - 3rem);
+    transition: transform ease-in-out .35s, opacity ease-in-out .35s;
 }
-
+.page.inactive {
+    opacity: 1; pointer-events: none;
+}
+.page.hide {
+    opacity: 0;
+}
+.page.out {
+    transform: scale(0.975);
+}
 
 /* #endregion */
 
@@ -996,9 +1005,8 @@ button.btn1.activated .iconSVG>img, button.btn2 .iconSVG>img, .propListItem:acti
 
 /* #endregion --- Edit Project --- Input Start Screen */
 
-/* #region --- Edit Project --- Core Editing Environment --- UPDATED (Dexter) 20190513 */
-#editCore {
-    width: 100%; height: 100%; bottom: 0; left: 0;
+/* #region --- Edit Project --- Core Editing Environment --- UPDATED (Dexter) 20190718 */
+#editModel {
     display: flex; flex-wrap: wrap; flex-direction: column;
 }
 #functionalButtons {

@@ -42,8 +42,8 @@ invalidFolderPath,This is not a folder path,這不是文件夾位址
 invalidFileType,This file type is not supported,這個檔案類別沒有支援
 needTick,Need to check here,需要勾選這個
 missingVal,Please fill in this value,請填寫這格
-saveProject,Save Project,儲存專案
-viewPythonCodes,View Python Codes,檢視 Python 程式碼
+saveProject,Save Project (NOM),儲存專案 (NOM)
+trainNow,View Python Codes,檢視 Python 程式碼
 attachOn,attach on...,連附在...
 connectTo,connect to...,連接至...
 startImageLoc,Fill in image folder location,填寫圖片資料夾的位址
@@ -92,24 +92,37 @@ viRandUni,Random Uniform,隨機均勻分佈
 viOtgl,Orthogonal,正交矩陣
 viIdty,Identity,單位矩陣
 propFilterWidth,Filter Width:,濾鏡寬度:
+propStride,Stride,移位:
 propStrideX,Stride-x,移位-x:
 propStrideY,Stride-y,移位-y:
 propDilation,Dilation:,擴張寬度:
-dilationDeviceErr,"Some convolutional dilations are non-zero, which is not supported by CPU processing.","有部分 Conv. 卷積層擴展寬度不是 0 ，而 CPU 處理是不能支援 Conv. 卷積擴展的。"
+dilationDeviceErr,"Some convolutional dilations are over one, which is not supported by CPU processing.","有部分 Conv. 卷積層擴展寬度大於 1，而 CPU 處理是不能支援 Conv. 卷積擴展的。"
+dconvDilationStrideErr,"Convolutional 2D transpose currently does not support dilation over one for striding over one.","目前置轉卷積當移位大於 1 時，不支援擴張大於 1。"
 propPadding,Keep Dimension:,維持形狀大小:
-propPaddingMethod,Padding / Resize:,填補 / 調整大小:
+propAlgorithm,Algorithm:,演算法:
+algorithmsTitle,Algorithms,演算法
+conv2DTranspose,Convolutional Transpose,轉置卷積
+scaleThenConv2D,Upscaling Then Convolution,放大後卷積
+propDeconvPadding,Padding:,貼齊方法:
+dconvPaddingTypes,Padding Methods,貼齊方法
+strecth,Stretch,延展
+propDeconvUpscale,Upscale:,影像放大:
+dconvUpscaleTypes,Upscale Methods,影像放大方法
 propCNNPadding,Padding Method:,填補方法:
 zeroPadding,Zero Padding,以 0 填補
-rsBicubic,Resize (Bicubic),調整大小 (雙三次插值)
-rsBilinear,Resize (Bi-linear),調整大小 (雙線性插值)
-rsNN,Resize (Nearest Neighbor),調整大小 (最近鄰插值)
+dconvResizeInsertZeros,Inserting Zeros,插入 0 值
 propBatchNorm,Batch Normalization:,批標準化:
 propActv,Activation Function:,激活函數:
 layerProceedings,Layer Proceedings,隱藏層後續
 BasicLayer,Fully Connected Layer,全連結層
+FullyConnected,Fully Connected Layer,全連結層
 layerInfo,Layer Operations,隱藏層運算
 CNNLayer,Convolutional Layer,Conv. 卷積層
 DCNNLayer,Deconvolutional Layer,Deconv. 反卷積層
+Convolution,Convolutional Layer,Conv. 卷積層
+Deconvolution,Deconvolutional Layer,Deconv. 反卷積層
+Convolution1D,1D Convolutional Layer (Coming Soon),一維 Conv. 卷積層 (即將登場)
+Deconvolution1D,1D Deconvolutional Layer (Coming Soon),一維 Deconv. 反卷積層 (即將登場)
 Collector,Collector,收集層
 incomingCollections,Incoming Collections,輸進收集
 method,Method:,方法:
@@ -252,19 +265,76 @@ noDelT,Layer not Deleted,模型層未能刪除
 noDelC,"Please check with the layer shapes if they have conflicts.<br>You may choose removing other layers first.","請檢查神經元層的形狀是否配對好，或許你可以選擇刪除其他模型層。"
 noDelCRef,"Some layers are referencing this layer.<br>Please clear the reference before removing it.","有其他神經元層正與這一層進行權重同步，請在移除這層前移除參數同步。"
 noInsT,Layer not Inserted,模型層未能插入
+noInsInfo,Layer cannot be inserted due to incompatibility with later layers,因為無法與後續層相容，模型層未能插入
 delT,Layer Deleted,模型層已刪除
 propCirCol,Circular Columns:,循環數據欄位:
 propTxmCol,Transformation Columns:,轉換數據欄位:
 propOneHot,one-hot encoding columns:,one-hot 編碼欄位:
 propMaxVal,Max Value:,最大值:
 propMinVal,Min Value:,最小值:
-propGain,Gain,
+propGain,Gain,Gain
 propTransSel,Transformation:,轉換類別:
+txNormalize,Normalization (Feature Scaling),正規化 (值距調整)
 txNormMinMax,Normalization (scaling using min/max range),正規化 (使用資料值範圍)
 txNormMax,Normalization (scaling relative to 0),正規化 (相對於 0)
 txLog,Log,對數
 txExp,Exponential,指數
 txClassify,Class IDs,分類編號
+txPower,Power,次方
+txMissingData,Missing Values,缺失數據
+txImage,Image Transformations,圖片轉換
+txImgResize,Resize,調整大小
+txImgCentralCrop,Central Crop,中央裁剪
+txImgGray,To Grayscale,換成灰階
+txImgRGB,To RGB,換成 RGB
+txImageAugment,Image Augmentation,圖片擴增
+txImgAugCrop,Random Crop,隨機剪裁
+txImgAugFlip,Random Flip,隨機置換
+txImgAugRotate,Random Rotate,隨機旋轉
+txImgAugHue,Random Hue,隨機色調
+txImgAugContrast,Random Contrast,隨機對比
+txImgAugSaturation,Random Saturation,隨機飽和度
+txImgAugBrightness,Random Brightness,隨機光度
+propTxScaleType,Scale Type:,調整方式:
+txScaleDataRange,Relative to Data Range,按照資料值域
+txScaleSpecificRange,Relative to Specific Range,按照指定範圍
+txScaleZero,Relative to Zero,相對於零
+txScaleMean,Relative to Mean,相對平均值
+propTxNormMin,Range Min.:,最小值:
+propTxNormMax,Range Max.:,最大值:
+propTxNormRel,Relative to:,相對值:
+propTxLogBase,Log Base:,對數底數:
+propTxPowerExponent,Exponent:,指數:
+propTxMissingHandleType,Handling Type:,處理方式:
+txMissingAuto,Auto Fill (Mean/Mode),自動填補 (平均值/眾數)
+txMissingMode,Fill Mode Only,填補眾數
+txMissingDelete,Remove Records with Missing Data,移除缺失資訊的項目
+txImages,Image Transformations,圖片轉換
+propImgResizeWidth,Resize Width:,調整闊度:
+propImgResizeHeight,Resize Height:,調整高度:
+propImgResizeInterpolation,Interpolation:,像素插值方法:
+txImgResizeBilinear,Bilinear,雙三次插值
+txImgResizeNN,Nearest Neighbor,雙線性插值
+txImgResizeBicubic,Bicubic,最近鄰插值
+txImgResizeArea,Area,區域
+propImgResizeAspect,Preserve Aspect Ratio:,保留長寬比:
+propImgCentralCropFrac,Central Fraction:,中央佔比:
+txCrop,Crop,裁剪
+propImgAugCropWidth,Crop Width:,裁剪闊度:
+propImgAugCropHeight,Crop Height:,裁剪高度:
+testAugmentation,Handling of Test Data,處理測試資料
+propImgAugFitSize,Fit Size:,貼合大小:
+txImgAugCropMethodsRPC,Resize with Pad or Crop,調整大小及貼齊或裁剪
+txImgAugCropMethodsRP,Resize with Padding,調整大小及貼齊
+txImgAugCropMethodsR,Resize,調整大小
+propImgAugFlipDirection,Flip Direction:,翻轉方向:
+txImgAugFlipLeftRight,Left / Right,左/右
+txImgAugFlipUpDown,Up / Down,上/下
+txImgAugFlipAny,Any,上/下/左/右
+propImgAugAngleDeviation,Angle Deviation:,角度差異:
+propImgAugMaxDelta,Max Delta:,最大差異:
+propImgAugLower,Lower Bound:,最低比例:
+propImgAugUpper,Upper Bound:,最高比例:
 colSelection,Column Selection,欄位選取
 onehot,One-Hot Encoding,One-Hot 獨立分類欄位
 propEpochCount,No. of Epoch:,資料訓練圈數:
@@ -450,7 +520,7 @@ txtC,Class,分類
 conFailed,Updates failed,連接編輯失敗
 createConFailedTxt,"The layer connection is not completed, due to constraints of the layer shapes.",因為神經層間的限制無法完成新增的連接
 removeConFailedTxt,"The connection removal is not completed, due to constraints of the layer shapes.",因為神經層間的限制無法完成刪除連接
-appInfo,"<strong>Version:</strong> 1903.04, <strong>Updated:</strong> Jul-12,2019","<strong>版本:</strong> 1903.04, <strong>更新日期:</strong> 2019年07月12日"
+appInfo,"<strong>Version:</strong> 1903.05, <strong>Updated:</strong> Jul-28,2019","<strong>版本:</strong> 1903.05, <strong>更新日期:</strong> 2019年07月28日"
 appDesc,"An open-source web app for editing <strong>basic neural network models</strong> and displaying the corresponding results, with the help of another open-source Python neural network training framework from our lab, <strong>Neural Simplycode</strong>.",這是一個協助編輯<strong>基本類神經網絡</strong>架構及視覺化相關結果的開源網頁應用程式，及透過另一個我們實驗室的開源 Python 套件 <strong>Neural Simplycode</strong> 作為訓練類神經網絡模型。
 appLead,"Asst Prof. Jui-Hung Chang","張端紘 副教授"
 appDev,"Dexter, Yin-Chung Leung","梁彥聰 (Dexter)"

@@ -19,7 +19,7 @@
 
         Version 版本:
 
-            1903.04
+            1903.05
 
         Website & Docs 網站及文件庫:
         
@@ -429,6 +429,43 @@ class TimeHelper():
             '''
             return self._initial
 
+class Enumeration(Enum):
+    @classmethod
+    def getName(cls, value: int) -> str:
+        """
+            Get the name from the value within this enumeration.   --- UPDATED (Dexter) 20190425
+
+            Parameters
+            ------------------------------
+
+            value   `int`   The value of the enumeration.
+
+            Returns
+            ------------------------------
+
+            name   `str`   The name of the enumeration.
+        """
+        for enumItem in cls:
+            if (enumItem.value == value):
+                return enumItem.name
+
+    @classmethod
+    def getValue(cls, name: str) -> int:
+        """
+            Get the value from the name within this enumeration.   --- UPDATED (Dexter) 20190425
+
+            Parameters
+            ------------------------------
+
+            name   `str`   The name of the enumeration.
+
+            Returns
+            ------------------------------
+
+            value   `int`   The value of the enumeration.
+        """
+        return getattr(cls, name).value
+
 def classof(obj: Any) -> str:
     '''
 			Get the class name of a certain object.   --- UPDATED (Dexter) 20180615
@@ -627,7 +664,7 @@ class __DataTransformationConfig__:
     '''
         Class representing a transformation configuration on data preprocessing.   --- UPDATED (Dexter) 20190201
     '''
-    def __init__(self, instanceClass: 'DataPreprocessing.Transformation.InstanceClassEnum', method: Enum):
+    def __init__(self, instanceClass: 'DataPreprocessing.Transformation.InstanceClassEnum', method: 'Enumeration'):
         '''
             Create a configruation for data transformation in data preprocessing.   --- UPDATED (Dexter) 20190130
 
@@ -636,7 +673,7 @@ class __DataTransformationConfig__:
 
             instanceClass       `DataPreprocessing.Transformation.InstanceClassEnum`    - The instance class, as defined in @DataPreprocessing.Transformation.InstanceClassEnum .
 
-            method              `Enum`      - The method type of transformation.
+            method              `Enumeration`      - The method type of transformation.
         '''
         self._instanceClass = instanceClass
         self._method = method
@@ -654,14 +691,14 @@ class __DataTransformationConfig__:
         return self._instanceClass
     
     @property
-    def method(self) -> 'Enum':
+    def method(self) -> 'Enumeration':
         '''
             The enumeration for the transformation method type of this @DataPreprocessing.Transformation.Confign node.   --- UPDATED (Dexter) 20190131
 
             Returns
             ------------------------------
 
-            `Enum`   - The enumeration for the transformation method type of this @DataPreprocessing.Transformation.Confign node.
+            `Enumeration`   - The enumeration for the transformation method type of this @DataPreprocessing.Transformation.Confign node.
         '''
         return self._method
 
@@ -718,8 +755,8 @@ class DataPreprocessing:
     '''
         Class including types of preprocessing nodes and related preprocessing utilities.   --- UPDATED (Dexter) 20190201
     '''
-    class InstanceClassEnum(Enum):
-        # Abstract class representing a data preprocessing node on a data source (@TrainSource object).
+    class InstanceClassEnum(Enumeration):
+        # Abstract class representing a data preprocessing node on a data source (@Source.Config object).
         Node = 0
 
         # Class representing a column configuration, i.e. preprocessing node of on a table-like source (like @TableSource object).
@@ -750,7 +787,7 @@ class DataPreprocessing:
 
     class Node:
         ''' 
-            Class representing a data preprocessing node on a data source (@TrainSource object).   --- UPDATED (Dexter) 20190129
+            Class representing a data preprocessing node on a data source (@Source.Config object).   --- UPDATED (Dexter) 20190129
         '''
         def __init__(self, instanceClass: 'DataPreProcessing.InstanceClassEnum' = None, 
                     source: str = None, dtype: 'tf.DType' = None, defaultHeader: str = None):
@@ -785,7 +822,7 @@ class DataPreprocessing:
 
             # `list<int>` The receiving data shape from previous node.
             self._dataShape = None
-            # `TrainSource` - The @TrainSource where this @DataPreprocessing.ColumnsNode object is attached to.
+            # `Source.Config` - The @Source.Config where this @DataPreprocessing.ColumnsNode object is attached to.
             self._trainSource = None
             # `str` - The column config key of this @DataPreprocessing.ColumnsNode object.
             self._key = None
@@ -809,7 +846,7 @@ class DataPreprocessing:
                 elif (k == "dtype"):
                     value = obj.dtype
                     if (value is not None):
-                        self.dtype = TrainSource.getDataType(value)
+                        self.dtype = Source.Config.getDataType(value)
                     else:
                         self.dtype = None 
 
@@ -826,14 +863,14 @@ class DataPreprocessing:
             return self._order
 
         @property
-        def trainSource(self) -> 'TrainSource':
+        def trainSource(self) -> 'Source.Config':
             '''
-                The @TrainSource where this @DataPreprocessing.Node object is attached to.   --- UPDATED (Dexter) 20190201
+                The @Source.Config where this @DataPreprocessing.Node object is attached to.   --- UPDATED (Dexter) 20190201
 
                 Returns
                 ------------------------------
 
-                `TrainSource`  - The @TrainSource where this @DataPreprocessing.Node object is attached to.
+                `Source.Config`  - The @Source.Config where this @DataPreprocessing.Node object is attached to.
             '''
             return self._trainSource
 
@@ -852,12 +889,12 @@ class DataPreprocessing:
         @property
         def dataShape(self) -> List[int]:
             ''' 
-                The receiving data shape from referencing @DataPreprocessing.Node node or root source of @TrainSource object.   --- UPDATED (Dexter) 20190201
+                The receiving data shape from referencing @DataPreprocessing.Node node or root source of @Source.Config object.   --- UPDATED (Dexter) 20190201
 
                 Returns
                 ------------------------------
 
-                `list<int>`  - The receiving data shape from referencing @DataPreprocessing.Node node or root source of @TrainSource object.
+                `list<int>`  - The receiving data shape from referencing @DataPreprocessing.Node node or root source of @Source.Config object.
             '''
             return self._dataShape
         
@@ -885,14 +922,14 @@ class DataPreprocessing:
             '''
             return self._instanceClass
         
-        def attachToSource(self, trainSource: 'TrainSource', dppKey: str):
+        def attachToSource(self, trainSource: 'Source.Config', dppKey: str):
             '''
-                Attach this @DataPreprocessing.Node object to a @TrainSource object.   --- UPDATED (Dexter) 20190130
+                Attach this @DataPreprocessing.Node object to a @Source.Config object.   --- UPDATED (Dexter) 20190130
 
                 Parameters
                 ------------------------------
 
-                trainSource     `TrainSource`   - The @TrainSource object to attach to.
+                trainSource     `Source.Config`   - The @Source.Config object to attach to.
 
                 dppKey          `str`           - The column key to identify this @DataPreprocessing.Node object.
             '''
@@ -1088,7 +1125,7 @@ class DataPreprocessing:
                     setattr(self, key, value)
                 if (key == "dtype"):
                     if (value is not None):
-                        self.dtype = TrainSource.getDataType(value)
+                        self.dtype = Source.Config.getDataType(value)
                 elif (key == "oneHotColums"):
                     for (oneHotIdx, oneHotList) in value:
                         setattr(self.oneHotColumns, oneHotIdx, set(oneHotList))
@@ -1145,7 +1182,7 @@ class DataPreprocessing:
             else:
                 return None
 
-        class StepEnum(Enum):
+        class StepEnum(Enumeration):
             '''
                 Enumeration representing the step of data preprocessing within a @ColConfig object.   --- UPDATED (Dexter) 20190129
             '''
@@ -1222,7 +1259,7 @@ class DataPreprocessing:
             else:
                 return obj
         
-        class InstanceClassEnum(Enum):
+        class InstanceClassEnum(Enumeration):
             '''
                 Enumeration representing the instance / sub-class type of a @DataPreprocessing.Transformation.Config object.   --- UPDATED (Dexter) 20190130
             '''
@@ -1238,7 +1275,7 @@ class DataPreprocessing:
             '''
                 Sub-class containing methods and instance classes on transformation configurations on columns from a @DataPreprocessing.ColumnsNode object.   --- RESERVED --- UPDATED (Dexter) 20190130
             '''
-            class Types(Enum):
+            class Types(Enumeration):
                 '''
                     Enumeration representing the transformation method type of a @DataPreprocessing.Transformation.Columns.Config object.   --- RESERVED --- UPDATED (Dexter) 20190131
                 '''
@@ -1286,7 +1323,7 @@ class DataPreprocessing:
             '''
                 Sub-class containing methods and instance classes on transformation configurations on images from a @DataPreprocessing.ImageNode object.   --- UPDATED (Dexter) 20190131
             '''
-            class Types(Enum):
+            class Types(Enumeration):
                 '''
                     Enumeration representing the transformation method type of a @DataPreprocessing.Transformation.Image.Config object.   --- RESERVED --- UPDATED (Dexter) 20190131
                 '''
@@ -1310,13 +1347,13 @@ class DataPreprocessing:
 # Fallback name for old class name.
 ColConfig = DataPreprocessing.ColumnsNode
 
-class TrainSource:
+class _SourceConfig:
     '''
 			Class representing a centralized interface for handling training data source.   --- UPDATED (Dexter) 20180622
     '''
     def __init__(self, oriShape = [], batchSize = 200, training = True, shuffle = True, name = "", splittable = False):
         '''
-			Create a TrainSource object.   --- UPDATED (Dexter) 20190128
+			Create a @Source.Config object.   --- UPDATED (Dexter) 20190128
 
             Parameters
             ------------------------------
@@ -1331,23 +1368,23 @@ class TrainSource:
 
             shuffle             `bool`              - Whether the data source will be shuffled on training.
 
-            name                `str`               - Name of this TrainSource.
+            name                `str`               - Name of this @Source.Config .
 
             splittable          `bool`              - Whether the data source is splittable, for the purpose of partitioning validation data.
         '''
-        # `str` - The type of this @TrainSource, like `"TableSource"`, `"CSVSource"`, etc.
+        # `str` - The type of this @Source.Config, like `"TableSource"`, `"CSVSource"`, etc.
         self._type = ""
         # `int` - Epoch size of the data, i.e. total number of records in the training dataset.
         self.epochSize = oriShape[0] if len(oriShape) > 0 else None
         # `int` - Batch size when using batched training.
         self.batchSize = batchSize
-        # `TrainSource` - The validation subset of this @TrainSource object.
+        # `Source.Config` - The validation subset of this @Source.Config object.
         self.validation = None
-        # `Train` - The @Train object where this @TrainSource belongs to. If this source is just constructed, it is not belonged to any training instance. 
+        # `Train` - The @Train object where this @Source.Config belongs to. If this source is just constructed, it is not belonged to any training instance. 
         self.train = None
         # `bool` - Whether the data source will be shuffled on training.
         self.shuffle = shuffle
-        # `str` - The name of this @TrainSource. 
+        # `str` - The name of this @Source.Config. 
         self.name = name
         # `bool` - Whether the data source is splittable, for the purpose of partitioning validation data.
         self.splittable = splittable
@@ -1357,7 +1394,7 @@ class TrainSource:
         self._training = training
         # `list<int>` - The original shape of the data source, including the batch dimension.
         self._oriShape = oriShape
-        # `TrainSource` - The train subset of this @TrainSource object.
+        # `Source.Config` - The train subset of this @Source.Config object.
         self.trainset = self
         # `bool` - Whether the source has been initialized for data generation.
         self._initialized = False
@@ -1381,12 +1418,12 @@ class TrainSource:
     @property
     def oriShape(self) -> List[int]:
         '''
-            Get the shape of the original (and primary) data of this @TrainSource object.   --- UPDATED (Dexter) 20190130
+            Get the shape of the original (and primary) data of this @Source.Config object.   --- UPDATED (Dexter) 20190130
 
             Returns
             ------------------------------
 
-            `list<int>` - The shape of the original (and primary) data of this @TrainSource object.
+            `list<int>` - The shape of the original (and primary) data of this @Source.Config object.
         '''
         return self._oriShape
     
@@ -1641,7 +1678,7 @@ class TrainSource:
         if not self.splittable:
             raise ValueError("This source cannot be split. Please consider to use seperate sources if you need to perform actions like cross validation.")
     
-    def splitTestDataset(self, test: float = 0.2, shuffle: float = False) -> 'TrainSource':
+    def splitTestDataset(self, test: float = 0.2, shuffle: float = False) -> 'Source.Config':
         '''
 			Virtual method for splitting current data into training and test sets, with this source as the training set. No action taken, and a sub-class should be used.   --- UPDATED (Dexter) 20181111
 
@@ -1655,7 +1692,7 @@ class TrainSource:
             Returns
             ------------------------------
 
-            `TrainSource`   - The test set.
+            `Source.Config`   - The test set.
         '''
         # Raise error if this is not a splittable data source.
         if not self.splittable:
@@ -1709,14 +1746,14 @@ class TrainSource:
         else:
             return self.getRootDppKey(self[dppKey].source)
     
-    def applyDataConfig(self, *toSources: 'TrainSource'):
+    def applyDataConfig(self, *toSources: 'Source.Config'):
         '''
 			Apply the data configuration of this source to other sources.   --- UPDATED (Dexter) 20190203
 
             Parameters
             ------------------------------
 
-            toSources      `*TrainSource`  - One or more TrainSource object to apply the same column configurations of this TrainSource.
+            toSources      `*Source.Config`  - One or more @Source.Config object to apply the same column configurations of this @Source.Config.
         '''
         # Get the root column configs.
         coreDataSources = [dppKey for dppKey,col in self.colConfigs.items() if col.source is None]
@@ -1726,7 +1763,7 @@ class TrainSource:
             # Get the root of this column config.
             thisDppKeyRoot = self.getRootDppKey(dppKey)
 
-            # Loop every applying TrainSource objects.
+            # Loop every applying @Source.Config objects.
             for tos in toSources:
                 # Get a new preprocessing node
                 newDppNode = getattr(DataPreprocessing,DataPreprocessing.InstanceClassEnum(dppNode._instanceClass).name)()
@@ -1778,7 +1815,7 @@ class TrainSource:
         '''
         return {"tf.float32": tf.float32, "tf.int64": tf.int64}[string]
 
-class TableSource(TrainSource):
+class TableSource(_SourceConfig):
     '''
         Class representing a data source in table format, usually rows of data records with attributes as columns.   --- UPDATED (Dexter) 20180622 
     '''
@@ -1838,7 +1875,7 @@ class TableSource(TrainSource):
             if (len(out)):
                 self["output"] = DataPreprocessing.ColumnsNode(None, targetCol)
         
-        # `str` - The type of this @TrainSource, i.e. ``"TableSource"``
+        # `str` - The type of this @Source.Config, i.e. ``"TableSource"``
         self._type = "TableSource"
 
         # `bool` - Whether the table has heading.
@@ -1853,7 +1890,7 @@ class TableSource(TrainSource):
         # `int` - Remember the row count, and find the iteration count for each epoch.
         self._itrCount = max(self.epochSize // batchSize, 1)
 
-        # Prepare the iteration of this TrainSource.
+        # Prepare the iteration of this @Source.Config.
         self.__prepareItr__()
     
     @property
@@ -2069,7 +2106,7 @@ class TableSource(TrainSource):
             Parameters
             ------------------------------
 
-            dppKey - The key for the requested @DataPreprocessing.ColumnsNode object in @TrainSource.colConfigs .
+            dppKey - The key for the requested @DataPreprocessing.ColumnsNode object in @Source.Config.colConfigs .
         '''
         # Ensure there is original data.
         if (self.oriData is None or len(self.oriData) == 0):
@@ -2093,7 +2130,7 @@ class TableSource(TrainSource):
             Parameters
             ------------------------------
 
-            dppKey      `str`  - The key for the requested @ColConfig object in @TrainSource.colConfigs .
+            dppKey      `str`  - The key for the requested @ColConfig object in @Source.Config.colConfigs .
 
             Returns
             ------------------------------
@@ -2939,7 +2976,7 @@ class CSVSource(TableSource):
         # `str` - The file name of the CSV file.
         self._fileName = path[max([path.rfind("/"), path.rfind("\\")])+1:]
 
-        # `str` - The type of this @TrainSource, i.e. `"CSVSorce"`
+        # `str` - The type of this @Source.Config , i.e. `"CSVSorce"`
         self._type = "CSVSource"
 
         # `str` - Encoding format of the file.
@@ -2969,7 +3006,7 @@ class CSVSource(TableSource):
         '''
         return self._fileName
 
-class ImageSource(TrainSource):
+class ImageSource(_SourceConfig):
     '''
         Class representing a centralized class for different image datasets as an input source.   --- UPDATED (Dexter) 20181209
     '''
@@ -2999,11 +3036,11 @@ class ImageSource(TrainSource):
         self._labelShape = []
         # `str` - The image source type (the renowned image dataset) of this @ImageSource object. 
         self._sourceType = None
-        # `str` - The type of this @TrainSource, i.e., `"ImageSource"`.
+        # `str` - The type of this @Source.Config , i.e., `"ImageSource"`.
         self._type = "ImageSource"
         
         # `str` - The folder directory where the renowned data source is saved.
-        self.coreDataDir = coreDataDir if (coreDataDir is not None) else ("D:/tmp/" + ("cifar10_data" if sourceType == "cirfar10" else "mnist" if sourceType == "mnist" else ""))
+        self.coreDataDir = coreDataDir if (coreDataDir is not None) else ("D:/tmp/" + ("cifar10_data/" if sourceType == "cirfar10" else "mnist/" if sourceType == "mnist" else ""))
         # Ensure the data folder exists.
         if not os.path.exists(self.coreDataDir):
             raise ValueError("Data Folder not found")
@@ -3062,7 +3099,7 @@ class ImageSource(TrainSource):
     
     def setSourceType(self, sourceType: str):
         '''
-            Set the source type of this @ImageSource object.   --- UPDATED (Dexter) 20190131
+            Set the source type of this @ImageSource object.   --- UPDATED (Dexter) 20190727
 
             Parameters
             ------------------------------
@@ -3084,7 +3121,7 @@ class ImageSource(TrainSource):
             
         # Set the epoch size and Dataset API-related file names.
         if (sourceType == "cifar10"):
-            self._fileNames = [self.coreDataDir +'/cifar-10-batches-bin/data_batch_%d.bin' % i for i in range(1, 6)] if self.training else [self.coreDataDir +'/cifar-10-batches-bin/test_batch.bin']
+            self._fileNames = [self.coreDataDir +'cifar-10-batches-bin/data_batch_%d.bin' % i for i in range(1, 6)] if self.training else [self.coreDataDir +'cifar-10-batches-bin/test_batch.bin']
             self.epochSize = 50000 if self.training else 10000
         elif (sourceType == "stl10-labeled"):
             self.epochSize = 5000 if self.training else 8000
@@ -3148,7 +3185,7 @@ class ImageSource(TrainSource):
             Parameters
             ------------------------------
 
-            dppKey - The key for the requested @DataPreprocessing.ColumnsNode object in @TrainSource.colConfigs .
+            dppKey - The key for the requested @DataPreprocessing.ColumnsNode object in @Source.Config.colConfigs .
 
             Returns
             ------------------------------
@@ -3478,6 +3515,31 @@ class ImageSource(TrainSource):
                 dataType = "Value"
         return [[dataType, json.dumps(i.tolist())] for i in (items if recovered else self.recoverToRawData(dppKey, items))]
         
+class Source:
+    '''
+        Module containing classes and functions regarding training sources.   --- UPDATED (Dexter) 20190302
+    '''
+    class Types(Enumeration):
+        '''
+			Enumeration defining the type of a @Source.Config object.   --- UPDATED (Dexter) 20190302
+        '''
+        # `int` - Abstract class representing a data source. (Ref: @Source.Config )
+        Config = 0
+        # `int` - Class representing a table data source. (Ref: @Source.Table )
+        Table = 1
+        # `int` - Class representing a CSV table data source. (Ref: @Source.CSV )
+        CSV = 2
+        # `int` - Class representing a centralized class for different image datasets as an input source. (Ref: @Source.Image )
+        Image = 3
+
+    Config = _SourceConfig
+
+    Table = TableSource
+
+    CSV = CSVSource
+
+    Image = ImageSource
+
 class TrainSourceData():
     '''
 			Class representing a structured data corresponding to a training object.   --- UPDATED (Dexter) 20180713
@@ -3695,7 +3757,7 @@ class Train():
     '''
     def __init__(self, trainName: str = "train", folder: str = "D:/tmp/", restorePath: Optional[str] = None, device: str = '/cpu:0', 
                 logFreq: int = 0, saveFreq: int = 0, testFreq: int = 0, traceFreq: int = 0, weightLogFreq: int = 0, filterFreq: int = 0, 
-                source: Optional[Union['TrainSource', List['TrainSource']]] = None, testSource: Optional[Union['TrainSource', List['TrainSource']]] = None, 
+                source: Optional[Union['Source.Config', List['Source.Config']]] = None, testSource: Optional[Union['Source.Config', List['Source.Config']]] = None, 
                 runCount: Optional[int] = None, trainingProfile: Optional[Union['TrainingProfile', List['TrainingProfile']]] = None, traceRecord: int = 0):
         '''
 			Create a Train object.   --- UPDATED (Dexter) 20190119
@@ -3723,9 +3785,9 @@ class Train():
 
             filterFreq          `int`       - The image filter logging frequency (per training step).   --- RESERVED
 
-            source              `TrainSource|list[TrainSource]`         - A training source or a list of training source that this training is using.
+            source              `Source.Config|list[Source.Config]`         - A training source or a list of training source that this training is using.
 
-            testSource          `TrainSource|list[TrainSource]`         - A testing source or a list of training source that this training is using.
+            testSource          `Source.Config|list[Source.Config]`         - A testing source or a list of training source that this training is using.
 
             runCount             `int`       - The count of multi-run setup.
 
@@ -3761,17 +3823,17 @@ class Train():
         if (trainingProfile is not None and ((classof(trainingProfile) != "list" and (not issubclass(trainingProfile.__class__, TrainingProfile))) or (classof(trainingProfile) == "list" and any([(not issubclass(tp.__class__, TrainingProfile)) for tp in trainingProfile])))):
             raise ValueError("`trainingProfile` parameters should be a `TrainingProfile` object.")
         self.trainingProfiles = [trainingProfile or TrainingProfile()] if classof(trainingProfile) != "list" else trainingProfile
-        # Raise Errors for `source` not matching TrainSource type.
-        if (source is not None and ((classof(source) != "list" and (not issubclass(source.__class__, TrainSource))) or (classof(source) == "list" and any([(not issubclass(s.__class__, TrainSource)) for s in source])))):
-            raise ValueError("`source` parameters should be a `TrainSource` object.")
+        # Raise Errors for `source` not matching @Source.Config type.
+        if (source is not None and ((classof(source) != "list" and (not issubclass(source.__class__, Source.Config))) or (classof(source) == "list" and any([(not issubclass(s.__class__, Source.Config)) for s in source])))):
+            raise ValueError("`source` parameters should be a `Source.Config` object.")
         self.sources = []
         if classof(source) == "list":
             self.setDataSources(*source)
         elif source is not None:
             self.addDataSource(source)
-        # Raise Errors for `testSource` not matching TrainSource type.
-        if (testSource is not None and ((classof(testSource) != "list" and (not issubclass(testSource.__class__, TrainSource))) or (classof(testSource) == "list" and any([(not issubclass(s.__class__, TrainSource)) for s in testSource])))):
-            raise ValueError("`testSource` parameters should be a `TrainSource` object.")
+        # Raise Errors for `testSource` not matching @Source.Config type.
+        if (testSource is not None and ((classof(testSource) != "list" and (not issubclass(testSource.__class__, Source.Config))) or (classof(testSource) == "list" and any([(not issubclass(s.__class__, Source.Config)) for s in testSource])))):
+            raise ValueError("`testSource` parameters should be a `Source.Config` object.")
         self.testSources = []
         if classof(testSource) == "list":
             self.testSources = testSource
@@ -3820,9 +3882,14 @@ class Train():
         return len(self.trainingProfiles) * self.runCount
 
     @staticmethod
-    def activationFunctions(string):
+    def activationFunctions(activationName: str) -> Callable:
         '''
-			Get an activation function from a key.   --- UPDATED (Dexter) 20180623
+			Get an activation function from a key.   --- UPDATED (Dexter) 20190725
+
+            Parameters
+            ------------------------------
+            
+            activationName `str` - The activation name.
 
             Returns
             ------------------------------
@@ -3831,8 +3898,8 @@ class Train():
         '''
         return {"relu": tf.nn.relu, "relu6": tf.nn.relu6, "crelu": tf.nn.crelu, "elu": tf.nn.elu,
                 "selu": tf.nn.selu, "softplus": tf.nn.softplus, "softsign": tf.nn.softsign,
-                "sigmoid": tf.nn.sigmoid, "tanh": tf.nn.tanh, "hardSigmoid": tf.keras.backend.hard_sigmoid,
-                "linear": lambda x: x }[string.lower()]
+                "sigmoid": tf.nn.sigmoid, "tanh": tf.nn.tanh, "hardsigmoid": tf.keras.backend.hard_sigmoid,
+                "linear": lambda x: x }[activationName.lower()]
 
     @staticmethod
     def optimizers(string):
@@ -4003,7 +4070,7 @@ class Train():
         # Assign the training profiles.
         self.trainingProfiles = trainingProfiles
 
-    def __build__(self, buildNo: int = 0):
+    def _build(self, buildNo: int = 0):
         '''
 			Build the TensorFlow Graph of the model.   --- UPDATED (Dexter) 20190208
 
@@ -4069,7 +4136,7 @@ class Train():
 
                 # 3D. For all meta data (Layer Profiles), build the TensorFlow graph
                 for x in [l for l in self.layerProfiles.values() if len(l.fromSource[buildNo]) > 0 and len(l.fromNode[buildNo]) == 0]:
-                    x.__build__(buildNo)
+                    x._build(buildNo)
         
         self._built = True
         
@@ -4148,7 +4215,7 @@ class Train():
         else:
             #   6.  Build the model if it has not built yet.
             if (not self._built):
-                self.__build__(buildNo)
+                self._build(buildNo)
 
             #   7.  Fire trainbuild event
             tb = TrainEvent("trainbuild", {"target": self, "buildNo": self._buildNo, "trainingProfile": nowTrainingProfile})
@@ -4546,7 +4613,7 @@ class Train():
         # Train the model.
         self.fullModelTrain()
     
-    def evaluate(self, x: Optional[Union['TrainSource', 'np.ndarray', List[List[Any]], List['TrainSource'], 'TrainSourceData']] = None, 
+    def evaluate(self, x: Optional[Union['Source.Config', 'np.ndarray', List[List[Any]], List['Source.Config'], 'TrainSourceData']] = None, 
                 batchSize: int = -1, shuffle: bool = False, validation: bool = False, isPredict: bool = False, event: str = "", saveOriginal: bool = False, saveResults: bool = False, buildNo: int = 0):
         '''
 			Evaluation this model (A user-oriented API).   --- UPDATED (Dexter) 20181114
@@ -4554,7 +4621,7 @@ class Train():
             Parameters
             ------------------------------
 
-            x               `TrainSource|np.ndarray[np.ndarray]|list[list]|list[TrainSource]|TrainSourceData`     - Input data of a model.
+            x               `Source.Config|np.ndarray[np.ndarray]|list[list]|list[Source.Config]|TrainSourceData`     - Input data of a model.
 
             batchSize       `int`   - Batch size of the test dataset. -1: Full epoch evaluation will be processed.
 
@@ -4575,11 +4642,11 @@ class Train():
         #   1A.  If there is evaluation data, set it as test data source.
         if (x is not None and not validation):
             #   1A-1.    Dependiing on the training source and set up the test sources.
-            if (issubclass(x.__class__, TrainSource)):
+            if (issubclass(x.__class__, Source.Config)):
                 self._evalSources = [x]
             elif (issubclass(x.__class__, TrainSourceData)):
                 self._evalSources = x
-            elif (classof(x) == "list" and all([issubclass(x.__class__, TrainSource) for t in x])):
+            elif (classof(x) == "list" and all([issubclass(x.__class__, Source.Config) for t in x])):
                 self._evalSources = x
             elif (classof(self.sources[0]) in ["TableSource", "CSVSource"]):
                 self._evalSources = [TableSource(x,batchSize=batchSize,training=False,shuffle=shuffle)]
@@ -4618,7 +4685,7 @@ class Train():
         #   3. Clear evaluation sources.
         self._evalSources = None
     
-    def predict(self, x: Optional[Union['TrainSource', 'np.ndarray', List[List[Any]], List['TrainSource'], 'TrainSourceData']] = None, 
+    def predict(self, x: Optional[Union['Source.Config', 'np.ndarray', List[List[Any]], List['Source.Config'], 'TrainSourceData']] = None, 
                 batchSize: int = -1, shuffle: bool = False, validation: bool = False, event: str = "", saveOriginal: bool = False, saveResults: bool = False, buildNo: int = 0):
         '''
 			Predict some data using this model (A user-oriented API).   --- UPDATED (Dexter) 20180713
@@ -4626,7 +4693,7 @@ class Train():
             Parameters
             ------------------------------
 
-            x               `TrainSource|np.ndarray[np.ndarray]|list[list]|list[TrainSource]|TrainSourceData`     - Input data of a model.
+            x               `Source.Config|np.ndarray[np.ndarray]|list[list]|list[Source.Config]|TrainSourceData`     - Input data of a model.
 
             batchSize       `int`   - Batch size of the test dataset. -1: Full epoch evaluation will be processed.
 
@@ -4725,7 +4792,7 @@ class Train():
             Parameters
             ------------------------------
 
-            source          `TrainSource`  - A data source to be assigned.
+            source          `Source.Config`  - A data source to be assigned.
         '''
         self.sources.append(source)
         source.train = self
@@ -4737,7 +4804,7 @@ class Train():
             Parameters
             ------------------------------
 
-            *sources        `TrainSource+`  - A data source to be assigned.
+            *sources        `Source.Config+`  - A data source to be assigned.
         '''
         self.sources = sources
         for s in sources:
@@ -4843,7 +4910,7 @@ class Train():
 
             buildNo         `int`           - The build no.
         '''
-        layerProfile.__updateOrder__(buildNo=buildNo)
+        layerProfile._updateOrder(buildNo=buildNo)
         if (not layerProfile._final):
             for lp in [lp for lp in self.layerProfiles.values() if lp._final]:
                 lp.updateOrder(buildNo=buildNo)
@@ -5906,7 +5973,7 @@ class IncomingConfig():
     '''
 			Class representing an incoming configurations of a node.   --- UPDATED (Dexter) 20180921
     '''
-    class Types(Enum):
+    class Types(Enumeration):
         '''
 			Sub-class representing the available methods for incoming configuration.   --- UPDATED (Dexter) 20180919
         '''
@@ -5922,7 +5989,7 @@ class IncomingConfig():
         # Elementally sum and multiply the elemenental min of all incoming nodes with weighted proportion on summation and multiplication. Nodes should be same in dimensions, or the pre-feature dimensions should be the multiple of the core incoming node.
         Blend = 5
     
-    class MergeDimTypes(Enum):
+    class MergeDimTypes(Enumeration):
         '''
 			Sub-class representing the type of handling merging higher dimensioned nodes to the lower dimensioned core node.   --- BETA --- UPDATED (Dexter) 20180923
         '''
@@ -6142,7 +6209,7 @@ class OutputConfig():
     '''
 			Class representing an output configuration of a node.   --- UPDATED (Dexter) 20180921
     '''
-    class Types(Enum):
+    class Types(Enumeration):
         '''
 			Sub-class representing the available methods for output configuration.   --- UPDATED (Dexter) 20181003
         '''
@@ -6382,7 +6449,123 @@ class BuildOrderList(BuildItemList):
 
         return super().__setitem__(buildNo, order)
 
-class LayerProfile():
+class _ModelNodeConfig():
+    """
+        Abstract class representing a model node configuration.   --- RESERVED --- UPDATED (Dexter) 20190508
+    """
+    def __init__(self, name: str = ""):
+        """
+            Create a graph model node.   --- RESERVED --- UPDATED (Dexter) 20190508
+
+            Parameters
+            ------------------------------
+
+            name    `str`   - The name of this layer; the base name hierarchy in TensorFlow model.
+        """
+        # `ModelNode.Types` - The type of the model node, as defined in @ModelNode.Types .
+        self._nodeType = ModelNode.Types.Config
+        # `str` - The name of this model node; the base name hierarchy in TensorFlow model.
+        self.name = name
+        # `BuildSourceList` - A 2 dimension array of a list of incoming data preprocessing node in each build. Each node is represented by its key.
+        self.fromSource = BuildSourceList()
+        # `BuildLayerList` - A 2 dimension array of a list of incoming model nodes in each build. Each model node is represented by the node name. When implemented in prgoramming runtime, it should be a @ModelNode.Config object.
+        self.fromNode = BuildLayerList()
+        # `BuildLayerList` - A 2 dimension array of a list of connecting model nodes in each build. Each model node is represented by the node name. When implemented in prgoramming runtime, it should be a @ModelNode.Config object.
+        self.toNode = BuildLayerList()
+        # `BuildOrderList` - A list of topological orders in the graph of each build.
+        self._order = BuildOrderList()
+        # `Train` - The @NOM object where this @Source.Config belongs to. If this layer is just constructed, it is not belonged to any training instance. Always `null` or `undefined` in NOM JSON file to avoid circular referencing.
+        self.train = None
+        # `tf.DType` - 
+        self._dataType = tf.float32
+
+        # Information that is used within a build.
+        self._outputTensor = None
+        self._built = False
+        self._inputCollections = []
+        self._weights = []
+        self.weightLogging = True
+
+    @staticmethod
+    def nodeType(self) -> 'ModelNode.Types':
+        """
+            The node type of this object, as defined in @ModelNode.Types .   --- RESERVED --- UPDATED (Dexter) 20190508
+
+            Returns
+            ------------------------------
+
+            `ModelNode.Types` - The node type of this object, as defined in @ModelNode.Types .
+        """
+        return self._nodeType
+    
+    @staticmethod
+    def shape(self) -> 'list<list<int>>':
+        """
+            A list of shapes in the order of each build. Each shape should be a list of number or `None`.    --- UPDATED (Dexter) 20190508
+
+            Returns
+            ------------------------------
+
+            `list<list<int>>` A list of shapes in the order of each build. Each shape should be a list of number or `None`.
+        """
+        return self._shape
+    
+    @staticmethod
+    def order(self) -> 'list<int>':
+        """
+            A list of topological orders in the graph of each build.    --- UPDATED (Dexter) 20190508
+
+            Returns
+            ------------------------------
+
+            `list<list<int>>` - A list of topological orders in the graph of each build.
+        """
+        return self._order
+    
+    @property
+    def dtype(self):
+        '''
+			Get the data type of this layer.   --- UPDATED (Dexter) 20181214
+        '''
+        return self._dataType
+    
+    def isFinal(self) -> bool:
+        """
+            Abstract method to check if this layer is a final layer.   --- UPDATED (Dexter) 20190409
+
+            Returns
+            ------------------------------
+
+            `bool` - Whether this layer is a final layer.
+        """
+        pass
+
+    def switchOffWeightLogging(self):
+        '''
+			Optionally switch off weightLogging.   --- UPDATED (Dexter) 20190508
+        '''
+        self.weightLogging = False
+
+    def _clearTempTensors(self):
+        '''
+			Abstract method to clear temp tensors that are on previous graphs, usually call for a new build.   --- UPDATED (Dexter) 20190508
+        '''
+        self._weights = []
+    
+    def _build(self, buildNo: int):
+        '''
+			Build the TensorFlow Graph of this layer.   --- UPDATED (Dexter) 20190724
+
+            Parameters
+            ------------------------------
+
+            buildNo     `int`   - The build number to be built.
+        '''
+        self._clearTempTensors()
+        raise ValueError("Model Node cannot be built directly. Please opt for a specific layer profile like CNNLayer or a CustomLayerProfile.")
+
+
+class LayerProfile(_ModelNodeConfig):
     '''
 			Class representing a layer module.   --- UPDATED (Dexter) 20180921
     '''
@@ -6393,7 +6576,7 @@ class LayerProfile():
                     batchNorm: bool = True, batchNormParams: Dict[str, Any] = {}, dropout: float = 1, 
                     outputConfig: 'OutputConfig' = OutputConfig.Default()):
         '''
-			Create a new layer.   --- UPDATED (Dexter) 20181011
+			Create a new layer.   --- UPDATED (Dexter) 20190724
 
             Parameters
             ------------------------------
@@ -6402,9 +6585,9 @@ class LayerProfile():
             
             layerUnits      `int`   - The number of hidden units in this layer.
 
-            final           `bool`  - Whether this is a final layer (training task).
+            final           `bool`  - Whether this is a final layer (training task).   --- DEPRECATED
 
-            incomingConfig  `IncomingConfig`    - Input configurations.
+            incomingConfig  `IncomingConfig`    - The input configurations of this layer.
 
             linearTransform `LinearTransformConfig` - The linear transformation configuration.
             
@@ -6418,64 +6601,54 @@ class LayerProfile():
 
             dropout         `float` - The keep probability of dropout during training.
 
-            outputConfig    `OutputConfig`      - Output configurations.
+            outputConfig    `OutputConfig`      - The output configurations of this layer.
         '''
         # Ensure the layer name is a string.
         if name is not None and classof(name) not in ["str", "String"]:
             raise ValueError("Layer Profile Name must be a string")
+
+        super().__init__(name = name)
         
-        # Define layer setup configurations.
-        self.name = name
+        ### Define layer setup configurations.
+        # `int` - The number of hidden units in this layer.
         self.layerUnits = layerUnits
+        # `LinearTransformConfig` - The linear transformation configuration of this layer.
         self.linearTransform = linearTransform
+        # `bool` - Whether to use batch normalization before activation function.
         self.batchNorm = batchNorm
+        # `dict{str:*}` - Batch normalization parameters as defined in TensorFlow.
         self.batchNormParams = batchNormParams
+        # `str` - The activation function of this layer.
         self.activation = activation
+        # `dict{str:*}` - Activation parameters as defined in TensorFlow.
         self.activationParams = activationParams
+        # `IncomingConfig` - The input configurations of this layer.
         self.incomingConfig = incomingConfig
+        # `OutputConfig` - The output configurations of this layer.
         self.outputConfig = outputConfig
         
-        # Define model-related information.
-        self._dataType = tf.float32
+        ### Define model-related information.
+        # `bool` - Whether this is a final layer (training task).   --- DEPRECATED
         self._final = final
-        self.fromSource = BuildSourceList()
-        self.fromNode = BuildLayerList()
-        self.toNode = BuildLayerList()
-        self._order = BuildOrderList()
 
-        # Information that is used within a build.
-        self._outputTensor = None
-        self._built = False
-        self._inputCollections = []
-        self._weights = []
-        self.weightLogging = True
-
-        # Define training-related information.
-        self.train = None
+        ### Define training-related information.
+        # `float` - The keep probability of dropout during training, in terms of %.
         self.dropout = dropout
+        # `tf.Tensor` - The dropout tensor to be handled within TensorFlow training.
         self._dropoutTensor = None
 
-    @property
-    def dtype(self):
-        '''
-			Get the data type of this layer.   --- UPDATED (Dexter) 20181214
-        '''
-        return self._dataType
+    def isFinal(self) -> bool:
+        """
+            Check if this layer is a final layer.   --- UPDATED (Dexter) 20190508
 
-    def switchOffWeightLogging(self):
-        '''
-			Optionally switch off weightLogging.   --- UPDATED (Dexter) 20181214
-        '''
-        self.weightLogging = False
+            Returns
+            ------------------------------
 
-    def __clearTempTensors__(self):
-        '''
-			Clear temp tensors that are on previous graphs, usually call for a new build.   --- UPDATED (Dexter) 20181110
-        '''
-        self._weights = []
-        self._dropoutTensor = None
+            `bool` - Whether this layer is a final layer.
+        """
+        return isinstance(self, ModelNode.Layer.Task.Config)
 
-    def __build__(self, buildNo: int):
+    def _build(self, buildNo: int):
         '''
 			Build the TensorFlow Graph of this layer.   --- UPDATED (Dexter) 20181115
 
@@ -6484,10 +6657,10 @@ class LayerProfile():
 
             buildNo     `int`   - The build number to be built.
         '''
-        self.__clearTempTensors__()
+        self._clearTempTensors()
         raise ValueError("LayerProfile cannot be built directly. Please opt for a specific layer profile like CNNLayer or a CustomLayerProfile.")
 
-    def __getTensorsFromPreviousNodes__(self, buildNo: int = 0) -> List['tf.Tensor']:
+    def _getTensorsFromPreviousNodes(self, buildNo: int = 0) -> List['tf.Tensor']:
         '''
 			Get the output tensors of the previous layer modules.   --- UPDATED (Dexter) 20181115
 
@@ -6503,7 +6676,7 @@ class LayerProfile():
         '''
         return [n._outputTensor for n in self.fromNode[buildNo]]
     
-    def __getTensorsFromPreviousSources__(self, buildNo: int = 0) -> List['tf.Tensor']:
+    def _getTensorsFromPreviousSources(self, buildNo: int = 0) -> List['tf.Tensor']:
         '''
 			Get the data source tensors of the previous sources.   --- UPDATED (Dexter) 20181115
 
@@ -6519,7 +6692,7 @@ class LayerProfile():
         '''
         return [self.train._sourceTensors[n][idx] for n,idx in self.fromSource[buildNo]]
     
-    def __getTensorsFromAvailableInputs__(self, buildNo: int = 0) -> List['tf.Tensor']:
+    def _getTensorsFromAvailableInputs(self, buildNo: int = 0) -> List['tf.Tensor']:
         '''
 			Get the feed-in tensors from the previous layer modules or sources.   --- DEPRECATED --- UPDATED (Dexter) 20181115
 
@@ -6533,9 +6706,9 @@ class LayerProfile():
 
             `tf.Tensor` - Collection tensor of all incoming inputs.
         '''
-        return [*self.__getTensorsFromPreviousSources__(buildNo = buildNo), *self.__getTensorsFromPreviousNodes__(buildNo = buildNo)]
+        return [*self._getTensorsFromPreviousSources(buildNo = buildNo), *self._getTensorsFromPreviousNodes(buildNo = buildNo)]
     
-    def __combineIncomingTensors__(self, buildNo: int = 0) -> 'tf.Tensor':
+    def _combineIncomingTensors(self, buildNo: int = 0) -> 'tf.Tensor':
         '''
 			Get the feed-in tensors from the previous layer modules or sources.   --- UPDATED (Dexter) 20190712
 
@@ -6549,10 +6722,15 @@ class LayerProfile():
 
             `tf.Tensor` - Collection tensor of all incoming inputs.
         '''
-        self._inputCollections = incomingNodes = [*self.__getTensorsFromPreviousSources__(buildNo = buildNo), *self.__getTensorsFromPreviousNodes__(buildNo = buildNo)]
+        self._inputCollections = incomingNodes = [*self._getTensorsFromPreviousSources(buildNo = buildNo), *self._getTensorsFromPreviousNodes(buildNo = buildNo)]
 
         # Standardize data type.
-        incomingNodes = [tf.cast(node, self._dataType) if node.dtype != self._dataType else node for node in incomingNodes]
+        try:
+            incomingNodes = [tf.cast(node, self._dataType) if node.dtype != self._dataType else node for node in incomingNodes]
+        except:
+            for node in incomingNodes:
+                print(node)
+            raise ValueError()
         
         # Ensure there is at least one incoming node.
         if (len(incomingNodes) == 0):
@@ -6780,7 +6958,7 @@ class LayerProfile():
 
         return startTensor
 
-    def __commonLayerOps__(self, operatedLayer: 'tf.Tensor') -> 'tf.Tensor':
+    def _commonLayerOps(self, operatedLayer: 'tf.Tensor') -> 'tf.Tensor':
         '''
             Apply common layer operations: batch norm, activation, dropout to a layer-specific operated layer.   --- UPDATED (Dexter) 20190208
 
@@ -6812,9 +6990,9 @@ class LayerProfile():
 
         return mid
 
-    def __processOutputTensor__(self, finalTensor: 'tf.Tensor') -> 'tf.Tensor':
+    def _processOutputTensor(self, finalTensor: 'tf.Tensor') -> 'tf.Tensor':
         '''
-			Process the output tensor according to output configs.   --- UPDATED (Dexter) 20181114
+			Process the output tensor according to output configs.   --- UPDATED (Dexter) 20190725
 
             Parameters
             ------------------------------
@@ -6822,33 +7000,52 @@ class LayerProfile():
             finalTensor     `tf.Tensor`     - The processed tensor after this node.
 
             Returns
-
             ------------------------------
 
             `tf.Tensor`     - The output tensor of this node after the processing defined in output configurations.
 
         '''
+        # Prepare necessary information.
+        outputConfig = self.outputConfig
+
         # A)  Output with no processing.
-        if (self.outputConfig.method == OutputConfig.Types.Default):
+        if (outputConfig.method == OutputConfig.Types.Default):
             return finalTensor
         
         # B)  Flatten the output tensor.
-        elif (self.outputConfig.method == OutputConfig.Types.Flatten):
+        elif (outputConfig.method == OutputConfig.Types.Flatten):
             finalShape = finalTensor.shape
-            flattenShape = finalShape[self.outputConfig.axis:]
+            flattenShape = finalShape[outputConfig.axis:]
             newAxisShape = functools.reduce(lambda x,y: x*y, flattenShape, 1)
-            return tf.reshape(finalTensor, [*VarConfig.setAsReshape(finalShape[:self.outputConfig.axis]), newAxisShape])
+            return tf.reshape(finalTensor, [*VarConfig.setAsReshape(finalShape[:outputConfig.axis]), newAxisShape])
         
         # C)  Reshape the output tensor.
-        elif (self.outputConfig.method == OutputConfig.Types.Reshape):
-            finalShape = finalTensor.shape
-            shapeTotal = functools.reduce(lambda x,y: x*y, finalShape[1:], 1)
-            newShapeTotal = functools.reduce(lambda x,y: x*y, self.outputConfig.getShape()[1:], 1)
-            if (shapeTotal != newShapeTotal):
-                raise ValueError("Item shape does not equalt to the output shape.")
-            return tf.reshape(finalTensor, [-1, *self.outputConfig.getShape()[1:]])
+        elif (outputConfig.method == OutputConfig.Types.Reshape):
+            # Get the new shape.
+            newShape = [*outputConfig.shape]
 
-    def __updateOrder__(self, buildNo: int = 0):
+            # Get the total dimension specified in the new shape.
+            confirmShape = round(functools.reduce(lambda x,y: x*y, [s for s in newShape if s not in [None, -1]], 1))
+
+            # Get the total dimension specified in the original shape.
+            totalShape = round(functools.reduce(lambda x,y: x*y, [s.value for s in finalTensor.shape if s.value is not None], 1))
+
+            # Confirm if the remaining axis (with value -1) is an integer.
+            if (totalShape % confirmShape != 0):
+                raise ValueError("The requested shape is not compatible with the layer original output shape.")
+            
+            # Replace the remaining axis (with value -1) with the reshaped dimension.
+            idx = newShape[1:].index(-1) if -1 in newShape[1:] else newShape[1:].index(None) if None in newShape[1:] else -1
+            if (idx == -1):
+                if totalShape == confirmShape:
+                    return tf.reshape(finalTensor, [*VarConfig.setAsReshape(newShape)])
+                else:
+                    raise ValueError("The requested shape is not compatible with the layer original output shape.")
+            else:
+                newShape[idx] = round(totalShape / confirmShape)
+                return tf.reshape(finalTensor, [*VarConfig.setAsReshape(newShape)])
+
+    def _updateOrder(self, buildNo: int = 0):
         '''
 			Update the order of this layer in a chained way.   --- UPDATED (Dexter) 20181115
 
@@ -6859,7 +7056,7 @@ class LayerProfile():
         '''
         self._order[buildNo] = max([0, *[lp._order[buildNo] for lp in self.fromNode[buildNo]]]) + 1
         for lp in self.toNode[buildNo]:
-            lp.__updateOrder__(buildNo=buildNo)
+            lp._updateOrder(buildNo=buildNo)
 
     def appendNode(self, layerProfile: 'LayerProfile', buildNo: int = 0):
         '''
@@ -7025,7 +7222,7 @@ class LayerProfile():
             if layerOrSource._trainSource is None:
                 raise ValueError("The ColConfig object on which this layer append is not specified in any training sources.")
             elif layerOrSource._trainSource.train is None:
-                raise ValueError("The TrainSource object containing this ColConfig object on which this layer append is not specified in any training models.")
+                raise ValueError("The Source.Config object containing this ColConfig object on which this layer append is not specified in any training models.")
             
             layerOrSource._trainSource.train.appendLayer(self, appendAt = layerOrSource, buildNo=buildNo)
         
@@ -7157,7 +7354,7 @@ class Collector(LayerProfile):
         return Collector(name = name, activation = self.activation, activationParams = self.activationParams, incomingConfig = self.incomingConfig,
                         batchNorm = self.batchNorm, batchNormParams = self.batchNormParams, dropout = self.dropout, outputConfig = self.outputConfig)
     
-    def __build__(self, buildNo: int):
+    def _build(self, buildNo: int):
         '''
 			Build the TensorFlow Graph of this layer.   --- UPDATED (Dexter) 20181221
 
@@ -7166,26 +7363,26 @@ class Collector(LayerProfile):
 
             buildNo     `int`   - The build number to be built.
         '''
-        self.__clearTempTensors__()
+        self._clearTempTensors()
 
         # 0. Ensure all incoming nodes have been built.
         if (all([n._built for n in self.fromNode[buildNo]])):
             # 1. Collect the incoming inputs.
-            mid = self.__combineIncomingTensors__(buildNo = buildNo)
+            mid = self._combineIncomingTensors(buildNo = buildNo)
 
             # TensorFlow Graph building, using the layer name as the scope.
             with tf.variable_scope(self.name, reuse=tf.AUTO_REUSE) as scope:
                 # 2. General layer operations.
-                mid = self.__commonLayerOps__(mid)
+                mid = self._commonLayerOps(mid)
 
                 # 5. Final output
-                self._outputTensor = self.__processOutputTensor__(mid)
+                self._outputTensor = self._processOutputTensor(mid)
 
             self._built = True
 
             # Create chain build actions
             for n in self.toNode[buildNo]:
-                n.__build__(buildNo)
+                n._build(buildNo)
 
 class BasicLayer(LayerProfile):
     '''
@@ -7301,7 +7498,7 @@ class BasicLayer(LayerProfile):
                     batchNorm = self.batchNorm, batchNormParams = self.batchNormParams, 
                     dropout = self.dropout, outputConfig = self.outputConfig)
 
-    def __build__(self, buildNo: int):
+    def _build(self, buildNo: int):
         '''
 			Build the TensorFlow Graph of this layer.   --- UPDATED (Dexter) 20190210
 
@@ -7310,7 +7507,7 @@ class BasicLayer(LayerProfile):
 
             buildNo     `int`   - The build number to be built.
         '''
-        self.__clearTempTensors__()
+        self._clearTempTensors()
 
         # 0. Ensure all incoming nodes have been built.
         if (all([n._built for n in self.fromNode[buildNo]])):
@@ -7329,7 +7526,7 @@ class BasicLayer(LayerProfile):
                     w = refW
             
             # 2. Collect the incoming inputs.
-            mid = self.__combineIncomingTensors__(buildNo = buildNo)
+            mid = self._combineIncomingTensors(buildNo = buildNo)
 
             # TensorFlow Graph building, using the layer name as the scope.
             with tf.variable_scope(self.name, reuse=tf.AUTO_REUSE) as scope:
@@ -7339,16 +7536,16 @@ class BasicLayer(LayerProfile):
                 self._weights.extend(linearTransformResults.weights)
             
                 # 4. General layer operations.
-                mid = self.__commonLayerOps__(mid)
+                mid = self._commonLayerOps(mid)
 
                 # 5. Final output
-                self._outputTensor = self.__processOutputTensor__(mid)
+                self._outputTensor = self._processOutputTensor(mid)
 
             self._built = True
 
             # Create chain build actions
             for n in self.toNode[buildNo]:
-                n.__build__(buildNo)
+                n._build(buildNo)
 
 class CustomLayerProfile(LayerProfile):
     '''
@@ -7397,7 +7594,7 @@ class CustomLayerProfile(LayerProfile):
         self._customizeBuild = cuzBuild
         self.cuzArgs = cuzArgs
 
-    def __build__(self, buildNo: int):
+    def _build(self, buildNo: int):
         '''
 			Build the TensorFlow Graph of this layer.   --- BETA --- UPDATED (Dexter) 20180630
 
@@ -7406,27 +7603,27 @@ class CustomLayerProfile(LayerProfile):
 
             buildNo     `int`   - The build number to be built.
         '''
-        self.__clearTempTensors__()
+        self._clearTempTensors()
 
         # 0. Ensure all incoming nodes have been built.
         if (all([n._built for n in self.fromNode[buildNo]])):
             # 1. Collect all incoming tensors, and confirm there is incoming tensor
-            fromTensor = self.__combineIncomingTensors__(buildNo = buildNo)
+            fromTensor = self._combineIncomingTensors(buildNo = buildNo)
 
             # 2. If there is a custom build function, apply it instead of the default linear model below.
             if (self._customizeBuild is not None):
-                self._outputTensor = self.__processOutputTensor__(self._customizeBuild(self, fromTensor))
+                self._outputTensor = self._processOutputTensor(self._customizeBuild(self, fromTensor))
             else:
                 raise ValueError("No build action is specified.")
 
             self._built = True
             # Create chain build actions
             for n in self.toNode[buildNo]:
-                n.__build__(buildNo)
+                n._build(buildNo)
     
     def appendWeightTensors(self, *weightTensors):
         '''
-			Append a weight tensor that is loggable during trainning.   --- BETA --- UPDATED 20180630
+			Append a weight tensor that is loggable during trainning.   --- BETA --- UPDATED (Dexter) 20180630
 
             Parameters
             ------------------------------
@@ -7437,7 +7634,7 @@ class CustomLayerProfile(LayerProfile):
     
     def setOutputTensor(self, outputTensor):
         '''
-			Set the output tensor of this layer.   --- BETA --- UPDATED 20180630
+			Set the output tensor of this layer.   --- BETA --- UPDATED (Dexter) 20180630
 
             Parameters
             ------------------------------
@@ -7448,7 +7645,7 @@ class CustomLayerProfile(LayerProfile):
     
     def applyBatchNorm(self, tensor):
         '''
-			Connect a given tensor to optional batch normalization.   --- BETA --- UPDATED 20190208
+			Connect a given tensor to optional batch normalization.   --- BETA --- UPDATED (Dexter) 20190208
 
             Parameters
             ------------------------------
@@ -7462,7 +7659,7 @@ class CustomLayerProfile(LayerProfile):
 
     def applyActivationFunction(self, tensor):
         '''
-			Apply activation function on a given tensor.   --- BETA --- UPDATED 20180630
+			Apply activation function on a given tensor.   --- BETA --- UPDATED (Dexter) 20180630
 
             Parameters
             ------------------------------
@@ -7473,7 +7670,7 @@ class CustomLayerProfile(LayerProfile):
 
     def applyDropout(self, tensor):
         '''
-			Apply optional dropout on a given tensor.   --- BETA --- UPDATED 20180630
+			Apply optional dropout on a given tensor.   --- BETA --- UPDATED (Dexter) 20180630
 
             Parameters
             ------------------------------
@@ -7488,7 +7685,7 @@ class CustomLayerProfile(LayerProfile):
     
     def setInputCollections(self, tensor):
         '''
-			Define the collected input tensors before further processes.   --- BETA --- UPDATED 20180630
+			Define the collected input tensors before further processes.   --- BETA --- UPDATED (Dexter) 20180630
 
             Parameters
             ------------------------------
@@ -7499,9 +7696,9 @@ class CustomLayerProfile(LayerProfile):
       
 class CNNLayer(LayerProfile):
     '''
-			Class representing a CNN layer.   --- UPDATED (Dexter) 20181105
+			Class representing a convolutional layer.   --- UPDATED (Dexter) 20181105
     '''
-    def __init__(self, name: str = None, layerUnits: int = 30, convFilterWidth: int = 3, convPadding: bool = True, convStride: Tuple[int, int] = [1,1], convDilation: int = 0, reshape: List[int] =None, refLayerName: str = None, refLayerTranspose: bool = False, 
+    def __init__(self, name: str = None, layerUnits: int = 30, convFilterWidth: int = 3, convPadding: bool = True, convStride: Tuple[int, int] = [1,1], convDilation: int = 1, reshape: List[int] =None, refLayerName: str = None, refLayerTranspose: bool = False, 
                 incomingConfig: 'IncomingConfig' = IncomingConfig.Concat(), 
                 linearTransform: 'LinearTransformConfig' = LinearTransformConfig.createBasicConfig(weightAvg = 0, weightStdDev = 5e-2, weightL1Loss = False, weightL2Loss = True, weightL2Decay = 0, biasInitial = 0.001),
                 activation: str = "relu", activationParams: Dict = {},
@@ -7509,7 +7706,7 @@ class CNNLayer(LayerProfile):
                 outputConfig: 'OutputConfig' = OutputConfig.Default(),
                 buildNo = 0, weightDecayRate=0,weightStdDev=5e-2, biasInitial=0.001, weightL2Loss=True, weightAvg=0,weightL1Loss=False):
         '''
-			Creates a CNN layer.   --- UPDATED (Dexter) 20181127
+			Creates a convolutional layer.   --- UPDATED (Dexter) 20190717
 
             Parameters
             ------------------------------
@@ -7566,12 +7763,19 @@ class CNNLayer(LayerProfile):
         super().__init__(name = name, layerUnits = layerUnits, incomingConfig = incomingConfig, linearTransform = linearTransform,
                         activation = activation, activationParams = activationParams, 
                         batchNorm = batchNorm, batchNormParams = batchNormParams, outputConfig = outputConfig)
+        # `int` - The CNN filter width.
         self.convFilterWidth = convFilterWidth
+        # `bool` - Whether to use padding on this CNN layer, i.e. the output image size will be the same as the previous one. 
         self.convPadding = convPadding
+        # `tuple(int, int)` - The stride of the CNN filter.   --- BETA
         self.convStride = convStride
+        # `int` - The CNN dilation of the CNN filter.
         self.convDilation = convDilation
+        # `tuple(int+)` - The shape of reshaping previous layers. If not specified, it will automatically reshaped if the previous layer can't interpret as an image.
         self.reshape = reshape
+        # `str` - Any referenced kernal that this layer mirrors for.
         self.refLayerName = refLayerName
+        # `bool` - Whether transpose is required for the referenced weight.
         self.refLayerTranspose = refLayerTranspose
 
     def __copySymmetricLayerConfig__(self, useSymmetricWeights = True, buildNo: int = 0):
@@ -7621,16 +7825,16 @@ class CNNLayer(LayerProfile):
                 batchNorm=self.batchNorm, batchNormParams=self.batchNormParams, 
                 outputConfig = self.outputConfig)
 
-    def __build__(self, buildNo: int):
+    def _build(self, buildNo: int):
         '''
-			Build the TensorFlow Graph of this layer.   --- BETA --- UPDATED (Dexter) 20190210
+			Build the TensorFlow Graph of this layer.   --- UPDATED (Dexter) 20190726
 
             Parameters
             ------------------------------
 
             buildNo     `int`   - The build number to be built.
         '''
-        self.__clearTempTensors__()
+        self._clearTempTensors()
 
         # 0. Ensure all incoming nodes have been built.
         if (all([n._built for n in self.fromNode[buildNo]])):
@@ -7647,8 +7851,8 @@ class CNNLayer(LayerProfile):
             # TensorFlow Graph building, using the layer name as the scope
             with tf.variable_scope(self.name, reuse=tf.AUTO_REUSE) as scope:
                 # 2. Get previous tensors and make CNN on it
-                fromTensor = self.__combineIncomingTensors__(buildNo = buildNo)
-                fromShape = fromTensor.shape
+                fromTensor = self._combineIncomingTensors(buildNo = buildNo)
+                fromShape = [s.value for s in fromTensor.shape]
 
                 # 3. Support CNN for other shapes of data
                 if (len(fromShape) != 4):
@@ -7658,12 +7862,12 @@ class CNNLayer(LayerProfile):
                         if (len(fromShape) > 4):
                             flattenSize = functools.reduce(lambda x,y: x*y, fromTensor[3:], 1)
                             fromTensor = tf.reshape(fromTensor, [*VarConfig.setAsReshape(fromTensor.shape[:3]), flattenSize])
-                            fromShape = fromTensor.shape
+                            fromShape = [s.value for s in fromTensor.shape]
 
                         # If only 3 dimension, supplement a dimension.
                         elif (len(fromShape) == 3):
                             fromTensor = tf.reshape(fromTensor, [*VarConfig.setAsReshape(fromTensor.shape), 1])
-                            fromShape = fromTensor.shape
+                            fromShape = [s.value for s in fromTensor.shape]
 
                         # If only 2 dimension, auto reshape to a 2D picture with 1 channel.
                         elif (len(fromShape) == 2):
@@ -7676,7 +7880,7 @@ class CNNLayer(LayerProfile):
                                     anotherDim = lastShape//d
                             if largestDim >1:
                                 fromTensor = tf.reshape(fromTensor, [-1, largestDim, anotherDim, 1])
-                                fromShape = fromTensor.shape
+                                fromShape = [s.value for s in fromTensor.shape]
                             else:
                                 raise ValueError("Unable to reshape before CNN can be applied.")
 
@@ -7691,47 +7895,71 @@ class CNNLayer(LayerProfile):
                         
                         # Update the reshape.
                         fromTensor = tf.reshape(fromTensor, [-1, *reshape])
-                        fromShape = fromTensor.shape
+                        fromShape = [s.value for s in fromTensor.shape]
                 
                 # 4. Apply kernal on the incoming tensors.
                 transformConfig = self.linearTransform
                 if (self.refLayerName is None):
-                    kernal = transformConfig.weightConfig.create("weight", [self.convFilterWidth,self.convFilterWidth,fromShape[-1].value,self.layerUnits], dtype = fromTensor.dtype, defaultDevice = self.train.device)
+                    kernal = transformConfig.weightConfig.create("weight", [self.convFilterWidth,self.convFilterWidth,fromShape[-1],self.layerUnits], dtype = fromTensor.dtype, defaultDevice = self.train.device)
                 biases = transformConfig.biasConfig.create("biases", [self.layerUnits], dtype=fromTensor.dtype, defaultDevice = self.train.device)
                 self._weights.extend([kernal, biases])
 
                 with tf.device(self.train.device):
-                    if (self.train.device.startswith("/cpu") and self.convDilation != 0):
-                        raise ValueError("DCNN Dilation is not supported for CPU processing. --- at Layer: " + self.name)
-                    mid = tf.nn.conv2d(fromTensor, kernal, [1, *self.convStride, 1], padding=('SAME' if self.convPadding else 'VALID'), dilations = [1, 1+self.convDilation, 1+self.convDilation, 1])
+                    mid = tf.nn.conv2d(fromTensor, kernal, [1, *self.convStride, 1], padding=('SAME' if self.convPadding else 'VALID'), dilations = [1, self.convDilation, self.convDilation, 1])
                     mid = tf.nn.bias_add(mid, biases)
 
                 # 5. General layer operations.
-                mid = self.__commonLayerOps__(mid)
+                mid = self._commonLayerOps(mid)
 
                 # 6. Final output
-                self._outputTensor = mid
+                self._outputTensor = self._processOutputTensor(mid)
 
             self._built = True
 
             # Create chain build actions
             for n in self.toNode[buildNo]:
-                n.__build__(buildNo)
+                n._build(buildNo)
 
 class DCNNLayer(LayerProfile):
     '''
-			Class representing a DCNN Layer.   --- UPDATED (Dexter) 20180701
+	    Class representing a deconvolutional Layer.   --- UPDATED (Dexter) 20180701
+    '''
+    class PaddingTypes(Enumeration):
         '''
-    class PaddingTypes(Enum):
+			Enumeration definining the deconvolutional padding methods.   --- UPDATED (Dexter) 20190722
         '''
-			A class definining the enumerations of DCNN padding methods.   --- UPDATED (Dexter) 20181127
+        # `Number` - Pad with zeros.
+        Zeros = 0
+        # `Number` - Stretch and upscale the original image.
+        Stretch = 1
+    
+    class UpscaleTypes(Enumeration):
         '''
+			Enumeration definining the deconvolutional upscale methods due to striding or stretched padding.   --- UPDATED (Dexter) 20190724
+        '''
+        # `Number` - Enlarge the image using bicubic resize.
         Bicubic = 0
+        # `Number` - Enlarge the image using bilinear resize.
         Bilinear = 1
+        # `Number` - Enlarge the image using nearest neighbor resize.
         NearestNeighbor = 2
-        Zeros = 3
+        # `Number` - Pad the image with zeros.
+        PadZeros = 3
+        # `Number` - Add zeros between original pixels.
+        InsertZeros = 4
+    
+    class AlgorithmTypes(Enumeration):
+        """
+            Enumeration definining the deconvolutional layer algorithms.   --- UPDATED (Dexter) 20190722
+        """
+        # `Number` - Use TensorFlow native Convolution 2D Transpose.
+        Conv2DTranspose = 0
+        # `Number` - Upscale the image and follow by a convolutional 2D layer.
+        ScaleThenConv2D = 1
 
-    def __init__(self, name: str = None, layerUnits: int = 30, convFilterWidth: int = 3, convPadding: bool = True, convStride: Tuple[int,int] = [1,1], convDilation: int = 0, dconvPadding: 'DCNNLayer.PaddingTypes' = PaddingTypes.Bicubic, refLayerName: str = None, refLayerTranspose: bool = False, 
+    def __init__(self, name: str = None, layerUnits: int = 30, convFilterWidth: int = 3, convPadding: bool = True, convStride: Tuple[int,int] = [1,1], convDilation: int = 1, 
+                dconvPadding: 'ModelNode.Layer.Deconvolution.PaddingTypes' = PaddingTypes.Stretch, dconvUpscale: 'ModelNode.Layer.Deconvolution.UpscaleTypes' = UpscaleTypes.Bicubic, 
+                dconvAlgorithm: 'ModelNode.Layer.Deconvolution.AlgorithmTypes' = AlgorithmTypes.Conv2DTranspose, refLayerName: str = None, refLayerTranspose: bool = False, 
                 incomingConfig: 'IncomingConfig' = IncomingConfig.Concat(), 
                 linearTransform: 'LinearTransformConfig' = LinearTransformConfig.createBasicConfig(weightAvg = 0, weightStdDev = 5e-2, weightL1Loss = False, weightL2Loss = True, weightL2Decay = 0, biasInitial = 0.001),
                 activation: str = "relu", activationParams: Dict = {},
@@ -7739,7 +7967,7 @@ class DCNNLayer(LayerProfile):
                 outputConfig: 'OutputConfig' = OutputConfig.Default(),
                 reshape = None, buildNo = 0, weightDecayRate=0,weightStdDev=5e-2, biasInitial=0.001, weightL2Loss=True, weightAvg=0,weightL1Loss=False):
         '''
-			Creates a DCNN layer.   --- UPDATED (Dexter) 20181127
+			Creates a deconvolutional layer.   --- UPDATED (Dexter) 20190721
 
             Parameters
             ------------------------------
@@ -7756,7 +7984,11 @@ class DCNNLayer(LayerProfile):
             
             convDilation     `int`   - The CNN dilation of the CNN filter.
 
-            dconvPadding     `DCNNLayer.PaddingTypes`   - A value defined in DCNNLayer.PaddingTypes .   --- BETA
+            dconvPadding `ModelNode.Layer.Deconvolution.PaddingTypes` - A value defined in @ModelNode.Layer.Deconvolution.PaddingTypes .   --- BETA
+
+            dconvUpscale `ModelNode.Layer.Deconvolution.UpscaleTypes` - The deconvolution upscale methods due to striding or stretched padding, as defined in @ModelNode.Layer.Deconvolution.UpscaleTypes .   --- BETA
+
+            dconvAlgorithm `ModelNode.Layer.Deconvolution.AlgorithmTypes` - A value defined in @ModelNode.Layer.Deconvolution.AlgorithmTypes .
 
             refLayerName    `str`   - Any referenced kernal that this layer mirrors for.
 
@@ -7798,71 +8030,87 @@ class DCNNLayer(LayerProfile):
         super().__init__(name = name, layerUnits = layerUnits, incomingConfig = incomingConfig,
                         activation = activation, activationParams = activationParams, linearTransform = linearTransform,
                         batchNorm = batchNorm, batchNormParams = batchNormParams, outputConfig = outputConfig)
+        # `int` - The deconvolution layer filter width.
         self.convFilterWidth = convFilterWidth
+        # `bool` - Whether to use padding on this deconvolution layer, i.e. the output image size will be the same as the previous one.
         self.convPadding = convPadding
+        # `tuple<int, int>` - The stride of the deconvolution layer filter.
         self.convStride = convStride
+        # `int` - The convolution dilation of this deconvolution filter.
         self.convDilation = convDilation
+        # `ModelNode.Layer.Deconvolution.PaddingTypes` - The deconvolution padding method, as defined in @ModelNode.Layer.Deconvolution.PaddingTypes .   --- BETA
         self.dconvPadding = dconvPadding
+        # `ModelNode.Layer.Deconvolution.StrideScaleTypes` - The deconvolution upscale methods due to striding or stretched padding, as defined in @ModelNode.Layer.Deconvolution.StrideScaleTypes .   --- BETA
+        self.dconvUpscale = dconvUpscale
+        # `ModelNode.Layer.Deconvolution.AlgorithmTypes` - A value defined in @ModelNode.Layer.Deconvolution.AlgorithmTypes .
+        self.dconvAlgorithm = dconvAlgorithm
+        # `str` - Any referenced weight that this layer mirrors for.
         self.refLayerName = refLayerName
+        # `bool` - Whether transpose is required for the referenced weight.
         self.refLayerTranspose = refLayerTranspose
 
-    def __copySymmetricLayerConfig__(self, useSymmetricWeights = True, buildNo: int = 0):
+    def _copySymmetricLayerConfig(self, useSymmetricWeights = True, buildNo: int = 0) -> 'ModelNode.Layer.Convolution':
         '''
-			Create a symmetric layer profile.   --- BETA --- UPDATED (Dexter) 20181127
+			Create a symmetric layer profile.   --- BETA --- UPDATED (Dexter) 20190725
 
             Parameters
             ------------------------------
 
-            useSymmetricWeights `bool`              - Whether to use symmetric weights.
+            useSymmetricWeights `bool` - Whether to use symmetric weights.
 
             buildNo             `int`   - The build number to be built.
         
             Returns
             ------------------------------
 
-            `BasicLayer`    - A copied profile of this layer.
+            `ModelNode.Layer.Convolution`    - A copied profile of this layer.
         '''
         if (len(self.fromNode[buildNo]) != 1):
             raise ValueError("Layers not having one and only one layer node inputs are not able to be copied in a symmetric way.")
 
-        return CNNLayer(name=(self.name + "_Sym"), layerUnits = self.layerUnits, convFilterWidth=self.convFilterWidth, convPadding=self.convPadding, convStride=self.convStride,
-                convDilation=self.convDilation, refLayerName = self.name if useSymmetricWeights else None, refLayerTranspose=True, 
+        return ModelNode.Layer.Convolution(name=(self.name + "_Sym"), layerUnits = self.layerUnits, convFilterWidth=self.convFilterWidth, convPadding=self.convPadding, convStride=self.convStride, convDilation=self.convDilation,
+                refLayerName = self.name if useSymmetricWeights else None, refLayerTranspose=True, 
                 incomingConfig=self.incomingConfig, linearTransform=self.linearTransform, 
                 activation=self.activation, activationParams=self.activationParams, 
                 batchNorm=self.batchNorm, batchNormParams=self.batchNormParams, 
                 outputConfig=self.outputConfig)
 
-    def copy(self, name: str):
+    def copy(self, name: str) -> 'ModelNode.Layer.Deconvolution':
         '''
-			Copy this layer profile.   --- UPDATED (Dexter) 20181127
+			Copy this layer profile.   --- UPDATED (Dexter) 20190725
 
             Parameters
             ------------------------------
 
             name    `str`   - The new name of the copied layer
+
+            Returns
+            ------------------------------
+
+            `ModelNode.Layer.Deconvolution`    - A copied profile of this layer.
         '''
         # Ensure this is not a subclass.
-        if (self.__class__.__name__ != "DCNNLayer"):
+        if (not isinstance(self, ModelNode.Layer.Deconvolution)):
             raise ValueError("This layer class (" + self.__class__.__name__ + ") has not supported for copying.")
         
         # Create a new Layer Profile on this.
-        return DCNNLayer(name=name, layerUnits = self.layerUnits, convFilterWidth=self.convFilterWidth, convPadding=self.convPadding, convStride=self.convStride,
-                convDilation=self.convDilation, dconvPadding=self.dconvPadding, refLayerName = self.refLayerName, refLayerTranspose=self.refLayerTranspose, 
+        return ModelNode.Layer.Deconvolution(name=name, layerUnits = self.layerUnits, convFilterWidth=self.convFilterWidth, convPadding=self.convPadding, convStride=self.convStride,
+                convDilation=self.convDilation, dconvPadding=self.dconvPadding, dconvUpscale = self.dconvUpscale, dconvAlgorithm = self.dconvAlgorithm, refLayerName = self.refLayerName, refLayerTranspose=self.refLayerTranspose, 
                 incomingConfig=self.incomingConfig, linearTransform=self.linearTransform, 
                 activation=self.activation, activationParams=self.activationParams, 
                 batchNorm=self.batchNorm, batchNormParams=self.batchNormParams, 
                 outputConfig = self.outputConfig)
 
-    def __build__(self, buildNo: int):
+    def _build(self, buildNo: int):
         '''
-			Build the TensorFlow Graph of this layer.   --- UPDATED (Dexter) 20190210
+			Build the TensorFlow Graph of this layer.   --- UPDATED (Dexter) 20190726
 
             Parameters
             ------------------------------
 
             buildNo     `int`   - The build number to be built.
         '''
-        self.__clearTempTensors__()
+        self._clearTempTensors()
 
         # 0. Ensure all incoming nodes have been built.
         if (all([n._built for n in self.fromNode[buildNo]])):
@@ -7879,21 +8127,21 @@ class DCNNLayer(LayerProfile):
             # TensorFlow Graph building, using the layer name as the scope
             with tf.variable_scope(self.name, reuse=tf.AUTO_REUSE) as scope:
                 # 2. Get previous tensors
-                fromTensor = self.__combineIncomingTensors__(buildNo = buildNo)
-                fromShape = fromTensor.shape
+                fromTensor = self._combineIncomingTensors(buildNo = buildNo)
+                fromShape = [s.value for s in fromTensor.shape]
 
-                # 3. Support CNN for other shapes of data
+                # 3. Support convolutional layer for other shapes of data
                 if (len(fromShape) != 4):
                     # If more than 4 dimension, flatten to the 4th dim.
                     if (len(fromShape) > 4):
                         flattenSize = functools.reduce(lambda x,y: x*y, fromTensor[3:], 1)
                         fromTensor = tf.reshape(fromTensor, [*VarConfig.setAsReshape(fromTensor.shape[:3]), flattenSize])
-                        fromShape = fromTensor.shape
+                        fromShape = [s.value for s in fromTensor.shape]
 
                     # If only 3 dimension, supplement a dimension.
                     elif (len(fromShape) == 3):
                         fromTensor = tf.reshape(fromTensor, [*VarConfig.setAsReshape(fromTensor.shape), 1])
-                        fromShape = fromTensor.shape
+                        fromShape = [s.value for s in fromTensor.shape]
                     
                     # 2 or lower dimension is not supported.
                     else:
@@ -7902,54 +8150,110 @@ class DCNNLayer(LayerProfile):
                 # 4. If no linked kernal, build a new kernal
                 transformConfig = self.linearTransform
                 if (self.refLayerName is None):
-                    kernal = transformConfig.weightConfig.create("weight", [self.convFilterWidth,self.convFilterWidth,fromShape[-1].value,self.layerUnits], dtype=fromTensor.dtype, defaultDevice = self.train.device)
+                    kernal = transformConfig.weightConfig.create("weight", [self.convFilterWidth,self.convFilterWidth,fromShape[-1],self.layerUnits], dtype=fromTensor.dtype, defaultDevice = self.train.device)
 
                 # 5. Set biases
                 biases = transformConfig.biasConfig.create("biases", [kernal.shape[-1].value], dtype=fromTensor.dtype, defaultDevice = self.train.device)
                 self._weights.extend([kernal, biases])
 
-                # 6. Apply paddings
-                paddingPxH = 0
-                paddingPxW = 0
-                if (self.convPadding == False):
-                    paddingPxH = self.convFilterWidth+self.convDilation*(self.convFilterWidth-1)-1+fromShape[1].value*(self.convStride[0] - 1)
-                    paddingPxW = self.convFilterWidth+self.convDilation*(self.convFilterWidth-1)-1+fromShape[2].value*(self.convStride[1] - 1)
+                # 6. Calculate the output shape.
+                outputH = 0
+                outputW = 0
+                if self.convPadding:
+                    outputH = fromShape[1] * self.convStride[0]
+                    outputW = fromShape[2] * self.convStride[1]
+                else:
+                    # Ref: https://github.com/tensorflow/tensorflow/blob/r1.14/tensorflow/python/keras/utils/conv_utils.py (def deconv_output_length)
+                    outputMorePxH = max([self.convFilterWidth+(self.convDilation-1)*(self.convFilterWidth-1) - self.convStride[0], 0])
+                    outputMorePxW = max([self.convFilterWidth+(self.convDilation-1)*(self.convFilterWidth-1) - self.convStride[1], 0])
+                    outputH = fromShape[1] * self.convStride[0] + outputMorePxH
+                    outputW = fromShape[2] * self.convStride[1] + outputMorePxW
 
-                if paddingPxH > 0 or paddingPxW > 0:
-                    if (self.dconvPadding == DCNNLayer.PaddingTypes.Zeros):
-                        fromTensor = tf.image.pad_to_bounding_box(fromTensor, int(paddingPxH/2), int(paddingPxW/2), fromShape[1].value+paddingPxH, fromShape[2].value+paddingPxW)
-                    else:
-                        resizeMethod = DCNNLayer.getTFResizeMethod(self.dconvPadding)
+                # 7. Apply deconvolution.
+                if self.dconvAlgorithm == ModelNode.Layer.Deconvolution.AlgorithmTypes.Conv2DTranspose:
+                    # 7-1. Utilize Convolutional 2-D Transpose deconvolution.
+                    if (self.train.device.startswith("/cpu") and self.convDilation > 1):
+                        raise ValueError("Deconvolutional dilation is not supported for CPU processing. --- at Layer: " + self.name)
+                    elif (self.convDilation > 1 and any([s>1 for s in self.convStride])):
+                        raise ValueError("Deconvolutional layer using convolutional 2D transpose currently does not support dilation > 1 when stride > 1.   --- at Layer: " + self.name)
+
+                    with tf.device(self.train.device): 
+                        mid = tf.nn.conv2d_transpose(fromTensor, filter=tf.transpose(kernal, [0,1,3,2]), output_shape=[tf.shape(fromTensor)[0], outputH, outputW, kernal.shape[-1].value], strides=[1,*self.convStride,1], padding=('SAME' if self.convPadding else 'VALID'), dilations = [1, self.convDilation, self.convDilation, 1])
+                        mid = tf.nn.bias_add(mid, biases)
+                else:
+                    # 7-2. Implement Ladder original deconvolution (scale followed by convolutional layer).
+                    # Calculate the actual filter length and pad length.
+                    actualFilterWidth = self.convFilterWidth + (self.convDilation - 1) * (self.convFilterWidth - 1)
+                    padLength = (actualFilterWidth - 1) * 2
+                    
+                    # Stretch the image so that the image is enlarged to every pixels that will contribute for the convolutional layer.
+                    if (self.dconvPadding == ModelNode.Layer.Deconvolution.PaddingTypes.Stretch):
+                        # Rasie errors for incompatible combinations.
+                        if (self.dconvUpscale in [ModelNode.Layer.Deconvolution.UpscaleTypes.PadZeros, ModelNode.Layer.Deconvolution.UpscaleTypes.InsertZeros]):
+                            raise ValueError("Deconvolutional upscale cannot be PadZeros or InsertZeros when it is stretching but not padding.")
+                        
+                        # Rescale the image.
+                        resizeMethod = DCNNLayer.getTFResizeMethod(self.dconvUpscale)
                         tfResizeMethod = tf.image.ResizeMethod.BICUBIC if resizeMethod == "BICUBIC" else tf.image.ResizeMethod.BILINEAR if resizeMethod == "BILINEAR" else tf.image.ResizeMethod.NEAREST_NEIGHBOR
-                        fromTensor = tf.image.resize_images(fromTensor, (fromShape[1].value+paddingPxH, fromShape[2].value+paddingPxW), tfResizeMethod)
+                        fromTensor = tf.image.resize_images(fromTensor, (outputH + padLength, outputW + padLength), tfResizeMethod)
+                    
+                    # The image is enlarged to the output size and followed with a zero padding at margin for convolutional layer.
+                    else:
+                        # Pad zeros directly.
+                        if (self.dconvUpscale == ModelNode.Layer.Deconvolution.UpscaleTypes.PadZeros):
+                            fromTensor = tf.image.pad_to_bounding_box(fromTensor, int((outputH + padLength - fromShape[1]) / 2), int((outputW + padLength - fromShape[2]) / 2), outputH + padLength, outputW + padLength)
+                        
+                        # Pad zeros after some upscaling.
+                        else:
+                            if (self.dconvUpscale == ModelNode.Layer.Deconvolution.UpscaleTypes.InsertZeros):
+                                # Insert Zero: (Stride == 2), resulting image is of shape stride * length .
+                                #               ┌ 1 0 2 0 3 0 ┐
+                                # ┌ 1 2 3 ┐     │ 0 0 0 0 0 0 │
+                                # │ 2 3 4 │  >  │ 2 0 3 0 4 0 │
+                                # └ 4 5 6 ┘     │ 0 0 0 0 0 0 │
+                                #               │ 5 0 6 0 7 0 │
+                                #               └ 0 0 0 0 0 0 ┘
+                                if (self.convStride[1] > 1):
+                                    moreH = [np.zeros(fromTensor.shape for x in range(0, self.convStride[1] - 1))]
+                                    fromTensor = tf.reshape(tf.concat([fromTensor, *moreH], axis = -1), [fromTensor.shape[0].value, fromTensor.shape[1].value, fromTensor.shape[2].value * self.convStride[1], fromTensor.shape[3].value])
+                                if (self.convStride[0] > 1):
+                                    moreW = [np.zeros(fromTensor.shape for x in range(0, self.convStride[0] - 1))]
+                                    fromTensor = tf.reshape(tf.concat([fromTensor, *moreH], axis = -2), [fromTensor.shape[0].value, fromTensor.shape[1].value * self.convStride[0], fromTensor.shape[2].value, fromTensor.shape[3].value])
+                            
+                            elif (self.convStride[1] > 1) or (self.convStride[0] > 1):
+                                # Rescale the image to stride * length .
+                                resizeMethod = DCNNLayer.getTFResizeMethod(self.dconvUpscale)
+                                tfResizeMethod = tf.image.ResizeMethod.BICUBIC if resizeMethod == "BICUBIC" else tf.image.ResizeMethod.BILINEAR if resizeMethod == "BILINEAR" else tf.image.ResizeMethod.NEAREST_NEIGHBOR
+                                fromTensor = tf.image.resize_images(fromTensor, (fromTensor.shape[1] * self.convStride[0], fromTensor.shape[2] * self.convStride[1]), tfResizeMethod)
+                            
+                            # Pad the remaining pixels with zeros.
+                            fromTensor = tf.image.pad_to_bounding_box(fromTensor, int((outputH + padLength - fromShape[1]) / 2), int((outputW + padLength - fromShape[2]) / 2), outputH + padLength, outputW + padLength)
 
-                with tf.device(self.train.device): 
-                    # 7. Apply DCNN
-                    if (self.train.device.startswith("/cpu") and self.convDilation != 0):
-                        raise ValueError("DCNN Dilation is not supported for CPU processing. --- at Layer: " + self.name)
-                    mid = tf.nn.conv2d(fromTensor, kernal, [1,*self.convStride,1], padding='SAME', dilations = [1, 1+self.convDilation, 1+self.convDilation, 1])
-                    mid = tf.nn.bias_add(mid, biases)
+                    with tf.device(self.train.device): 
+                        # 7. Apply deconvolutional layer
+                        mid = tf.nn.conv2d(fromTensor, kernal, [1,1,1,1], padding='SAME', dilations = [1, self.convDilation, self.convDilation, 1])
+                        mid = tf.nn.bias_add(mid, biases)
 
                 # 8. General layer operations.
-                mid = self.__commonLayerOps__(mid)
+                mid = self._commonLayerOps(mid)
 
                 # 9. Final output
-                self._outputTensor = self.__processOutputTensor__(mid)
+                self._outputTensor = self._processOutputTensor(mid)
 
             self._built = True
             # Create chain build actions
             for n in self.toNode[buildNo]:
-                n.__build__(buildNo)
+                n._build(buildNo)
     
     @staticmethod
-    def getTFResizeMethod(paddingTypes: 'DCNNLayer.PaddingTypes') -> str:
+    def getTFResizeMethod(upscaleType: 'DCNNLayer.UpscaleTypes') -> str:
         '''
-			Get the TensorFlow resize method name.   --- UPDATED (Dexter) 20181127
+			Get the TensorFlow resize method name.   --- UPDATED (Dexter) 20190724
 
             Parameters
             ------------------------------
 
-            paddingTypes  `DCNNLayer.PaddingTypes`   - A value defined in DCNNLayer.PaddingTypes .
+            upscaleType  `DCNNLayer.UpscaleTypes`   - A value defined in @ModelNode.Layer.Deconvolution.UpscaleTypes .
 
             Returns
             ------------------------------
@@ -7957,9 +8261,9 @@ class DCNNLayer(LayerProfile):
             `str` - The TensorFlow resize method name.
         '''
         methodDict = {0: "BICUBIC", 1: "BINEAR", 2: "NEAREST_NEIGHBOR", 3: "AREA"}
-        if paddingTypes.value not in methodDict:
+        if upscaleType.value not in methodDict:
             raise ValueError("Resize method not supported.")
-        return methodDict[paddingTypes.value]
+        return methodDict[upscaleType.value]
 
 class FinalLayer(LayerProfile):
     '''
@@ -8039,11 +8343,11 @@ class FinalLayer(LayerProfile):
         self._evalTotList = []
         self._customizeBuild = cuzBuild
 
-    def __clearTempTensors__(self):
+    def _clearTempTensors(self):
         '''
 			Clear temp tensors that are on previous graphs, usually called for a new build.   --- UPDATED (Dexter) 20181114
         '''
-        super().__clearTempTensors__()
+        super()._clearTempTensors()
         self._trainTensors = []
         self._predictionTensors = None
         self.__clearEvalInfo__()
@@ -8057,7 +8361,7 @@ class FinalLayer(LayerProfile):
         self._evalCumList = []
         self._evalTotList = []
 
-    def __updateOrder__(self, buildNo: int = 0):
+    def _updateOrder(self, buildNo: int = 0):
         '''
 			Update the order of this layer, noted it should be the largest order.   --- UPDATED (Dexter) 20181115
 
@@ -8128,7 +8432,7 @@ class FinalLayer(LayerProfile):
         # Ensure this is not a subclass.
         raise ValueError("FinalLayer is not copyable.")
         
-    def __build__(self, buildNo: int):
+    def _build(self, buildNo: int):
         '''
 			Build the TensorFlow Graph of this layer.   --- BETA --- UPDATED (Dexter) 20181109
 
@@ -8137,12 +8441,12 @@ class FinalLayer(LayerProfile):
 
             buildNo     `int`   - The build number to be built.
         '''
-        self.__clearTempTensors__()
+        self._clearTempTensors()
 
         # 0. Ensure all incoming nodes have been built.
         if (all([n._built for n in self.fromNode[buildNo]])):
             # 1. Collect all incoming tensors, and confirm there is incoming tensor
-            fromTensor = self.__combineIncomingTensors__(buildNo = buildNo)
+            fromTensor = self._combineIncomingTensors(buildNo = buildNo)
             targetTensors = self._targetTensors = self.train._sourceTensors[self.compareSourceID][self.compareTensorIdx]
             
             # TensorFlow Graph building, using the layer name as the scope
@@ -8263,7 +8567,7 @@ class Classifier(FinalLayer):
                 incomingConfig = self.incomingConfig, linearTransform = self.linearTransform,
                 activation = self.activation, activationParams=self.activationParams)
 
-    def __build__(self, buildNo: int):
+    def _build(self, buildNo: int):
         '''
 			Build the TensorFlow Graph of this layer.   --- UPDATED (Dexter) 20190210
 
@@ -8272,12 +8576,12 @@ class Classifier(FinalLayer):
 
             buildNo     `int`   - The build number to be built.
         '''
-        self.__clearTempTensors__()
+        self._clearTempTensors()
 
         # 0. Ensure all incoming nodes have been built.
         if (all([n._built for n in self.fromNode[buildNo]])):
             # 1. Collect all incoming tensors, and confirm there is incoming tensor
-            mid = self.__combineIncomingTensors__(buildNo = buildNo)
+            mid = self._combineIncomingTensors(buildNo = buildNo)
             targetTensor = self._targetTensors = tf.cast(self.train._sourceTensors[self.compareSourceID][self.compareTensorIdx], tf.int32)
 
             # 2. TensorFlow Graph building, using the layer name as the scope
@@ -8420,7 +8724,7 @@ class Regressor(FinalLayer):
                 batchNorm=False)
         
 
-    def __build__(self, buildNo: int):
+    def _build(self, buildNo: int):
         '''
 			Build the TensorFlow Graph of this layer.   --- BETA --- UPDATED (Dexter) 20190210
 
@@ -8429,12 +8733,12 @@ class Regressor(FinalLayer):
 
             buildNo     `int`   - The build number to be built.
         '''
-        self.__clearTempTensors__()
+        self._clearTempTensors()
 
         # 0. Ensure all incoming nodes have been built.
         if (all([n._built for n in self.fromNode[buildNo]])):
             # 1. Collect all incoming tensors, and confirm there is incoming tensor
-            mid = self.__combineIncomingTensors__(buildNo = buildNo)
+            mid = self._combineIncomingTensors(buildNo = buildNo)
             targetTensor = self._targetTensors = self.train._sourceTensors[self.compareSourceID][self.compareTensorIdx]
 
             # 2. TensorFlow Graph building, using the layer name as the scope
@@ -8620,3 +8924,68 @@ class TrainingProfile():
         # Count how many runs requires for a full cross validation, and initiate the matching runID.
         self.validationRuns = (int((1/self.crossValidationProp)*self.crossValidationCount) if self.crossValidationType == "fold" else self.crossValidationCount) if self.crossValidationType is not None else 1
         self._cvCount = 0
+
+class ModelNode:
+    """
+        Module including different types of graph model nodes in a data model node.   --- RESERVED --- UPDATED (Dexter) 20190508
+    """
+    class Types(Enumeration):
+        """
+            Enumeration defining the types of model nodes.   --- RESERVED --- UPDATED (Dexter) 20190508
+        """
+        # `int` - Abstract class representing a model node configuration.
+        Config = 0
+        # `int` - Class including different types of high-level Ladder model layer.
+        Layer = 1
+    
+    Config = _ModelNodeConfig
+
+    class Layer:
+        """
+            Module including different types of high-level Ladder model layer.   --- RESERVED --- UPDATED (Dexter) 20190508
+        """
+        class Types(Enumeration):
+            """
+                Enumeration managing the types of high-level Ladder model layer.   --- RESERVED --- UPDATED (Dexter) 20190706
+            """
+            # `int` - Abstract class representing a high level Ladder model layer.
+            Config = 0
+            # `int` - A collector layer, without any dimensional transformation from all the input layers.
+            Collector = 1
+            # `int` - A fully connected layer, aka dense layer, etc.
+            FullyConnected = 2
+            # `int` - A 2D convolutional layer, providing auto reshaping of data which are not 2D images.
+            Convolution = 3
+            # `int` - A 2D de-convolutional layer.
+            Deconvolution = 4
+            # `int` - A 1D convolutional layer, providing auto reshaping of data which are not 2D images.
+            Convolution1D = 6
+            # `int` - Class including different types of task layers.
+            Task = 5
+
+        Incoming = IncomingConfig
+        Output = OutputConfig
+        Config = LayerProfile
+        FullyConnected = BasicLayer
+        Convolution = CNNLayer
+        Deconvolution = DCNNLayer
+        Collector = Collector
+        
+        class Task:
+            """
+                Module including different types of high-level Ladder task layers.   --- RESERVED --- UPDATED (Dexter) 20190508
+            """
+            class Types(Enumeration):
+                """
+                    Enumeration managing the types of high-level Ladder task layer.   --- RESERVED --- UPDATED (Dexter) 20190508
+                """
+                # `int` - Abstract class representing a high level Ladder model layer. (Ref: @ModelNode.Layer.Config) 
+                Config = 0
+                # `int` - Class representing a NOM classifier (Ref: @ModelNode.Layer.Task.Classifier), to compare model predictions with discrete classes.
+                Classifier = 1
+                # `int` - Class representing a NOM regressor (Ref: @ModelNode.Layer.Task.Regressor), to compare model predictions with continous variables.
+                Regressor = 2
+            
+            Config = FinalLayer
+            Classifier = Classifier
+            Regressor = Regressor
