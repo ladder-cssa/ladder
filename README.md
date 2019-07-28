@@ -19,7 +19,7 @@ Notes: Inline remarks are written in English as priority.<br/>
 
   Version 版本:
 
-  1903.04
+  1903.05
 
   Website & Docs 網站及文件庫:
 
@@ -30,6 +30,38 @@ Notes: Inline remarks are written in English as priority.<br/>
         
 
 # Updates 更新 (English Only 只提供英文版)
+  
+  1903.05   Jul-28, 2019 (Dexter)
+  * Effective for NeuralSimplycode.py, script.js, index.html, style.css, lang.csv
+  - [Feature] Deconvolutional Layer now utilizes Convolutional 2D 
+    Transpose TensorFlow algorithm by default.
+  - [Feature] Selecting "CPU" as training device in Ladder Web App 
+    now disables discovery on any GPU in local devices. 
+  - [Feature] Convolutional and deconvolutional layers can now 
+    enable weight syncing in Ladder web app, which was only enabled
+    in NeuralSimplycode previously.
+  - [NOM] Convolutional dilation definition now follows with TensorFlow
+    API. Old NOM (project) files will be automatically updated when
+    reopening in current version of Ladder Web App.
+  - [NOM] Version information is now included in the NOM object.
+  - [UI] New page transition effect.
+  - [Bug Fixed] Deconvolutional layers displayed incorrect shape 
+    shown in Ladder Web App when using striding. 
+    <strong>Thank you for reporting bugs!</strong>
+  - [Bug Fixed] Using "crelu" activation function displayed incorrect
+    shown in Ladder Web App.
+    <strong>Thank you for reporting bugs!</strong>
+  - [Bug Fixed] Output configuration using "Reshape" was buggy and 
+    could not input for a correct shape; it might also not executable
+    in NeuralSimplycode.
+  - [Bug Fixed] Incoming configuration in Ladder Web App had default
+    axis as 1 instead of -1 as defined in NOM.
+  - [Bug Fixed] Fully Connected Layer was storing incorrect layer
+    type value internally in Ladder Web App.
+  - [Bug Fixed] Task layers like regressors could not enable
+    layer attaching from context menu buttons in Ladder Web App.
+  - Other miscelleneous updates, including variables naming
+    to be better following NOM definitions.
   
   1903.04   Jul-12, 2019 (Dexter)
   * Effective for NeuralSimplycode.py, script.js, index.html, style.css, lang.csv
